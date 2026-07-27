@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NL→SQL Analyst Agent — Lekan Lawal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Lekan Lawal</a>
+    <nav class="top">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="project-hero">
+    <a class="backlink" href="../index.html#projects">← All projects</a>
+    <h1>NL→SQL Analyst Agent — Ask the Churn Database in Plain English</h1>
+    <p class="one-liner">The continuation of Project 3: a sporting director can now just <em>ask</em>.
+    An AI agent that writes and runs SQL — provably read-only, schema-grounded, and honest about uncertainty.</p>
+    <div class="meta-row">
+      <span class="tag">Gemini API</span><span class="tag">DuckDB</span><span class="tag">AI safety</span>
+      <span class="tag">Streamlit</span><span class="tag">evaluation</span>
+    </div>
+  </div>
+
+  <a class="big-shot" href="https://project4-nl-sql-agent-8cmg7fua3ja7m8xqbfomgw.streamlit.app">
+    <img src="../assets/p4.png" alt="NL to SQL Churn Analyst Agent demo screenshot">
+  </a>
+
+  <article class="case">
+    <h2>The story</h2>
+    <p>Text-to-SQL is easy to demo and hard to trust: models hallucinate columns, run whatever
+    they're told, and guess silently when questions are vague. This agent is the trust engineering.
+    The LLM only ever drafts; code decides — five layers deep. A single-statement SELECT-only shape
+    check, a keyword denylist, DuckDB's own <code>EXPLAIN</code> binding every table and column
+    before execution (a hallucinated column returns "couldn't verify this query is safe," never a
+    guess), and a read-only connection underneath, so even a total bypass cannot write. Every
+    answer shows the SQL that actually ran plus a plain-English restatement of what was computed.</p>
+    <p>It's tested, not asserted: an 18-question eval — analytical, prompt-injection, ambiguous, and
+    impossible questions — runs against the live agent with the full transcript committed. Getting
+    the agent to ask for clarification instead of silently defining "risky" for you took a
+    documented prompt iteration: v1 answered ambiguous questions confidently; v2's rule is that
+    defaults may decide presentation, never definition.</p>
+
+    <h2>Eval scorecard (live run, transcript in repo)</h2>
+    <div class="numbers">
+      <div class="num"><div class="v">3/3</div><div class="l">prompt-injection attempts refused — including fake-admin framing</div></div>
+      <div class="num"><div class="v">2/2</div><div class="l">ambiguous questions answered with a clarifying question, not a silent guess</div></div>
+      <div class="num"><div class="v">11/12</div><div class="l">analytical questions answered with correct SQL + explanation (1 over-asked — the safe direction)</div></div>
+    </div>
+
+    <h2>Key decisions I'd defend in an interview</h2>
+    <ul>
+      <li><b>Read-only enforced in code, not prompting</b> — a prompt is a request; code is a boundary. Injected text can steer what the model emits; it can't change what the validator returns.</li>
+      <li><b>DuckDB's EXPLAIN as the hallucination catcher</b> — the database's own parser verifies every identifier, instead of half-reimplementing SQL with regex.</li>
+      <li><b>Built on Project 3's real database</b> — the portfolio tells one story: pipeline → model → dashboard → self-serve agent, all on the same data.</li>
+    </ul>
+  </article>
+
+  <div class="project-links">
+    <a class="btn primary" href="https://project4-nl-sql-agent-8cmg7fua3ja7m8xqbfomgw.streamlit.app">Try the live demo</a>
+    <a class="btn" href="https://github.com/lekanlawal1/project4-nl-sql-agent">View code & guardrail docs</a>
+  </div>
+</main>
+
+<footer class="site"><div class="wrap">© 2026 Lekan Lawal</div></footer>
+</body>
+</html>

@@ -1,0 +1,111 @@
+/* Portfolio — Lekan Lawal. Static, framework-free, fast. */
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f6f8fa;
+  --ink: #111827;
+  --ink-2: #4b5563;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --accent: #1d4ed8;
+  --accent-soft: #eff4ff;
+  --radius: 12px;
+}
+* { box-sizing: border-box; margin: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink); background: var(--bg);
+  line-height: 1.6; font-size: 16.5px;
+}
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 22px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* nav */
+header.site {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+header.site .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.brand { font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+.brand:hover { text-decoration: none; }
+nav.top a { color: var(--ink-2); margin-left: 26px; font-size: .95rem; font-weight: 500; }
+nav.top a:hover { color: var(--ink); text-decoration: none; }
+
+/* hero */
+.hero { padding: 84px 0 64px; }
+.hero .kicker { color: var(--accent); font-weight: 600; font-size: .95rem; letter-spacing: .02em; }
+.hero h1 { font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -0.03em; line-height: 1.12; margin: 10px 0 18px; }
+.hero p.lead { color: var(--ink-2); max-width: 46rem; font-size: 1.12rem; }
+.hero .cta { margin-top: 28px; display: flex; gap: 14px; flex-wrap: wrap; }
+.btn {
+  display: inline-block; padding: 11px 20px; border-radius: 999px;
+  font-weight: 600; font-size: .95rem; border: 1px solid var(--line); color: var(--ink);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.btn:hover { text-decoration: none; transform: translateY(-1px); box-shadow: 0 6px 16px -8px rgba(0,0,0,.25); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* sections */
+section { padding: 56px 0; }
+section.alt { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+h2.section { font-size: 1.65rem; letter-spacing: -0.02em; margin-bottom: 8px; }
+p.section-sub { color: var(--muted); margin-bottom: 34px; max-width: 44rem; }
+
+/* project cards */
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+@media (max-width: 800px) { .cards { grid-template-columns: 1fr; } }
+.card {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; display: flex; flex-direction: column;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 18px 34px -20px rgba(17,24,39,.28); }
+.card .shot { aspect-ratio: 16 / 9; overflow: hidden; border-bottom: 1px solid var(--line); background: var(--bg-soft); }
+.card .shot img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.card .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.card h3 { font-size: 1.15rem; letter-spacing: -0.01em; }
+.card h3 a { color: var(--ink); }
+.card p.hook { color: var(--ink-2); font-size: .95rem; flex: 1; }
+.tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.tag {
+  font-size: .74rem; font-weight: 600; color: var(--accent);
+  background: var(--accent-soft); border-radius: 999px; padding: 3px 10px;
+}
+.card .links { display: flex; gap: 16px; font-size: .92rem; font-weight: 600; margin-top: 4px; }
+
+/* about / skills */
+.about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; }
+@media (max-width: 800px) { .about-grid { grid-template-columns: 1fr; } }
+.skill-groups { display: grid; gap: 18px; }
+.skill-groups h4 { font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 8px; }
+
+/* contact */
+.contact-list { list-style: none; padding: 0; display: grid; gap: 10px; font-size: 1.05rem; }
+.contact-list b { display: inline-block; min-width: 92px; color: var(--ink-2); font-weight: 600; }
+
+footer.site { border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--muted); font-size: .9rem; }
+
+/* ---- project pages ---- */
+.project-hero { padding: 64px 0 30px; }
+.project-hero .backlink { font-size: .92rem; color: var(--muted); }
+.project-hero h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); letter-spacing: -0.02em; margin: 10px 0 12px; }
+.project-hero p.one-liner { color: var(--ink-2); font-size: 1.12rem; max-width: 48rem; }
+.meta-row { display: flex; gap: 14px; flex-wrap: wrap; margin: 20px 0 6px; }
+.big-shot { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin: 26px 0; }
+.big-shot img { width: 100%; display: block; }
+article.case { max-width: 46rem; }
+article.case h2 { font-size: 1.3rem; letter-spacing: -0.01em; margin: 34px 0 10px; }
+article.case ul { padding-left: 20px; display: grid; gap: 8px; }
+article.case .numbers {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px; margin: 18px 0;
+}
+.num {
+  background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.num .v { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; color: var(--accent); }
+.num .l { font-size: .8rem; color: var(--muted); line-height: 1.35; margin-top: 2px; }
+.project-links { display: flex; gap: 14px; flex-wrap: wrap; margin: 30px 0 60px; }

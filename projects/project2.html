@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Support Ticket Triage — Lekan Lawal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Lekan Lawal</a>
+    <nav class="top">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="project-hero">
+    <a class="backlink" href="../index.html#projects">← All projects</a>
+    <h1>AI Support Ticket Triage — LLM Pipeline with Guardrails</h1>
+    <p class="one-liner">An LLM sorts incoming support tickets by category, priority, and routing —
+    engineered around the assumption that the AI will sometimes be wrong.</p>
+    <div class="meta-row">
+      <span class="tag">Python</span><span class="tag">Gemini API</span><span class="tag">structured output</span>
+      <span class="tag">Streamlit</span><span class="tag">prompt engineering</span>
+    </div>
+  </div>
+
+  <a class="big-shot" href="https://project2-ai-ticket-triage-ubf6qjhxmukei7tzjp5xgo.streamlit.app">
+    <img src="../assets/p2.png" alt="AI Support Ticket Triage demo screenshot">
+  </a>
+
+  <article class="case">
+    <h2>The story</h2>
+    <p>Support desks burn 3–8 minutes of skilled attention per ticket just deciding what it is and
+    who should handle it. This tool automates that first pass with Gemini — but the interesting
+    part isn't the API call, it's everything wrapped around it. The model is forced into a JSON
+    schema (no free-text parsing), reports a confidence score, and below 75% confidence a ticket is
+    never auto-routed: it goes to a human review queue with the model's guess attached as a
+    suggestion. Rate limits, timeouts, and malformed responses get exponential-backoff retries; if
+    everything fails, the ticket lands in the review queue with the reason logged. The batch never
+    crashes and never silently drops a ticket.</p>
+    <p>Evaluated on 171 labeled synthetic tickets — including 15 deliberately ambiguous ones — the
+    evaluation caught something better than a good score: a systematic prompt bug. Complaints that
+    mention money were misfiled as billing at 95% confidence, traceable to one tie-breaking rule in
+    my prompt. The lesson, documented in the repo: confidence gates catch <em>vagueness</em>, not
+    <em>bias</em> — shipping an LLM feature means shipping its monitoring.</p>
+
+    <h2>Headline numbers</h2>
+    <div class="numbers">
+      <div class="num"><div class="v">90.1%</div><div class="l">category accuracy on auto-routed tickets (the ones no human checks)</div></div>
+      <div class="num"><div class="v">5.8%</div><div class="l">of tickets routed to human review by the confidence gate</div></div>
+      <div class="num"><div class="v">≈62 hrs</div><div class="l">triage labor saved per 1,000 monthly tickets (~CA$1,860, math in repo)</div></div>
+    </div>
+
+    <h2>Key decisions I'd defend in an interview</h2>
+    <ul>
+      <li><b>Confidence gate over maximizing accuracy</b> — the goal isn't zero errors; it's that errors get caught. A low-confidence mistake costs 4 minutes of human review; only high-confidence errors are true failures, and they're measured.</li>
+      <li><b>Two documented prompt iterations</b> — v1's failures (invented categories, priority inflation for ALL-CAPS customers) each map to a specific v2 fix.</li>
+      <li><b>Free-tier rate limits treated as a design constraint</b> — throttling, backoff, and resumable batches, not an afterthought.</li>
+    </ul>
+  </article>
+
+  <div class="project-links">
+    <a class="btn primary" href="https://project2-ai-ticket-triage-ubf6qjhxmukei7tzjp5xgo.streamlit.app">Try the live demo</a>
+    <a class="btn" href="https://github.com/lekanlawal1/project2-ai-ticket-triage">View code & prompt docs</a>
+  </div>
+</main>
+
+<footer class="site"><div class="wrap">© 2026 Lekan Lawal</div></footer>
+</body>
+</html>
