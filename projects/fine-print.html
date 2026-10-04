@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fine Print: iOS Contract Checker | Lekan Lawal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Lekan Lawal</a>
+    <nav class="top">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="project-hero">
+    <a class="backlink" href="../index.html#projects">&larr; All projects</a>
+    <h1>Fine Print: an iOS app that checks contracts against Ontario law</h1>
+    <p class="one-liner">Paste a lease, open a PDF, or photograph a job offer. Fine Print finds the clauses
+    that matter and tells you, with the exact statute section, which ones Ontario law has already made void.</p>
+    <div class="meta-row">
+      <span class="tag">Swift 6</span><span class="tag">SwiftUI</span><span class="tag">Apple Foundation Models</span>
+      <span class="tag">Gemini API</span><span class="tag">Vision OCR</span><span class="tag">Swift Testing</span>
+    </div>
+  </div>
+
+  <div class="phone-row">
+    <div class="phone">
+      <video src="../assets/fine-print/demo.mp4" controls muted playsinline preload="metadata"
+             poster="../assets/fine-print/poster.png" aria-label="Two-minute demo of Fine Print in the iOS Simulator"></video>
+    </div>
+  </div>
+  <p style="text-align:center;color:var(--muted);font-size:.9rem;margin-top:-8px">Two-minute walkthrough, recorded in the
+  iOS Simulator with real Gemini analysis: a problem lease, a scanned photo, and a contractor agreement.</p>
+
+  <article class="case">
+    <h2>The story</h2>
+    <p>Tenants and new hires sign documents full of clauses Ontario law has already made void: "no pets" rules,
+    damage deposits, non-competes. An AI model can read a contract in seconds, but one that confidently calls a
+    legal clause illegal does real harm. So in Fine Print the AI only reads. It tags clauses from a closed list and
+    must quote each one word for word. Ordinary, unit-tested code then checks that the quote exists, checks that
+    the document's own wording supports the AI's label, and only then applies cited rules from the Residential
+    Tenancies Act and the Employment Standards Act. Every rule was checked against the official statute text, and
+    the app shows the date it was checked.</p>
+    <p>A 12-document test set built to break the system found the failure that mattered: both AI engines labelled
+    "Pets are welcome" as a pet ban, and the rules then called it void. Quote checking couldn't catch it because the
+    quote was real. A deterministic label check brought wrong legal verdicts to zero for every engine.</p>
+
+    <h2>Headline numbers</h2>
+    <div class="numbers">
+      <div class="num"><div class="v">0</div><div class="l">wrong legal verdicts across 12 test documents, for every engine</div></div>
+      <div class="num"><div class="v">100%</div><div class="l">of labelled clauses found by Gemini, with every number read correctly</div></div>
+      <div class="num"><div class="v">175 s &rarr; 2 s</div><div class="l">per document after capping Gemini's runaway hidden reasoning</div></div>
+    </div>
+
+    <h2>In the app</h2>
+    <div class="shots">
+      <figure><img src="../assets/fine-print/2-results.png" alt="Results for a problem lease"><figcaption>8 conflicts found, each cited</figcaption></figure>
+      <figure><img src="../assets/fine-print/5-detail-source.png" alt="Clause detail with statute citation"><figcaption>The clause in context, with its source</figcaption></figure>
+      <figure><img src="../assets/fine-print/6-scan-results.png" alt="Results for a scanned photo of a lease"><figcaption>A photo, read on the device</figcaption></figure>
+      <figure><img src="../assets/fine-print/7-contractor.png" alt="Contractor agreement with no legal verdicts"><figcaption>Not employment, so no ESA verdict</figcaption></figure>
+    </div>
+
+    <h2>Key decisions I'd defend in an interview</h2>
+    <ul>
+      <li><b>The AI never issues a legal verdict.</b> Verdicts come only from rule packs written as data, each with a citation, an official source link, and a verified date. A rule I couldn't verify against the statute doesn't ship.</li>
+      <li><b>Verify the quote, then verify the label.</b> Quote checks catch invented clauses but not a real clause with the wrong label, which was the dangerous failure in testing.</li>
+      <li><b>Test capability, don't trust the flag.</b> In the iOS Simulator Apple's on-device model reports "available" but every request fails, so the app picks its engine with a real test request at launch.</li>
+      <li><b>Gemini first, by measurement, with consent.</b> Gemini found 100% of clauses versus 49% on-device, so it's preferred, but the app asks before any document leaves the phone.</li>
+      <li><b>Prompt changes get regression tests.</b> A stricter prompt quietly broke overtime detection; the evaluation caught it and one clearer description fixed it.</li>
+    </ul>
+  </article>
+
+  <div class="project-links">
+    <a class="btn primary" href="https://github.com/lekanlawal1/fine-print">View the code and evaluation</a>
+    <a class="btn" href="../assets/fine-print/demo.mp4">Download the demo video</a>
+  </div>
+</main>
+
+<footer class="site"><div class="wrap">&copy; 2026 Lekan Lawal</div></footer>
+</body>
+</html>

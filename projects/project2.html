@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Support Ticket Triage — Lekan Lawal</title>
+<title>AI Support Ticket Triage | Lekan Lawal</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../style.css">
 </head>
@@ -22,8 +22,8 @@
 <main class="wrap">
   <div class="project-hero">
     <a class="backlink" href="../index.html#projects">← All projects</a>
-    <h1>AI Support Ticket Triage — LLM Pipeline with Guardrails</h1>
-    <p class="one-liner">An LLM sorts incoming support tickets by category, priority, and routing —
+    <h1>AI Support Ticket Triage: LLM Pipeline with Guardrails</h1>
+    <p class="one-liner">An LLM sorts incoming support tickets by category, priority, and routing,
     engineered around the assumption that the AI will sometimes be wrong.</p>
     <div class="meta-row">
       <span class="tag">Python</span><span class="tag">Gemini API</span><span class="tag">structured output</span>
@@ -38,18 +38,18 @@
   <article class="case">
     <h2>The story</h2>
     <p>Support desks burn 3–8 minutes of skilled attention per ticket just deciding what it is and
-    who should handle it. This tool automates that first pass with Gemini — but the interesting
+    who should handle it. This tool automates that first pass with Gemini, but the interesting
     part isn't the API call, it's everything wrapped around it. The model is forced into a JSON
     schema (no free-text parsing), reports a confidence score, and below 75% confidence a ticket is
     never auto-routed: it goes to a human review queue with the model's guess attached as a
     suggestion. Rate limits, timeouts, and malformed responses get exponential-backoff retries; if
     everything fails, the ticket lands in the review queue with the reason logged. The batch never
     crashes and never silently drops a ticket.</p>
-    <p>Evaluated on 171 labeled synthetic tickets — including 15 deliberately ambiguous ones — the
+    <p>Evaluated on 171 labeled synthetic tickets, including 15 deliberately ambiguous ones, the
     evaluation caught something better than a good score: a systematic prompt bug. Complaints that
     mention money were misfiled as billing at 95% confidence, traceable to one tie-breaking rule in
     my prompt. The lesson, documented in the repo: confidence gates catch <em>vagueness</em>, not
-    <em>bias</em> — shipping an LLM feature means shipping its monitoring.</p>
+    <em>bias</em>, and shipping an LLM feature means shipping its monitoring.</p>
 
     <h2>Headline numbers</h2>
     <div class="numbers">
@@ -60,9 +60,9 @@
 
     <h2>Key decisions I'd defend in an interview</h2>
     <ul>
-      <li><b>Confidence gate over maximizing accuracy</b> — the goal isn't zero errors; it's that errors get caught. A low-confidence mistake costs 4 minutes of human review; only high-confidence errors are true failures, and they're measured.</li>
-      <li><b>Two documented prompt iterations</b> — v1's failures (invented categories, priority inflation for ALL-CAPS customers) each map to a specific v2 fix.</li>
-      <li><b>Free-tier rate limits treated as a design constraint</b> — throttling, backoff, and resumable batches, not an afterthought.</li>
+      <li><b>Confidence gate over maximizing accuracy</b>: the goal isn't zero errors; it's that errors get caught. A low-confidence mistake costs 4 minutes of human review; only high-confidence errors are true failures, and they're measured.</li>
+      <li><b>Two documented prompt iterations</b>: v1's failures (invented categories, priority inflation for ALL-CAPS customers) each map to a specific v2 fix.</li>
+      <li><b>Free-tier rate limits treated as a design constraint</b>: throttling, backoff, and resumable batches, not an afterthought.</li>
     </ul>
   </article>
 
