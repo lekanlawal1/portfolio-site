@@ -30,7 +30,7 @@
     <p class="lead">Computer Science graduate (Trent University, 2026) based in Canada. I build
     dashboards that expose where profit leaks, pipelines that survive messy real-world data, and
     LLM systems engineered around the fact that AI gets things wrong. Every project below is
-    documented decision-by-decision and built to be defended in an interview, and four of the five
+    documented decision-by-decision and built to be defended in an interview, and five of the six
     run live in your browser.</p>
     <div class="cta">
       <a class="btn primary" href="#projects">See the work</a>
@@ -41,9 +41,9 @@
   <section id="projects" class="alt">
     <div class="wrap">
       <h2 class="section">Projects</h2>
-      <p class="section-sub">Five builds: an iOS app that checks contracts against Ontario law,
-      business intelligence, applied AI with guardrails, a full data pipeline with a predictive
-      model, and an AI agent on top of it.</p>
+      <p class="section-sub">Six builds: an iOS app that checks contracts against Ontario law, a
+      self-refreshing economic data platform, business intelligence, applied AI with guardrails, a full
+      data pipeline with a predictive model, and an AI agent on top of it.</p>
 
       <div class="cards">
         <div class="card wide">
@@ -58,6 +58,23 @@
             <div class="links">
               <a href="projects/fine-print.html">Demo video and case study</a>
               <a href="https://github.com/lekanlawal1/fine-print">Source</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <a class="shot" href="projects/project5.html"><img src="assets/p5.png" alt="Canada Economy Intelligence dashboard: headline indicators and the AI monthly briefing"></a>
+          <div class="body">
+            <h3><a href="projects/project5.html">Canada Economy Intelligence Platform</a></h3>
+            <p class="hook">A pipeline on live Statistics Canada data that refreshes itself after every release.
+            A tested SQL warehouse whose headline numbers match StatCan's official releases exactly, forecasts
+            that admit when a simple guess wins, and an AI-written briefing where code checks every number
+            before it is published.</p>
+            <div class="tags"><span class="tag">Python</span><span class="tag">DuckDB</span><span class="tag">SQL</span><span class="tag">statsmodels</span><span class="tag">GitHub Actions</span><span class="tag">Gemini API</span><span class="tag">Plotly.js</span></div>
+            <div class="links">
+              <a href="https://lekanlawal1.github.io/project5-canada-economy-platform/">Live dashboard</a>
+              <a href="projects/project5.html">Case study</a>
+              <a href="https://github.com/lekanlawal1/project5-canada-economy-platform">Source</a>
             </div>
           </div>
         </div>
@@ -133,13 +150,15 @@
           <p style="margin-top:12px">Four of the projects above are deliberately one story: a BI
           dashboard, an AI tool with error-handling as the headline feature, an end-to-end pipeline
           with a model, and an AI agent that queries that same pipeline's database safely. Fine Print
-          takes the same principle to an iPhone app: the AI reads and quotes, and code decides. Each
-          repo has a decision log; nothing is a black box.</p>
+          takes the same principle to an iPhone app: the AI reads and quotes, and code decides. The
+          Canada Economy platform puts it all into production: scheduled ingestion, data tests that
+          block a bad deploy, honest forecasts, and an AI briefing that code verifies. Each repo has a
+          decision log; nothing is a black box.</p>
         </div>
         <div class="skill-groups">
           <div>
             <h4>Languages & Data</h4>
-            <p>Python · SQL · JavaScript · pandas · DuckDB · scikit-learn</p>
+            <p>Python · SQL · JavaScript · pandas · DuckDB · scikit-learn · statsmodels</p>
           </div>
           <div>
             <h4>BI & Visualization</h4>
@@ -147,7 +166,7 @@
           </div>
           <div>
             <h4>Web & Cloud</h4>
-            <p>React · Firebase · Streamlit · GitHub Pages</p>
+            <p>React · Firebase · Streamlit · GitHub Pages · GitHub Actions (CI and scheduled pipelines)</p>
           </div>
           <div>
             <h4>AI Tooling</h4>

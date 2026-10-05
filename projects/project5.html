@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canada Economy Intelligence Platform | Lekan Lawal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Lekan Lawal</a>
+    <nav class="top">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="project-hero">
+    <a class="backlink" href="../index.html#projects">← All projects</a>
+    <h1>Canada Economy Intelligence Platform: Live StatCan Data, Tested and Self-Refreshing</h1>
+    <p class="one-liner">The production-style project: a pipeline on Statistics Canada open data that
+    checks for new releases every weekday, rebuilds a tested warehouse, re-runs honest forecasts, has an
+    AI draft the monthly briefing, and redeploys the dashboard. No server, no cost, no manual steps.</p>
+    <div class="meta-row">
+      <span class="tag">Python</span><span class="tag">DuckDB</span><span class="tag">SQL</span>
+      <span class="tag">statsmodels</span><span class="tag">GitHub Actions</span><span class="tag">Gemini API</span>
+      <span class="tag">Plotly.js</span>
+    </div>
+  </div>
+
+  <a class="big-shot" href="https://lekanlawal1.github.io/project5-canada-economy-platform/">
+    <img src="../assets/p5.png" alt="Canada Economy Intelligence dashboard: headline indicators and the AI monthly briefing">
+  </a>
+
+  <article class="case">
+    <h2>The story</h2>
+    <p>The other projects are built once and stay still. This one keeps running. Five StatCan tables
+    (labour force, consumer prices, new housing prices, job vacancies, GDP) arrive as 1.4 GB of CSV,
+    including one 1.18 GB file that DuckDB streams and filters instead of loading into memory. Versioned
+    SQL turns them into raw, staging and mart layers, and every cleaning decision is logged with the rows
+    it affected. A daily job asks StatCan whether anything changed, and rebuilds only when it did.</p>
+    <p>The theme is not claiming more than the data supports. A monthly job loss of 41,700 sounds like
+    news, but it sits inside StatCan's own margin of error, so the chart shows it grey. Forecasts were
+    judged by rules committed before any result: a seasonal model wins for next month's inflation, and
+    for unemployment no model beats "next month equals this month", so that is what the site publishes.
+    Gemini writes the monthly briefing, and code checks every number for the right value, the right
+    measure and the right direction before anything goes live.</p>
+
+    <h2>Evidence, not assertions</h2>
+    <div class="numbers">
+      <div class="num"><div class="v">11/11</div><div class="l">headline figures match StatCan's official releases exactly, checked on every build</div></div>
+      <div class="num"><div class="v">80</div><div class="l">data tests run before every deploy; each failure mode proven by injecting it</div></div>
+      <div class="num"><div class="v">15/15</div><div class="l">planted errors caught by the briefing's number verifier, 0 false alarms on correct drafts</div></div>
+      <div class="num"><div class="v">20/20</div><div class="l">live AI briefings verified after fixes, up from 5/10 in the first batch</div></div>
+    </div>
+
+    <h2>What the evaluation found</h2>
+    <p>The first batch of 10 live Gemini briefings published only 5. Reading every failure showed most
+    were my verifier's false alarms: in "a change of 0.00 and rose 1.4", it read "rose" as describing
+    the 0.00. The fixes went in on both sides, every real failing sentence became a permanent test, and
+    the next 20 runs all published a verified briefing. The 15 planted errors still had to be caught, so
+    the verifier could not be loosened by accident.</p>
+
+    <h2>Key decisions I'd defend in an interview</h2>
+    <ul>
+      <li><b>Months matched by calendar, not by row</b>: StatCan suppresses small-group cells, which leaves gaps; <code>LAG()</code> would silently compare against the wrong month.</li>
+      <li><b>Robust anomaly scores</b>: a classic z-score called the September 2020 unemployment drop normal, because COVID inflated the variance for three years. Median and MAD flag it at -6.7.</li>
+      <li><b>Significance before narrative</b>: a forecast only "beats the baseline" with a Diebold-Mariano test, and a monthly move is only news when it beats StatCan's published standard error.</li>
+      <li><b>AI drafts, code verifies</b>: a failed draft gets one retry with its exact failures listed, then a verified template is published. An API error never blocks the deploy.</li>
+      <li><b>Failure keeps the last good site</b>: data tests run before export, so a bad StatCan release fails the job and the live page does not change.</li>
+    </ul>
+  </article>
+
+  <div class="project-links">
+    <a class="btn primary" href="https://lekanlawal1.github.io/project5-canada-economy-platform/">Open the live dashboard</a>
+    <a class="btn" href="https://github.com/lekanlawal1/project5-canada-economy-platform">View code &amp; decision docs</a>
+  </div>
+</main>
+
+<footer class="site"><div class="wrap">© 2026 Lekan Lawal</div></footer>
+</body>
+</html>
