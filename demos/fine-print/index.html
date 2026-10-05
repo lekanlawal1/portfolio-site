@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fine Print Demo</title>
+<meta name="description" content="Try Fine Print in your browser: an Ontario contract checker where the AI only reads and quotes, and code decides. Real rule packs, real verdict engine.">
+<meta property="og:title" content="Fine Print: try the contract checker">
+<meta property="og:description" content="Pick a lease or job offer and see which clauses Ontario law has already voided, with the section cited. Then try to break it.">
+<meta property="og:image" content="https://lekanlawal1.github.io/portfolio-site/assets/fine-print/banner.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+/* Fine Print's own theme (FinePrint/Theme.swift): warm paper, terracotta accent, and four verdict
+   colours that are always paired with an icon and a label, never colour alone. */
+:root {
+  color-scheme: light;
+  --bg: #F6EFE4; --card: #FFFAF2; --field: #F1E7D8; --border: #E6D8C4;
+  --ink: #2B211A; --ink-2: #6E5D4E; --accent: #B4532A;
+  --violation: #B3261E; --needs: #6A4C93; --look: #B86E00; --ok: #4E7A3A;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #1C1814; --card: #282320; --field: #221D19; --border: #3A322B;
+    --ink: #F3E9DD; --ink-2: #BFAE9C; --accent: #E08A5C;
+    --violation: #F2766B; --needs: #B39DDB; --look: #F0B04A; --ok: #8CC07A;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--accent); }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+.serif { font-family: "Source Serif 4", Georgia, serif; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0; font-size: 14px; }
+.topbar a { color: var(--ink-2); text-decoration: none; }
+.topbar a:hover { color: var(--ink); }
+.hero { padding: 26px 0 8px; }
+.eyebrow { color: var(--accent); font-weight: 600; font-size: 14px; letter-spacing: .02em; }
+h1 { font-family: "Source Serif 4", Georgia, serif; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.1; margin: 6px 0 12px; }
+.lead { color: var(--ink-2); font-size: 1.08rem; max-width: 46rem; margin: 0; }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 26px 0; }
+.step { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px; }
+.step b { display: block; margin-bottom: 4px; }
+.step span { color: var(--ink-2); font-size: .92rem; }
+.step .n { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; margin-bottom: 8px; }
+@media (max-width: 760px) { .steps { grid-template-columns: 1fr; } }
+
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 18px; }
+.tab { font: inherit; font-size: 14px; font-weight: 600; padding: 9px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--card); color: var(--ink-2); }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tab.trap { border-color: var(--violation); color: var(--violation); }
+.tab.trap[aria-selected="true"] { background: var(--violation); color: #fff; }
+.tab:focus-visible, .switch:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.blurb { color: var(--ink-2); margin: -6px 0 16px; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px; min-width: 0; }
+.panel h2 { font-family: "Source Serif 4", Georgia, serif; font-size: 1.2rem; margin: 0 0 4px; }
+.panel .sub { color: var(--ink-2); font-size: .88rem; margin: 0 0 12px; }
+
+.doc { white-space: pre-wrap; font-family: "Source Serif 4", Georgia, serif; font-size: .98rem; line-height: 1.6;
+  background: var(--field); border-radius: 14px; padding: 16px; max-height: 640px; overflow: auto; }
+.hl { border-radius: 4px; padding: 1px 2px; cursor: pointer; border-bottom: 2px solid; }
+.hl.rule_violation { background: color-mix(in srgb, var(--violation) 16%, transparent); border-color: var(--violation); }
+.hl.needs_human { background: color-mix(in srgb, var(--needs) 16%, transparent); border-color: var(--needs); }
+.hl.worth_a_look { background: color-mix(in srgb, var(--look) 18%, transparent); border-color: var(--look); }
+.hl.rule_compliant { background: color-mix(in srgb, var(--ok) 16%, transparent); border-color: var(--ok); }
+.hl.dropped { background: transparent; border-bottom: 2px dashed var(--ink-2); }
+.hl.active { outline: 2px solid var(--accent); }
+
+.counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+.count { text-align: center; background: var(--field); border-radius: 14px; padding: 10px 6px; }
+.count .num { font-family: "Source Serif 4", Georgia, serif; font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
+.count .lbl { font-size: .74rem; color: var(--ink-2); line-height: 1.25; }
+@media (max-width: 420px) { .counts { grid-template-columns: repeat(2, 1fr); } }
+
+.icon { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; color: #fff;
+  font-size: 12px; font-weight: 800; flex: none; }
+.icon.rule_violation { background: var(--violation); border-radius: 6px; }
+.icon.needs_human { background: var(--needs); }
+.icon.worth_a_look { background: var(--look); }
+.icon.rule_compliant { background: var(--ok); }
+.tier-head { display: flex; align-items: center; gap: 8px; margin: 18px 0 2px; font-weight: 700; }
+.tier-head:first-child { margin-top: 4px; }
+.tier-meaning { color: var(--ink-2); font-size: .84rem; margin: 0 0 8px; }
+
+.finding { border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; background: var(--card); scroll-margin-top: 16px; }
+.finding.active { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
+.finding h3 { font-size: 1rem; margin: 0 0 6px; }
+.finding blockquote { margin: 0 0 8px; padding: 6px 10px; border-left: 3px solid var(--border); color: var(--ink-2);
+  font-family: "Source Serif 4", Georgia, serif; font-size: .92rem; background: var(--field); border-radius: 0 8px 8px 0; cursor: pointer; }
+.finding p { margin: 0 0 8px; font-size: .93rem; }
+.cite { font-size: .82rem; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.cite b { color: var(--ink); }
+.note { font-size: .82rem; color: var(--ink-2); font-style: italic; }
+.empty { color: var(--ink-2); font-size: .92rem; }
+
+.trapbox { border: 2px solid var(--violation); border-radius: 18px; padding: 16px 18px; margin-bottom: 18px; background: var(--card); }
+.trapbox h2 { font-family: "Source Serif 4", Georgia, serif; margin: 0 0 6px; font-size: 1.3rem; }
+.toggle-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.switch { position: relative; width: 56px; height: 32px; border-radius: 999px; border: 0; cursor: pointer; background: var(--ink-2); flex: none; }
+.switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.switch[aria-checked="true"] { background: var(--ok); }
+.switch[aria-checked="true"]::after { transform: translateX(24px); }
+.verdict-banner { margin-top: 12px; border-radius: 12px; padding: 10px 14px; font-weight: 600; }
+.verdict-banner.bad { background: color-mix(in srgb, var(--violation) 15%, transparent); color: var(--violation); }
+.verdict-banner.good { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
+.ai-label { display: inline-block; font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--field); color: var(--ink-2); margin-bottom: 6px; }
+
+.video { margin: 40px 0 10px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: center; }
+.video video { width: 100%; max-width: 300px; aspect-ratio: 600 / 1304; border: 12px solid #141414; border-radius: 48px; background: #000; display: block; margin: 0 auto; }
+@media (max-width: 760px) { .video { grid-template-columns: 1fr; } }
+.honest { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px 20px; margin: 30px 0; font-size: .93rem; }
+.honest h2 { font-family: "Source Serif 4", Georgia, serif; font-size: 1.15rem; margin: 0 0 8px; }
+.honest ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.btn { display: inline-block; padding: 10px 16px; border-radius: 999px; font-weight: 600; font-size: 14px; text-decoration: none;
+  border: 1px solid var(--border); background: var(--card); color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="../../index.html">&larr; Lekan Lawal, portfolio</a>
+    <a href="https://github.com/lekanlawal1/fine-print">Source on GitHub</a>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow">Fine Print &middot; interactive demo</div>
+    <h1>The AI reads. The code decides.</h1>
+    <p class="lead">Fine Print is an iPhone app that checks leases, job offers and terms of service against Ontario law.
+      Pick a document below to see what it finds, with the law cited for every verdict. Then open
+      <b>Try to break it</b> and switch off the safety check that stops a wrong legal verdict.</p>
+  </header>
+
+  <section class="steps" aria-label="How Fine Print works">
+    <div class="step"><span class="n">1</span><b>AI reads and quotes</b><span>The model tags clauses from a closed list and must quote each one word for word. It never gives a verdict.</span></div>
+    <div class="step"><span class="n">2</span><b>Code checks the AI</b><span>The quote must exist in the document, and its wording must support the label the AI gave it.</span></div>
+    <div class="step"><span class="n">3</span><b>Cited rules judge</b><span>Only then do rules from the Residential Tenancies Act and Employment Standards Act apply, each with its section.</span></div>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Sample documents" id="tabs"></div>
+  <p class="blurb" id="blurb"></p>
+  <div id="trap"></div>
+
+  <div class="grid">
+    <section class="panel" aria-label="Document">
+      <h2 id="doc-title">Document</h2>
+      <p class="sub">Highlighted clauses are what the app found. Tap one to jump to its verdict.</p>
+      <div class="doc" id="doc"></div>
+    </section>
+    <section class="panel" aria-label="Results">
+      <h2>Results</h2>
+      <p class="sub" id="results-sub"></p>
+      <div class="counts" id="counts"></div>
+      <div id="findings"></div>
+    </section>
+  </div>
+
+  <section class="video">
+    <div>
+      <h2 class="serif" style="font-size:1.5rem;margin:0 0 8px">Watch the real app</h2>
+      <p style="color:var(--ink-2);margin:0">A two-minute walkthrough recorded in the iOS Simulator with real Gemini
+        analysis: a problem lease, a scanned photo, and a contractor agreement.</p>
+      <div class="btns">
+        <a class="btn primary" href="../../projects/fine-print.html">Read the case study</a>
+        <a class="btn" href="https://github.com/lekanlawal1/fine-print">View the code</a>
+      </div>
+    </div>
+    <video src="../../assets/fine-print/demo.mp4" controls muted playsinline preload="metadata"
+      poster="../../assets/fine-print/poster.png" aria-label="Demo of the Fine Print iPhone app"></video>
+  </section>
+
+  <section class="honest" aria-label="What is real in this demo">
+    <h2>What is real here, and what isn't</h2>
+    <ul>
+      <li><b>Real:</b> the documents, the rule packs (with citations and verified dates) and the verdict logic.
+        Verdicts are computed in your browser by the app's rule engine and label check, ported from Swift to
+        JavaScript and tested against the app's own rule tests (97 checks, all passing).</li>
+      <li><b>Pre-recorded:</b> step 1. In the app, Gemini or Apple's on-device model reads the document live. Here the
+        clause tags are the ones from the app's evaluation run, where Gemini found every one of them (34 of 34 clauses,
+        20 of 20 numbers read correctly). This keeps the demo free and private: nothing you do here is sent anywhere.</li>
+      <li><b>Not legal advice.</b> Fine Print points to the law and says what it covers; it does not replace a lawyer,
+        a tenant clinic or the Landlord and Tenant Board.</li>
+    </ul>
+  </section>
+
+  <footer>Built by Lekan Lawal &middot; <a href="../../index.html">Portfolio</a> &middot;
+    <a href="https://github.com/lekanlawal1/fine-print">github.com/lekanlawal1/fine-print</a></footer>
+</div>
+
+<script src="engine.js"></script>
+<script>
+const E = FinePrintEngine;
+const ICON = { rule_violation: "!", needs_human: "?", worth_a_look: "•", rule_compliant: "✓" };
+const TYPE_NAME = (t) => t.replaceAll("_", " ");
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
+let data, current = 0, guardOn = true;
+
+function results(doc) {
+  const { kept, dropped } = E.guardLabels(doc.clauses, doc === data.trap ? guardOn : true);
+  return { findings: E.evaluate(kept, doc.document_type, data.packs, data.heuristics), dropped };
+}
+
+function renderDoc(doc, findings, dropped) {
+  // The most serious finding decides each clause's highlight colour.
+  const tierOf = new Map();
+  for (const f of findings) if (!tierOf.has(f.clause.start)) tierOf.set(f.clause.start, f.tier);
+  const spans = doc.clauses.map((c) => ({ c, tier: tierOf.get(c.start) || (dropped.some((d) => d.clause.start === c.start) ? "dropped" : null) }))
+    .filter((s) => s.tier).sort((a, b) => a.c.start - b.c.start);
+  let html = "", pos = 0;
+  for (const { c, tier } of spans) {
+    if (c.start < pos) continue;
+    html += esc(doc.text.slice(pos, c.start));
+    html += `<mark class="hl ${tier}" data-start="${c.start}" tabindex="0" role="button" aria-label="${esc(TYPE_NAME(c.type))} clause">${esc(doc.text.slice(c.start, c.end))}</mark>`;
+    pos = c.end;
+  }
+  html += esc(doc.text.slice(pos));
+  document.getElementById("doc").innerHTML = html;
+  document.querySelectorAll(".hl").forEach((el) => {
+    const go = () => select(+el.dataset.start, true);
+    el.addEventListener("click", go);
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+  });
+}
+
+function findingCard(f, doc) {
+  const ai = f.clause.ai_mislabel ? `<span class="ai-label">AI's label: ${esc(TYPE_NAME(f.clause.type))}</span>` : "";
+  const cite = f.citation ? `<div class="cite"><span><b>${esc(f.citation)}</b></span>
+      ${f.sourceURL ? `<a href="${esc(f.sourceURL)}" target="_blank" rel="noopener">Read the law</a>` : ""}
+      <span>Rule checked against the statute ${esc(f.lastVerified)}</span></div>` : `<div class="cite"><span>No legal claim: a common pattern worth reading.</span></div>`;
+  return `<article class="finding" data-start="${f.clause.start}">
+    ${ai}<h3>${esc(f.title)}</h3>
+    <blockquote data-start="${f.clause.start}">“${esc(f.clause.quote)}”</blockquote>
+    <p>${esc(f.explanation)}</p>
+    ${f.exceptionNote ? `<p class="note">${esc(f.exceptionNote)}</p>` : ""}
+    ${cite}</article>`;
+}
+
+function render() {
+  const doc = current === "trap" ? data.trap : data.documents[current];
+  const { findings, dropped } = results(doc);
+  document.getElementById("doc-title").textContent = doc.title === "Try to break it" ? "A pet-friendly lease" : doc.title;
+  document.getElementById("blurb").textContent = current === "trap" ? "" : doc.blurb;
+  const scoped = data.packs.some((p) => p.document_types.includes(doc.document_type));
+  document.getElementById("results-sub").textContent = scoped
+    ? `Identified as: ${TYPE_NAME(doc.document_type)}. Ontario rules apply.`
+    : `Identified as: ${doc.document_type === "unknown" ? "a document the app can't classify" : TYPE_NAME(doc.document_type)}. No Ontario statute is applied, so there are no legal verdicts.`;
+
+  document.getElementById("counts").innerHTML = E.ORDER.map((t) => {
+    const n = findings.filter((f) => f.tier === t).length;
+    return `<div class="count"><span class="icon ${t}" aria-hidden="true">${ICON[t]}</span>
+      <div class="num">${n}</div><div class="lbl">${E.TIERS[t].label}</div></div>`;
+  }).join("");
+
+  let html = "";
+  for (const t of E.ORDER) {
+    const fs = findings.filter((f) => f.tier === t);
+    if (!fs.length) continue;
+    html += `<div class="tier-head"><span class="icon ${t}" aria-hidden="true">${ICON[t]}</span>${E.TIERS[t].label}</div>
+      <p class="tier-meaning">${E.TIERS[t].meaning}</p>` + fs.map((f) => findingCard(f, doc)).join("");
+  }
+  if (dropped.length) {
+    html += `<div class="tier-head"><span class="icon" style="background:var(--ink-2)" aria-hidden="true">×</span>Rejected by the label check</div>
+      <p class="tier-meaning">The AI's label contradicted the wording, so the clause got no verdict at all.</p>`
+      + dropped.map((d) => `<article class="finding" data-start="${d.clause.start}">
+          <span class="ai-label">AI's label: ${esc(TYPE_NAME(d.clause.type))}</span>
+          <blockquote data-start="${d.clause.start}">“${esc(d.clause.quote)}”</blockquote>
+          <p>Label rejected: ${esc(d.reason)}. No legal verdict given.</p></article>`).join("");
+  }
+  document.getElementById("findings").innerHTML = html || `<p class="empty">Nothing found.</p>`;
+  document.querySelectorAll(".finding blockquote").forEach((q) => q.addEventListener("click", () => select(+q.dataset.start, false)));
+  renderDoc(doc, findings, dropped);
+  renderTrap(findings, dropped);
+}
+
+function renderTrap(findings, dropped) {
+  const box = document.getElementById("trap");
+  if (current !== "trap") { box.innerHTML = ""; return; }
+  const wrong = findings.some((f) => f.clause.ai_mislabel && f.tier === "rule_violation");
+  box.innerHTML = `<div class="trapbox">
+    <h2>Try to break it</h2>
+    <p style="margin:0">This really happened in testing. Both AI engines read <i>“Pets are welcome. The Tenant may keep cats and dogs”</i>
+      and labelled it a <b>no-pets clause</b>. The quote was real, so the quote check passed, and the rule then declared the
+      clause void under s. 14 of the Residential Tenancies Act. The fix was a deterministic <b>label check</b>: code confirms the
+      wording supports the AI's label before any rule may judge it.</p>
+    <div class="toggle-row">
+      <button class="switch" role="switch" aria-checked="${guardOn}" id="guard" aria-label="Label check"></button>
+      <span><b>Label check is ${guardOn ? "on" : "off"}.</b> ${guardOn ? "Switch it off to see what the app said before the fix." : "Switch it back on."}</span>
+    </div>
+    <div class="verdict-banner ${wrong ? "bad" : "good"}">${wrong
+      ? "Wrong legal verdict: the app just told a tenant that their pet-friendly lease clause is void."
+      : "Caught: the label contradicts the wording (“pets are welcome”), so no legal verdict is given."}</div>
+  </div>`;
+  document.getElementById("guard").addEventListener("click", () => { guardOn = !guardOn; render(); });
+}
+
+function select(start, fromDoc) {
+  document.querySelectorAll(".active").forEach((el) => el.classList.remove("active"));
+  const card = document.querySelector(`.finding[data-start="${start}"]`);
+  const mark = document.querySelector(`.hl[data-start="${start}"]`);
+  card?.classList.add("active");
+  mark?.classList.add("active");
+  (fromDoc ? card : mark)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function tabs() {
+  const el = document.getElementById("tabs");
+  el.innerHTML = data.documents.map((d, i) => `<button class="tab" role="tab" data-i="${i}">${esc(d.title)}</button>`).join("")
+    + `<button class="tab trap" role="tab" data-i="trap">Try to break it</button>`;
+  el.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => {
+    current = b.dataset.i === "trap" ? "trap" : +b.dataset.i;
+    el.querySelectorAll(".tab").forEach((x) => x.setAttribute("aria-selected", x === b));
+    history.replaceState(null, "", current === "trap" ? "#break-it" : `#${data.documents[current].id}`);
+    render();
+  }));
+  const hash = location.hash.slice(1);
+  const start = hash === "break-it" ? "trap" : Math.max(0, data.documents.findIndex((d) => d.id === hash));
+  el.querySelector(`[data-i="${start}"]`).click();
+}
+
+fetch("data.json").then((r) => r.json()).then((d) => { data = d; tabs(); })
+  .catch((err) => { document.getElementById("findings").innerHTML = `<p class="empty">Could not load the demo data (${esc(err.message)}).</p>`; });
+</script>
+</body>
+</html>
