@@ -1,0 +1,75 @@
+1
+00:00:00,000 --> 00:00:02,200
+Fine Print: an iPhone app that checks contracts against Ontario law
+
+2
+00:00:02,200 --> 00:00:08,000
+Paste a contract, import a PDF, or photograph a paper one
+
+3
+00:00:08,000 --> 00:00:14,000
+Let's try a sample lease
+
+4
+00:00:14,000 --> 00:00:17,200
+Before anything leaves the phone, it asks for consent
+
+5
+00:00:17,200 --> 00:00:20,100
+The AI only reads: it tags clauses and must quote each one word for word
+
+6
+00:00:20,100 --> 00:00:27,000
+Code checks every quote, then cited Ontario rules decide
+
+7
+00:00:27,000 --> 00:00:37,000
+8 clauses conflict with the law. Read in 2.8 seconds
+
+8
+00:00:37,000 --> 00:00:40,000
+Each verdict names the exact section of the Residential Tenancies Act
+
+9
+00:00:40,000 --> 00:00:46,000
+Common patterns are only "worth a look": no legal claim
+
+10
+00:00:46,000 --> 00:00:58,000
+Every finding quotes the contract word for word
+
+11
+00:00:58,000 --> 00:01:03,000
+Tap a clause to see it highlighted in the original document
+
+12
+00:01:03,000 --> 00:01:07,600
+with what the law says, and a link to the official statute
+
+13
+00:01:07,600 --> 00:01:15,000
+Now a photo of a paper lease
+
+14
+00:01:15,000 --> 00:01:19,000
+The text is read on the phone itself, with Apple's Vision OCR
+
+15
+00:01:19,000 --> 00:01:29,000
+Same checks on the scan: 3 conflicts with the law
+
+16
+00:01:29,000 --> 00:01:39,000
+Last: a contractor agreement
+
+17
+00:01:39,000 --> 00:01:46,000
+Not a lease or a job, so no Ontario rule applies
+
+18
+00:01:46,000 --> 00:01:51,000
+So no legal verdicts. Only patterns worth reading
+
+19
+00:01:51,000 --> 00:01:54,700
+Try it yourself: link in the post
