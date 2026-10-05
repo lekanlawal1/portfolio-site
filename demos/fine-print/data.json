@@ -1,0 +1,618 @@
+{
+ "source": "https://github.com/lekanlawal1/fine-print",
+ "packs": [
+  {
+   "id": "ca-on-residential-lease",
+   "name": "Ontario residential tenancy rules",
+   "jurisdiction": "CA-ON",
+   "document_types": [
+    "residential_lease"
+   ],
+   "last_verified": "2026-10-04",
+   "source_url": "https://www.ontario.ca/laws/statute/06r17",
+   "rules": [
+    {
+     "id": "no-pets-void",
+     "applies_to": "pets",
+     "check": {
+      "kind": "present"
+     },
+     "title": "No-pets clause",
+     "citation": "Residential Tenancies Act, 2006, s. 14",
+     "explanation_if_violated": "Ontario's Residential Tenancies Act says a provision in a tenancy agreement prohibiting animals in or about the residential complex is void. The clause is in the lease, but it has no legal effect."
+    },
+    {
+     "id": "acceleration-void",
+     "applies_to": "acceleration_clause",
+     "check": {
+      "kind": "present"
+     },
+     "title": "Rent acceleration clause",
+     "citation": "Residential Tenancies Act, 2006, s. 15",
+     "explanation_if_violated": "A provision making the remaining rent (or a specific sum) due because the tenant defaulted on rent or another obligation is void under s. 15."
+    },
+    {
+     "id": "security-deposit",
+     "applies_to": "security_deposit",
+     "check": {
+      "kind": "present"
+     },
+     "title": "Security or damage deposit",
+     "citation": "Residential Tenancies Act, 2006, ss. 105(1) and 4(1)",
+     "explanation_if_violated": "Under s. 105(1), the only security deposit a landlord may collect is a rent deposit under s. 106. Damage, pet and similar deposits fall outside that, and s. 4(1) makes lease terms that are inconsistent with the Act void."
+    },
+    {
+     "id": "rent-deposit-cap",
+     "applies_to": "rent_deposit",
+     "check": {
+      "kind": "max_ratio",
+      "param": "amount",
+      "of_param": "monthly_rent",
+      "limit": 1
+     },
+     "title": "Rent deposit amount",
+     "citation": "Residential Tenancies Act, 2006, s. 106(2)",
+     "explanation_if_violated": "A rent deposit can't be more than the lesser of one rent period and one month's rent. This one is larger than one month's rent.",
+     "explanation_if_compliant": "The rent deposit is within the limit of one month's rent.",
+     "exception_note": "If rent is paid weekly or for another period shorter than a month, the limit is one rent period, which this check doesn't model."
+    },
+    {
+     "id": "key-deposit-limit",
+     "applies_to": "key_deposit",
+     "check": {
+      "kind": "max_ratio",
+      "param": "amount",
+      "of_param": "replacement_cost",
+      "limit": 1
+     },
+     "title": "Key deposit",
+     "citation": "Residential Tenancies Act, 2006, s. 134(1)(a); O. Reg. 516/06, s. 17, item 3",
+     "source_url": "https://www.ontario.ca/laws/regulation/060516",
+     "explanation_if_violated": "A key, fob or card deposit must be refundable and no more than the expected direct cost of replacing it. This one is larger than the replacement cost stated.",
+     "explanation_if_compliant": "The key deposit is no more than the stated replacement cost. It must also be refundable."
+    },
+    {
+     "id": "nsf-admin-fee",
+     "applies_to": "nsf_fee",
+     "check": {
+      "kind": "max_value",
+      "param": "amount",
+      "limit": 20
+     },
+     "title": "Bounced cheque (NSF) fee",
+     "citation": "Residential Tenancies Act, 2006, s. 134(1); O. Reg. 516/06, s. 17, items 4-5",
+     "source_url": "https://www.ontario.ca/laws/regulation/060516",
+     "explanation_if_violated": "A landlord's administration charge for an NSF cheque can't exceed $20. The bank's own NSF charges to the landlord can be passed on separately, but not as a larger flat fee.",
+     "explanation_if_compliant": "The administration charge is within the $20 limit."
+    },
+    {
+     "id": "required-postdated-cheques",
+     "applies_to": "post_dated_cheques",
+     "check": {
+      "kind": "present"
+     },
+     "title": "Required post-dated cheques or automatic payments",
+     "citation": "Residential Tenancies Act, 2006, ss. 108 and 4(1)",
+     "explanation_if_violated": "Under s. 108, neither a landlord nor a tenancy agreement can require post-dated cheques, automatic bank debits, or automatic credit card charges for rent. A tenant can choose to pay that way, but the lease can't make it a requirement."
+    },
+    {
+     "id": "entry-notice",
+     "applies_to": "landlord_entry",
+     "check": {
+      "kind": "min_value",
+      "param": "notice_hours",
+      "limit": 24
+     },
+     "title": "Landlord entry notice",
+     "citation": "Residential Tenancies Act, 2006, ss. 27(1), 27(3) and 4(1)",
+     "explanation_if_violated": "For non-emergency entries such as repairs or inspections, s. 27 requires written notice at least 24 hours in advance, stating the reason, the day, and a time between 8 a.m. and 8 p.m. This clause allows less notice.",
+     "explanation_if_compliant": "The notice period meets the 24-hour minimum in s. 27.",
+     "exception_note": "Section 26 allows entry without written notice in an emergency, with the tenant's consent at the time, and in a few other specific situations."
+    },
+    {
+     "id": "rent-increase-notice",
+     "applies_to": "rent_increase",
+     "check": {
+      "kind": "min_value",
+      "param": "notice_days",
+      "limit": 90
+     },
+     "title": "Rent increase notice",
+     "citation": "Residential Tenancies Act, 2006, s. 116(1)",
+     "explanation_if_violated": "A landlord must give at least 90 days' written notice before increasing rent. Under s. 116(4), an increase without the required notice is void.",
+     "explanation_if_compliant": "The notice period meets the 90-day minimum."
+    },
+    {
+     "id": "rent-increase-frequency",
+     "applies_to": "rent_increase",
+     "check": {
+      "kind": "min_value",
+      "param": "months_between_increases",
+      "limit": 12
+     },
+     "title": "Rent increase frequency",
+     "citation": "Residential Tenancies Act, 2006, s. 119(1)",
+     "explanation_if_violated": "Rent can be increased only if at least 12 months have passed since the last increase, or since the tenant first rented the unit. This clause allows increases more often.",
+     "explanation_if_compliant": "The increase frequency respects the 12-month rule.",
+     "exception_note": "Many units are also subject to the annual rent increase guideline in s. 120, which this check doesn't cover."
+    }
+   ]
+  },
+  {
+   "id": "ca-on-employment",
+   "name": "Ontario employment standards",
+   "jurisdiction": "CA-ON",
+   "document_types": [
+    "employment"
+   ],
+   "last_verified": "2026-10-04",
+   "source_url": "https://www.ontario.ca/laws/statute/00e41",
+   "rules": [
+    {
+     "id": "non-compete-void",
+     "applies_to": "non_compete",
+     "check": {
+      "kind": "present"
+     },
+     "title": "Non-compete clause",
+     "citation": "Employment Standards Act, 2000, s. 67.2",
+     "explanation_if_violated": "Section 67.2 prohibits employers from entering into employment contracts that are, or include, a non-compete agreement, and says such an agreement is void.",
+     "exception_note": "Two exceptions apply: an agreement made as part of the sale of a business where the seller then becomes the buyer's employee, and employees who are executives (CEO, president, CFO, COO, CIO, chief legal officer, chief HR officer, chief corporate development officer, or another chief executive position). The prohibition was added in 2021, and courts have treated agreements signed before then differently."
+    },
+    {
+     "id": "vacation-minimum",
+     "applies_to": "vacation",
+     "check": {
+      "kind": "min_value",
+      "param": "vacation_weeks",
+      "limit": 2
+     },
+     "title": "Vacation time",
+     "citation": "Employment Standards Act, 2000, ss. 33(1) and 5(1)",
+     "explanation_if_violated": "The ESA requires at least two weeks of vacation after each vacation entitlement year for employees with under five years of service. A contract can't waive that minimum (s. 5(1)).",
+     "explanation_if_compliant": "The vacation offered meets the two-week minimum for the first five years.",
+     "exception_note": "From five years of service, the minimum rises to three weeks (s. 33(1)(b))."
+    },
+    {
+     "id": "overtime-threshold",
+     "applies_to": "overtime",
+     "check": {
+      "kind": "max_value",
+      "param": "overtime_threshold_hours",
+      "limit": 44
+     },
+     "title": "Overtime threshold",
+     "citation": "Employment Standards Act, 2000, ss. 22(1) and 5(1)",
+     "explanation_if_violated": "Overtime pay is owed for each hour over 44 in a work week (unless another threshold is prescribed). This clause starts overtime later than that.",
+     "explanation_if_compliant": "Overtime starts at or before the 44-hour weekly threshold.",
+     "exception_note": "Some jobs are exempt from overtime or have special rules under the ESA regulations. Check whether your role is one of them."
+    },
+    {
+     "id": "overtime-rate",
+     "applies_to": "overtime",
+     "check": {
+      "kind": "min_value",
+      "param": "overtime_multiplier",
+      "limit": 1.5
+     },
+     "title": "Overtime rate",
+     "citation": "Employment Standards Act, 2000, ss. 22(1) and 5(1)",
+     "explanation_if_violated": "Overtime must be paid at least one and one-half times the regular rate. This clause pays less.",
+     "explanation_if_compliant": "The overtime rate meets the 1.5x minimum.",
+     "exception_note": "Some jobs are exempt from overtime or have special rules under the ESA regulations. Check whether your role is one of them."
+    },
+    {
+     "id": "termination-notice-review",
+     "applies_to": "termination",
+     "check": {
+      "kind": "review"
+     },
+     "title": "Termination notice",
+     "citation": "Employment Standards Act, 2000, ss. 57 and 5(1)",
+     "explanation_if_violated": "The ESA sets minimum termination notice by length of service: one week under one year, two weeks from one to three years, then one more week per year of service up to eight weeks at eight years or more. A contract can't provide less than that (s. 5(1)). Whether this clause meets the minimum depends on your length of service and how the clause is worded, so this app doesn't decide it. Read it against that schedule."
+    }
+   ]
+  }
+ ],
+ "heuristics": {
+  "id": "universal-heuristics",
+  "name": "Common patterns worth a look",
+  "flags": [
+   {
+    "applies_to": "auto_renewal",
+    "title": "Automatic renewal",
+    "explanation": "This renews unless you act. Note the date and the steps needed to cancel."
+   },
+   {
+    "applies_to": "unilateral_amendment",
+    "title": "They can change the terms",
+    "explanation": "The other party can change the agreement on its own. Check how you'd be told, and whether you can leave if you don't accept."
+   },
+   {
+    "applies_to": "liability_waiver",
+    "title": "Limits on their liability",
+    "explanation": "This limits what the other party is responsible for if something goes wrong. Check what's excluded."
+   },
+   {
+    "applies_to": "arbitration",
+    "title": "Arbitration instead of court",
+    "explanation": "Disputes may have to go to private arbitration, and class actions may be excluded. Check whether you can opt out."
+   },
+   {
+    "applies_to": "indemnity",
+    "title": "You cover their costs",
+    "explanation": "You may have to pay the other party's losses or legal costs in some situations. Check how broad this is."
+   },
+   {
+    "applies_to": "content_license",
+    "title": "Rights to your content",
+    "explanation": "You may be granting rights to what you upload or create. Check whether they're perpetual, transferable, or commercial."
+   },
+   {
+    "applies_to": "data_sharing",
+    "title": "Sharing your data",
+    "explanation": "Your information may be shared with other companies. Check with whom and why, and whether you can refuse."
+   },
+   {
+    "applies_to": "cancellation_fee",
+    "title": "Cancellation or early-exit fee",
+    "explanation": "Leaving early costs money. Check the amount and when it applies."
+   },
+   {
+    "applies_to": "price_increase",
+    "title": "Price can go up",
+    "explanation": "The price can change during the agreement. Check how much notice you get and whether you can cancel."
+   },
+   {
+    "applies_to": "venue",
+    "title": "Where disputes are handled",
+    "explanation": "Disputes may be governed by another place's law or courts, which could make them harder to pursue from where you live."
+   },
+   {
+    "applies_to": "non_disparagement",
+    "title": "Limits on what you can say",
+    "explanation": "You may be restricted from criticizing the other party publicly. Check how long this lasts and what it covers."
+   },
+   {
+    "applies_to": "assignment",
+    "title": "The agreement can be transferred",
+    "explanation": "The other party may transfer the agreement to someone else, possibly without asking you."
+   },
+   {
+    "applies_to": "guests",
+    "title": "Limits on guests",
+    "explanation": "This restricts guests in your home. If it seems unreasonable, check the Landlord and Tenant Board's guidance before relying on it."
+   },
+   {
+    "applies_to": "non_compete",
+    "title": "Restriction on competing work",
+    "explanation": "This limits the work you can take on after the agreement ends. Check how long it lasts, where it applies, and what work it covers."
+   },
+   {
+    "applies_to": "termination",
+    "title": "How the agreement ends",
+    "explanation": "Check the notice required to end this agreement, and any fees or conditions attached."
+   }
+  ]
+ },
+ "documents": [
+  {
+   "id": "01_lease_problems",
+   "title": "Lease with problems",
+   "blurb": "An Ontario residential lease with several clauses the law has already voided.",
+   "document_type": "residential_lease",
+   "text": "RESIDENTIAL TENANCY AGREEMENT\n\nThis agreement is made between Maple Grove Properties Inc. (the \"Landlord\") and Jordan Ellis (the \"Tenant\") for Unit 4B, 112 King Street, Peterborough, Ontario.\n\n1. TERM AND RENT\n1.1 The tenancy begins on September 1, 2026 and continues for one year.\n1.2 The Tenant shall pay rent of $1,800 per month, due on the first day of each month.\n\n2. DEPOSITS\n2.1 The Tenant shall pay a rent deposit of $1,800, to be applied to the last month of the tenancy.\n2.2 The Tenant shall also pay a damage deposit of $600, refundable at the end of the tenancy if the unit is undamaged.\n\n3. PAYMENT\n3.1 The Tenant must provide twelve post-dated cheques for the year's rent before moving in.\n3.2 A fee of $50 will be charged for any cheque returned NSF.\n3.3 If the Tenant fails to pay rent when due, the rent for the remainder of the term becomes due immediately.\n\n4. USE OF THE UNIT\n4.1 No pets of any kind are permitted in the unit or the building.\n4.2 Guests may not stay overnight for more than three nights in any month without the Landlord's written approval.\n\n5. ACCESS\n5.1 The Landlord may enter the unit at any time without notice to carry out inspections or repairs.\n\n6. RENT INCREASES\n6.1 The Landlord may increase the rent once every six months by giving the Tenant 60 days' written notice.\n",
+   "clauses": [
+    {
+     "type": "rent_deposit",
+     "start": 386,
+     "end": 480,
+     "quote": "The Tenant shall pay a rent deposit of $1,800, to be applied to the last month of the tenancy.",
+     "params": {
+      "amount": 1800,
+      "monthly_rent": 1800
+     }
+    },
+    {
+     "type": "security_deposit",
+     "start": 485,
+     "end": 599,
+     "quote": "The Tenant shall also pay a damage deposit of $600, refundable at the end of the tenancy if the unit is undamaged.",
+     "params": {
+      "amount": 600
+     }
+    },
+    {
+     "type": "post_dated_cheques",
+     "start": 616,
+     "end": 703,
+     "quote": "The Tenant must provide twelve post-dated cheques for the year's rent before moving in.",
+     "params": {}
+    },
+    {
+     "type": "nsf_fee",
+     "start": 708,
+     "end": 765,
+     "quote": "A fee of $50 will be charged for any cheque returned NSF.",
+     "params": {
+      "amount": 50
+     }
+    },
+    {
+     "type": "acceleration_clause",
+     "start": 770,
+     "end": 875,
+     "quote": "If the Tenant fails to pay rent when due, the rent for the remainder of the term becomes due immediately.",
+     "params": {}
+    },
+    {
+     "type": "pets",
+     "start": 900,
+     "end": 962,
+     "quote": "No pets of any kind are permitted in the unit or the building.",
+     "params": {}
+    },
+    {
+     "type": "guests",
+     "start": 967,
+     "end": 1077,
+     "quote": "Guests may not stay overnight for more than three nights in any month without the Landlord's written approval.",
+     "params": {}
+    },
+    {
+     "type": "landlord_entry",
+     "start": 1093,
+     "end": 1188,
+     "quote": "The Landlord may enter the unit at any time without notice to carry out inspections or repairs.",
+     "params": {
+      "notice_hours": 0
+     }
+    },
+    {
+     "type": "rent_increase",
+     "start": 1212,
+     "end": 1314,
+     "quote": "The Landlord may increase the rent once every six months by giving the Tenant 60 days' written notice.",
+     "params": {
+      "notice_days": 60,
+      "months_between_increases": 6
+     }
+    }
+   ]
+  },
+  {
+   "id": "02_lease_fair",
+   "title": "A fair lease",
+   "blurb": "An Ontario lease that mostly follows the rules: what a clean result looks like.",
+   "document_type": "residential_lease",
+   "text": "RESIDENTIAL TENANCY AGREEMENT\n\nLandlord: Hillcrest Rentals Ltd.\nTenant: Alex Moreau\nRental unit: 27 Elm Avenue, Apartment 3, Kingston, Ontario\n\n1. The Tenant will pay rent of $2,100 per month on the first day of each month.\n2. The Tenant will pay a rent deposit of $2,100, which will be applied to the rent for the last month of the tenancy. The Landlord will pay interest on the deposit each year as required by law.\n3. The Tenant may pay rent by cheque, e-transfer or pre-authorized debit, at the Tenant's choice.\n4. The Landlord will provide two keys. A refundable key deposit of $40 is required, which is the cost of replacing both keys.\n5. Except in an emergency, the Landlord will give the Tenant at least 24 hours' written notice before entering the unit, and will enter only between 8 a.m. and 8 p.m.\n6. The rent will not be increased more than once in any 12-month period, and the Landlord will give at least 90 days' written notice of any increase.\n7. The Tenant is responsible for obtaining tenant's insurance.\n",
+   "clauses": [
+    {
+     "type": "rent_deposit",
+     "start": 227,
+     "end": 341,
+     "quote": "The Tenant will pay a rent deposit of $2,100, which will be applied to the rent for the last month of the tenancy.",
+     "params": {
+      "amount": 2100,
+      "monthly_rent": 2100
+     }
+    },
+    {
+     "type": "key_deposit",
+     "start": 555,
+     "end": 641,
+     "quote": "A refundable key deposit of $40 is required, which is the cost of replacing both keys.",
+     "params": {
+      "amount": 40,
+      "replacement_cost": 40
+     }
+    },
+    {
+     "type": "landlord_entry",
+     "start": 645,
+     "end": 797,
+     "quote": "Except in an emergency, the Landlord will give the Tenant at least 24 hours' written notice before entering the unit, and will enter only between 8 a.m.",
+     "params": {
+      "notice_hours": 24
+     }
+    },
+    {
+     "type": "rent_increase",
+     "start": 812,
+     "end": 958,
+     "quote": "The rent will not be increased more than once in any 12-month period, and the Landlord will give at least 90 days' written notice of any increase.",
+     "params": {
+      "notice_days": 90,
+      "months_between_increases": 12
+     }
+    }
+   ]
+  },
+  {
+   "id": "04_employment_offer",
+   "title": "Job offer",
+   "blurb": "An Ontario employment offer with a non-compete and short vacation.",
+   "document_type": "employment",
+   "text": "OFFER OF EMPLOYMENT\n\nDear Priya Sharma,\n\nWe are pleased to offer you the position of Data Analyst at Northwind Analytics Ltd., located in Toronto, Ontario, starting November 2, 2026.\n\n1. Salary. Your annual salary will be $68,000, paid bi-weekly.\n2. Hours and Overtime. Your regular hours are 40 per week. Overtime will be paid at your regular hourly rate for hours worked beyond 48 hours in a week.\n3. Vacation. You will receive 10 days of paid vacation per year.\n4. Non-Competition. For 12 months after your employment ends, you will not work for or provide services to any business that competes with Northwind Analytics in Canada.\n5. Termination. The Company may end your employment at any time with two weeks' notice or pay in lieu of notice.\n6. Non-Disparagement. You agree not to make negative public statements about the Company during or after your employment.\n7. Intellectual Property. All work you create in the course of your employment belongs to the Company.\n\nPlease sign below to accept this offer.\n",
+   "clauses": [
+    {
+     "type": "overtime",
+     "start": 306,
+     "end": 399,
+     "quote": "Overtime will be paid at your regular hourly rate for hours worked beyond 48 hours in a week.",
+     "params": {
+      "overtime_threshold_hours": 48,
+      "overtime_multiplier": 1
+     }
+    },
+    {
+     "type": "vacation",
+     "start": 413,
+     "end": 464,
+     "quote": "You will receive 10 days of paid vacation per year.",
+     "params": {
+      "vacation_weeks": 2
+     }
+    },
+    {
+     "type": "non_compete",
+     "start": 485,
+     "end": 634,
+     "quote": "For 12 months after your employment ends, you will not work for or provide services to any business that competes with Northwind Analytics in Canada.",
+     "params": {}
+    },
+    {
+     "type": "termination",
+     "start": 651,
+     "end": 747,
+     "quote": "The Company may end your employment at any time with two weeks' notice or pay in lieu of notice.",
+     "params": {}
+    },
+    {
+     "type": "non_disparagement",
+     "start": 770,
+     "end": 869,
+     "quote": "You agree not to make negative public statements about the Company during or after your employment.",
+     "params": {}
+    },
+    {
+     "type": "content_license",
+     "start": 896,
+     "end": 972,
+     "quote": "All work you create in the course of your employment belongs to the Company.",
+     "params": {}
+    }
+   ]
+  },
+  {
+   "id": "05_subscription_terms",
+   "title": "Streaming terms",
+   "blurb": "Online terms of service: no Ontario statute applies, so only 'worth a look' flags.",
+   "document_type": "subscription_terms",
+   "text": "STREAMLY PREMIUM - TERMS OF SERVICE\n\nBy creating an account you agree to these Terms.\n\n1. Your subscription automatically renews each month at the then-current price until you cancel.\n2. We may modify these Terms at any time. Continued use of the service after changes means you accept them.\n3. We may change the price of your subscription with 7 days' notice.\n4. Any dispute will be resolved by binding arbitration, and you waive your right to participate in a class action.\n5. We may share your personal information with our advertising partners and other third parties.\n6. If you cancel before the end of a 12-month promotional term, a cancellation fee of $45 applies.\n7. These Terms are governed by the laws of the State of Delaware, and you agree to the exclusive jurisdiction of its courts.\n8. To the maximum extent permitted by law, Streamly will not be liable for any indirect or consequential damages.\n",
+   "clauses": [
+    {
+     "type": "auto_renewal",
+     "start": 90,
+     "end": 183,
+     "quote": "Your subscription automatically renews each month at the then-current price until you cancel.",
+     "params": {}
+    },
+    {
+     "type": "unilateral_amendment",
+     "start": 187,
+     "end": 225,
+     "quote": "We may modify these Terms at any time.",
+     "params": {}
+    },
+    {
+     "type": "price_increase",
+     "start": 295,
+     "end": 360,
+     "quote": "We may change the price of your subscription with 7 days' notice.",
+     "params": {}
+    },
+    {
+     "type": "arbitration",
+     "start": 364,
+     "end": 475,
+     "quote": "Any dispute will be resolved by binding arbitration, and you waive your right to participate in a class action.",
+     "params": {}
+    },
+    {
+     "type": "data_sharing",
+     "start": 479,
+     "end": 572,
+     "quote": "We may share your personal information with our advertising partners and other third parties.",
+     "params": {}
+    },
+    {
+     "type": "cancellation_fee",
+     "start": 576,
+     "end": 671,
+     "quote": "If you cancel before the end of a 12-month promotional term, a cancellation fee of $45 applies.",
+     "params": {
+      "amount": 45
+     }
+    },
+    {
+     "type": "venue",
+     "start": 675,
+     "end": 796,
+     "quote": "These Terms are governed by the laws of the State of Delaware, and you agree to the exclusive jurisdiction of its courts.",
+     "params": {}
+    },
+    {
+     "type": "liability_waiver",
+     "start": 800,
+     "end": 910,
+     "quote": "To the maximum extent permitted by law, Streamly will not be liable for any indirect or consequential damages.",
+     "params": {}
+    }
+   ]
+  },
+  {
+   "id": "06_contractor_agreement",
+   "title": "Contractor agreement",
+   "blurb": "A document the app can't classify, so it refuses to give any legal verdict.",
+   "document_type": "unknown",
+   "text": "INDEPENDENT CONTRACTOR AGREEMENT\n\nThis agreement is between Brightline Media Inc. (the \"Client\") and Sam Okafor (the \"Contractor\").\n\n1. Services. The Contractor will provide video editing services as described in each statement of work. The Contractor is an independent contractor and not an employee of the Client.\n2. Fees. The Client will pay the Contractor $55 per hour, invoiced monthly.\n3. Non-Competition. During this agreement and for 6 months afterward, the Contractor will not provide editing services to any direct competitor of the Client.\n4. Indemnity. The Contractor will indemnify the Client against any claims arising from the Contractor's work.\n5. Termination. Either party may end this agreement with 14 days' written notice.\n6. Ownership. The Contractor assigns to the Client all rights in the work product created under this agreement.\n",
+   "clauses": [
+    {
+     "type": "non_compete",
+     "start": 412,
+     "end": 550,
+     "quote": "During this agreement and for 6 months afterward, the Contractor will not provide editing services to any direct competitor of the Client.",
+     "params": {}
+    },
+    {
+     "type": "indemnity",
+     "start": 565,
+     "end": 660,
+     "quote": "The Contractor will indemnify the Client against any claims arising from the Contractor's work.",
+     "params": {}
+    },
+    {
+     "type": "termination",
+     "start": 677,
+     "end": 742,
+     "quote": "Either party may end this agreement with 14 days' written notice.",
+     "params": {}
+    },
+    {
+     "type": "content_license",
+     "start": 757,
+     "end": 854,
+     "quote": "The Contractor assigns to the Client all rights in the work product created under this agreement.",
+     "params": {}
+    }
+   ]
+  }
+ ],
+ "trap": {
+  "id": "08_lease_negations",
+  "title": "Try to break it",
+  "blurb": "A lease that welcomes pets.",
+  "document_type": "residential_lease",
+  "text": "LEASE AGREEMENT - 9 Brock Street, Unit B, Guelph, Ontario\n\nLandlord: Rivera Homes. Tenant: Sam Delacroix.\n\n1. Rent is $1,650 per month, due on the first day of each month.\n\n2. No damage deposit or security deposit will be required for this tenancy.\n\n3. Pets are welcome. The Tenant may keep cats and dogs in the unit.\n\n4. Post-dated cheques are optional. The Tenant may pay rent by cheque, e-transfer or cash, whichever the Tenant prefers.\n\n5. The Landlord will not charge any fee for a returned or NSF cheque beyond the bank's own charges.\n\n6. The Landlord will give the Tenant at least 24 hours' written notice before entering the unit, except in an emergency.\n\n7. Guests are welcome at any time.\n",
+  "clauses": [
+   {
+    "type": "pets",
+    "start": 253,
+    "end": 317,
+    "quote": "Pets are welcome. The Tenant may keep cats and dogs in the unit.",
+    "params": {},
+    "ai_mislabel": true
+   },
+   {
+    "type": "landlord_entry",
+    "start": 545,
+    "end": 662,
+    "quote": "The Landlord will give the Tenant at least 24 hours' written notice before entering the unit, except in an emergency.",
+    "params": {
+     "notice_hours": 24
+    }
+   }
+  ]
+ }
+}
