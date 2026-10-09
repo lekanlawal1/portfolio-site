@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discrepancy Checker</title>
+<meta name="description" content="An Excel workbook and browser tool that checks cycle counts against the system, receipts against the packing slip and PO, and storage invoices against the rate card.">
+<meta property="og:title" content="Shipment and Inventory Discrepancy Checker">
+<meta property="og:description" content="Counts vs system, receipts vs paperwork, invoices vs rate card. Download the workbook or run the checks on your own file in the browser.">
+<meta property="og:image" content="https://lekanlawal1.github.io/portfolio-site/assets/discrepancy-checker.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%231F3A5F%22/%3E%3Cpath d=%22M9 17l5 5 9-11%22 stroke=%22white%22 stroke-width=%223.5%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #F4F6F9; --card: #FFFFFF; --field: #EEF1F5; --border: #DDE2E9;
+  --ink: #1F2933; --ink-2: #5F6B7A; --accent: #1F3A5F; --accent-2: #2E6FB7;
+  --bad: #B3261E; --bad-bg: #FDECEC; --ok: #1E6B35; --ok-bg: #E6F3EA; --amber: #A86A0A;
+  --input: #1D4ED8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #11161D; --card: #19202A; --field: #212A36; --border: #2C3644;
+    --ink: #E8EDF3; --ink-2: #9AA7B6; --accent: #8DB4E8; --accent-2: #8DB4E8;
+    --bad: #F28B82; --bad-bg: #3A1F1F; --ok: #81C995; --ok-bg: #1C3325; --amber: #F0B04A;
+    --input: #93B4FF;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--accent-2); }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+.mono { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
+
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0; font-size: 14px; }
+.topbar a { color: var(--ink-2); text-decoration: none; }
+.topbar a:hover { color: var(--ink); }
+
+.hero { padding: 22px 0 6px; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; }
+.eyebrow { color: var(--accent-2); font-weight: 600; font-size: 14px; letter-spacing: .02em; }
+h1 { font-size: clamp(1.9rem, 4.6vw, 2.8rem); line-height: 1.1; letter-spacing: -.02em; margin: 6px 0 12px; }
+.lead { color: var(--ink-2); font-size: 1.06rem; max-width: 44rem; margin: 0; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-weight: 600; font-size: 15px; padding: 11px 18px;
+  border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--ink); text-decoration: none; cursor: pointer; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+@media (prefers-color-scheme: dark) { .btn.primary { color: #11161D; } }
+.btn small { font-weight: 500; opacity: .75; }
+.hero .actions { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+@media (max-width: 760px) { .hero { grid-template-columns: 1fr; } .hero .actions { flex-direction: row; flex-wrap: wrap; } }
+
+.notice { margin: 18px 0 0; font-size: 14px; color: var(--ink-2); background: var(--card); border: 1px solid var(--border);
+  border-left: 4px solid var(--amber); border-radius: 10px; padding: 10px 14px; }
+
+.source { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin: 26px 0 14px; }
+.seg { display: inline-flex; background: var(--field); border-radius: 10px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 600; border: 0; background: none; color: var(--ink-2); padding: 7px 14px; border-radius: 8px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.status { font-size: 14px; color: var(--ink-2); }
+.status b { color: var(--ink); }
+
+.drop { display: none; border: 2px dashed var(--border); border-radius: 14px; padding: 22px; text-align: center; background: var(--card); margin-bottom: 14px; }
+.drop.show { display: block; }
+.drop.over { border-color: var(--accent-2); background: var(--field); }
+.drop p { margin: 4px 0; color: var(--ink-2); font-size: 14px; }
+.drop .err { color: var(--bad); font-weight: 600; }
+
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.kpi { background: var(--card); border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: 12px; padding: 12px 16px 14px; }
+.kpi.bad { border-top-color: var(--bad); }
+.kpi .l { font-size: 13px; color: var(--ink-2); font-weight: 600; }
+.kpi .v { font-size: clamp(1.5rem, 3.4vw, 2rem); font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.kpi.bad .v { color: var(--bad); }
+.kpi .s { font-size: 12.5px; color: var(--ink-2); }
+@media (max-width: 760px) { .kpis { grid-template-columns: 1fr 1fr; } .kpi.wide-sm { grid-column: span 2; } }
+
+.charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+@media (max-width: 900px) { .charts { grid-template-columns: 1fr; } }
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.panel h3 { margin: 0 0 10px; font-size: 15px; }
+.bars { display: grid; grid-template-columns: minmax(0, 9.5em) 1fr; gap: 7px 10px; align-items: center; font-size: 13px; }
+.bars .lab { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bars .track { position: relative; height: 20px; }
+.bars .fill { position: absolute; top: 0; bottom: 0; border-radius: 4px; transition: width .35s ease, left .35s ease; }
+.bars .num { position: absolute; top: 0; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums; font-size: 12.5px; white-space: nowrap; }
+.bars .axis { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--ink-2); opacity: .5; }
+
+h2.section { font-size: 1.4rem; letter-spacing: -.01em; margin: 40px 0 4px; }
+.section-sub { color: var(--ink-2); margin: 0 0 14px; max-width: 48rem; }
+
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+.tab { font: inherit; font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--card); color: var(--ink-2); }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.tab .c { display: inline-block; min-width: 1.5em; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--bad-bg); color: var(--bad); font-size: 12px; }
+.tabs .spacer { flex: 1; }
+.chk { font-size: 14px; color: var(--ink-2); display: inline-flex; gap: 6px; align-items: center; }
+.linkbtn { font: inherit; font-size: 14px; background: none; border: 0; color: var(--accent-2); cursor: pointer; padding: 4px; }
+
+.tablewrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: auto; max-height: 560px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th { position: sticky; top: 0; z-index: 1; background: var(--accent); color: #fff; text-align: left; font-weight: 600; padding: 9px 10px; white-space: nowrap; }
+@media (prefers-color-scheme: dark) { th { background: #26354A; } }
+td { padding: 6px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td.n, th.n { text-align: right; }
+td.calc { background: var(--field); }
+tr.bad td { background: var(--bad-bg); }
+tr.bad td.calc { background: color-mix(in srgb, var(--bad-bg) 70%, var(--field)); }
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; }
+.pill.ok { color: var(--ok); background: var(--ok-bg); }
+.pill.bad { color: #fff; background: var(--bad); }
+@media (prefers-color-scheme: dark) { .pill.bad { color: #11161D; } }
+.neg { color: var(--bad); font-weight: 600; }
+td input { width: 5.5em; font: inherit; color: var(--input); font-weight: 600; text-align: right; background: transparent;
+  border: 1px solid transparent; border-radius: 6px; padding: 2px 4px; }
+td input.money { width: 7.5em; }
+td input:hover { border-color: var(--border); }
+td input:focus { outline: none; border-color: var(--accent-2); background: var(--card); }
+td input.changed { background: color-mix(in srgb, var(--input) 12%, transparent); }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--ink-2); margin: 10px 2px 0; }
+.legend span::before { content: ""; display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.legend .i::before { border: 2px solid var(--input); }
+.legend .f::before { background: var(--field); border: 1px solid var(--border); }
+.legend .r::before { background: var(--bad-bg); border: 1px solid var(--bad); }
+
+.formulas > *, .charts > *, .kpis > * { min-width: 0; }
+.formulas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 760px) { .formulas { grid-template-columns: 1fr; } }
+.f-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.f-card .where { font-size: 12.5px; font-weight: 600; color: var(--accent-2); text-transform: uppercase; letter-spacing: .04em; }
+.f-card h4 { margin: 2px 0 8px; font-size: 15.5px; }
+.f-card code { display: block; background: var(--field); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; overflow-x: auto; white-space: pre; }
+.f-card p { margin: 8px 0 0; font-size: 14px; color: var(--ink-2); }
+.f-card .alt { font-size: 12.5px; margin-top: 8px; color: var(--ink-2); }
+.f-card .alt code { margin-top: 4px; }
+
+.format { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 14px; }
+.format ul { margin: 6px 0 0; padding-left: 20px; }
+.format li { margin: 3px 0; }
+footer { color: var(--ink-2); font-size: 13.5px; padding: 36px 0 44px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="../../">&larr; Lekan Lawal</a>
+    <a href="Discrepancy_Checker_Sample.xlsx" download>Download .xlsx</a>
+  </div>
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Excel workbook + browser checker</div>
+      <h1>Shipment and Inventory Discrepancy Checker</h1>
+      <p class="lead">Catches the three mistakes a warehouse pays for: cycle counts that don't match the system,
+        receipts that don't match the packing slip or PO, and storage invoices that don't match the rate card.
+        The checks below are read straight from the workbook. Change any blue number and watch them update.</p>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="Discrepancy_Checker_Sample.xlsx" download>Download the workbook <small>.xlsx</small></a>
+      <a class="btn" href="#how">How each check works</a>
+    </div>
+  </div>
+  <p class="notice"><b>Sample data.</b> Every company, SKU, quantity, rate and dollar amount here is made up for practice.
+    Carrier names are real Canadian carriers, used only to make the receiving log realistic.</p>
+
+  <div class="source">
+    <div class="seg" role="group" aria-label="Data source">
+      <button type="button" data-src="sample" aria-pressed="true">Sample workbook</button>
+      <button type="button" data-src="own" aria-pressed="false">Check your own file</button>
+    </div>
+    <div class="status" id="status">Loading the workbook&hellip;</div>
+  </div>
+
+  <div class="drop" id="drop">
+    <p><b>Drop an .xlsx file here</b> or <label class="linkbtn" for="file" style="display:inline">choose one</label>.
+      <input type="file" id="file" accept=".xlsx,.xls" hidden></p>
+    <p>It is read in your browser and never uploaded. Use the same sheet and column names as the
+      <a href="Discrepancy_Checker_Sample.xlsx" download>sample workbook</a> (details <a href="#format">below</a>).</p>
+    <p class="err" id="drop-err"></p>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+  <div class="charts">
+    <div class="panel"><h3>Discrepancies by type</h3><div class="bars" id="c-type"></div></div>
+    <div class="panel"><h3>Count discrepancies by reason</h3><div class="bars" id="c-reason"></div></div>
+    <div class="panel"><h3>Billing variance by client</h3><div class="bars" id="c-client"></div></div>
+  </div>
+
+  <h2 class="section">The sheets</h2>
+  <p class="section-sub">Same rows, same rules as the workbook. Blue numbers are typed values and can be edited here;
+    grey cells are calculated.</p>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="inventory" aria-selected="true">Inventory <span class="c" id="n-inventory"></span></button>
+    <button class="tab" role="tab" data-tab="receiving" aria-selected="false">Receiving <span class="c" id="n-receiving"></span></button>
+    <button class="tab" role="tab" data-tab="billing" aria-selected="false">Billing <span class="c" id="n-billing"></span></button>
+    <span class="spacer"></span>
+    <label class="chk"><input type="checkbox" id="only"> Only rows that need a look</label>
+    <button class="linkbtn" id="reset" hidden>Undo my edits</button>
+  </div>
+  <div class="tablewrap"><table id="grid"></table></div>
+  <div class="legend"><span class="i">Typed value (editable)</span><span class="f">Formula</span><span class="r">Needs a look</span></div>
+
+  <h2 class="section" id="how">How each check works</h2>
+  <p class="section-sub">The formulas in the workbook, row 2 shown. Lookups use INDEX and MATCH, which works in every version
+    of Excel; the XLOOKUP version is shown where it applies.</p>
+  <div class="formulas" id="formulas"></div>
+
+  <h2 class="section" id="format">Using your own file</h2>
+  <div class="format">
+    Sheets are matched by name and columns by their header in row 1. Any sheet you leave out is skipped.
+    <ul>
+      <li><b>Inventory:</b> SKU, System qty, Physical count. Optional: Reason, Count date.</li>
+      <li><b>Receiving:</b> PO, SKU, PO qty, Packing slip qty, Qty received. Optional: Receipt date, Carrier, BOL.</li>
+      <li><b>Billing:</b> Month, Client, Pallets stored, Invoice amount. Rate comes from the Lists sheet, or a Rate column.</li>
+      <li><b>Items</b> (optional): SKU, Description, Bin location, Unit cost. Needed for descriptions and dollar variance.</li>
+      <li><b>Lists</b> (optional): Client and Storage rate columns, and a Billing tolerance cell. Tolerance defaults to $1.00.</li>
+    </ul>
+  </div>
+
+  <footer>Built by Lekan Lawal. The workbook uses plain Excel formulas (no macros), so it opens in Excel 2010 and later,
+    Excel for Mac and Google Sheets. <a href="../../">Back to the portfolio</a></footer>
+</div>
+<script src="xlsx.mini.min.js"></script>
+<script src="checker.js"></script>
+</body>
+</html>
