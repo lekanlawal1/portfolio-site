@@ -327,6 +327,6 @@
     blds.forEach((b, i) => setTimeout(() => { b._tip.classList.add("on"); setTimeout(() => b._tip.classList.remove("on"), 1400); }, 800 + i * 500));
   }
 
-  window.Town = { visited, total: PROJECTS.length };
+  window.Town = { visited, total: PROJECTS.length, ids: PROJECTS.map((p) => p.id) };
   document.dispatchEvent(new CustomEvent("town-ready"));
 })();

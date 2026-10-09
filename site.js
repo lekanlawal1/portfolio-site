@@ -17,7 +17,7 @@
       const c = document.createElement("div");
       c.className = "confetti";
       c.style.background = colors[i % colors.length];
-      document.body.appendChild(c);
+      (document.querySelector("dialog[open]") || document.body).appendChild(c);   // an open dialog sits above the page
       const ang = Math.random() * Math.PI * 2, v = 6 + Math.random() * 9;
       let vx = Math.cos(ang) * v, vy = Math.sin(ang) * v - 7, px = x, py = y, rot = Math.random() * 360, life = 0;
       const step = () => {
@@ -119,19 +119,94 @@
       confetti(e.clientX, e.clientY, 40);
     }));
 
-    // the town quest on the home page
+    // the town quest: every project counts once it has been seen, however the visitor got there
+    // (an island building, a project card, or the page itself). Finishing unlocks the contact card.
     const quest = document.getElementById("quest");
+    const BODY_TO_ID = { "c-econ": "econ", "c-store": "store", "c-triage": "triage", "c-fifa": "fifa", "c-fine": "fine", "c-wh": "wh" };
+    const CARD_TO_ID = { economy: "econ", superstore: "store", triage: "triage", football: "fifa", "fine-print": "fine", discrepancy: "wh" };
+    const readVisited = () => { try { return JSON.parse(localStorage.getItem("town-visited") || "[]"); } catch { return []; } };
+    const markVisited = (id) => {
+      if (window.Town) window.Town.visited.add(id);
+      const all = new Set(readVisited()); all.add(id);
+      try { localStorage.setItem("town-visited", JSON.stringify([...all])); } catch {}
+    };
+    const here = Object.keys(BODY_TO_ID).find((c) => document.body.classList.contains(c));
+    if (here && !document.querySelector(".archived")) markVisited(BODY_TO_ID[here]);
+    document.addEventListener("click", (e) => {
+      const card = e.target.closest(".card[id] a")?.closest(".card[id]");
+      if (card && CARD_TO_ID[card.id]) markVisited(CARD_TO_ID[card.id]);
+    });
+
     const update = () => {
       if (!quest || !window.Town) return;
-      const n = window.Town.visited.size, total = window.Town.total;
+      const n = window.Town.visited.size, total = window.Town.total, done = n >= total;
       quest.querySelector(".stars").innerHTML = Array.from({ length: total }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("");
-      quest.querySelector(".count").textContent = n >= total ? "Whole town explored!" : `${n}/${total} explored`;
-      if (n >= total) {
-        let shown = false; try { shown = sessionStorage.getItem("quest-done") === "1"; sessionStorage.setItem("quest-done", "1"); } catch {}
-        if (!shown) setTimeout(() => { const r = quest.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 90); toast("You've seen every project. Say hi below!"); }, 600);
+      quest.querySelector(".count").textContent = done ? "Town explored! Open your reward" : `${n}/${total} explored · see all ${total} to unlock a surprise`;
+      quest.classList.toggle("done", done);
+      if (done) {
+        quest.setAttribute("role", "button"); quest.tabIndex = 0;
+        let seen = false; try { seen = localStorage.getItem("reward-seen") === "1"; } catch {}
+        if (!seen) setTimeout(() => { openReward(); confetti(innerWidth / 2, innerHeight * 0.3, 110); }, 700);
       }
     };
+    if (quest) {
+      quest.addEventListener("click", () => { if (quest.classList.contains("done")) openReward(); });
+      quest.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && quest.classList.contains("done")) { e.preventDefault(); openReward(); } });
+    }
     if (window.Town) update(); else document.addEventListener("town-ready", update);
+    // coming back from a project page via the back button restores this page as it was: catch up
+    addEventListener("pageshow", (e) => {
+      if (!e.persisted || !window.Town) return;
+      readVisited().filter((id) => window.Town.ids.includes(id)).forEach((id) => window.Town.visited.add(id));
+      update();
+    });
+
+    // the reward: a contact card floating over the blurred page
+    const EMAIL = "lekan1553@gmail.com";
+    const DRAFT = "mailto:" + EMAIL + "?subject=" + encodeURIComponent("Hi from your portfolio island") + "&body=" + encodeURIComponent(
+      "Hey Lekan,\r\n\r\nMy name is ___ and I work at ___. I came across your portfolio and wanted to reach out about ___.\r\n\r\n");
+    let reward = null;
+    function openReward() {
+      try { localStorage.setItem("reward-seen", "1"); } catch {}
+      if (!reward) {
+        reward = document.createElement("dialog");
+        reward.className = "reward";
+        reward.setAttribute("aria-labelledby", "reward-title");
+        reward.innerHTML = `<div class="reward-card">
+          <button type="button" class="x" aria-label="Close">&times;</button>
+          <p class="unlocked"><span class="stars">${"<i class=\"on\"></i>".repeat(window.Town ? window.Town.total : 6)}</span>Whole town explored</p>
+          <div class="who"><span class="dot big" aria-hidden="true">LL</span>
+            <div><h2 id="reward-title">Lekan Lawal</h2><p>Data, BI and AI analyst · Canada</p></div></div>
+          <p class="msg">You've seen every project. If something caught your eye, I'd love to hear about it.</p>
+          <div class="actions">
+            <a class="btn primary" href="${DRAFT}">Write to Lekan</a>
+            <button type="button" class="btn copy">Copy email</button>
+          </div>
+          <p class="addr">${EMAIL}</p>
+          <ul class="links">
+            <li><a href="https://www.linkedin.com/in/lekan-lawal/" target="_blank" rel="noopener">LinkedIn</a></li>
+            <li><a href="https://github.com/lekanlawal1" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="tel:+12896715308">Call (289) 671 5308</a></li>
+          </ul></div>`;
+        document.body.appendChild(reward);
+        const close = () => { reward.classList.add("closing"); setTimeout(() => { reward.classList.remove("closing"); reward.close(); }, reduced ? 0 : 180); };
+        reward.querySelector(".x").addEventListener("click", close);
+        // the dialog fills the screen; a click outside the card lands on the dialog element itself
+        reward.addEventListener("click", (e) => { if (e.target === reward) close(); });
+        reward.addEventListener("cancel", (e) => { e.preventDefault(); close(); });     // Esc
+        reward.querySelector(".copy").addEventListener("click", async (e) => {
+          const b = e.currentTarget;
+          try {
+            await navigator.clipboard.writeText(EMAIL);
+            b.textContent = "Copied!"; confetti(e.clientX, e.clientY, 40);
+            setTimeout(() => { b.textContent = "Copy email"; }, 1800);
+          } catch { location.href = "mailto:" + EMAIL; }
+        });
+      }
+      if (!reward.open) reward.showModal();
+    }
+    window.Fun.openReward = openReward;
+
     let treeToasts = 0;
     document.addEventListener("tree-planted", (e) => {
       if (e.detail === 1) toast("You planted a tree. Keep going!");

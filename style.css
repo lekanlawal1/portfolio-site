@@ -374,3 +374,43 @@ article.case p + p { margin-top: 14px; }
 .archived { margin: 14px 0 0; padding: 10px 14px; border: 2px solid var(--ink); border-radius: 12px;
   background: var(--sun); color: #1D1535; font-size: 0.95rem; max-width: 70ch; }
 .archived a { color: inherit; font-weight: 700; }
+
+/* the tour reward: a contact card over the blurred page */
+.quest.done { cursor: pointer; border-color: var(--line); background: var(--sun); color: #1D1535; }
+.quest.done:hover { transform: translateY(-1px); }
+.quest.done .stars i { border-color: #1D1535; }
+dialog.reward { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 16px;
+  border: 0; background: transparent; display: none; place-items: center; overflow-y: auto; }
+dialog.reward[open] { display: grid; }
+dialog.reward::backdrop { background: rgba(29, 21, 53, .38); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); animation: fade .25s ease; }
+.reward-card { position: relative; width: min(440px, 100%); background: var(--card); color: var(--ink); border: 3px solid var(--line);
+  border-radius: 24px; box-shadow: var(--shadow-lg); padding: 26px 24px 22px; animation: pop .45s cubic-bezier(.34, 1.56, .64, 1); }
+dialog.reward.closing .reward-card { animation: unpop .18s ease forwards; }
+dialog.reward.closing::backdrop { animation: fade .18s ease reverse forwards; }
+@keyframes pop { from { opacity: 0; transform: translateY(18px) scale(.92) rotate(-1.5deg); } to { opacity: 1; transform: none; } }
+@keyframes unpop { to { opacity: 0; transform: translateY(10px) scale(.96); } }
+@keyframes fade { from { opacity: 0; } }
+.reward .x { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: 2.5px solid var(--line);
+  background: var(--bg); color: var(--ink); font: 700 22px/1 Inter, sans-serif; cursor: pointer; display: grid; place-items: center; }
+.reward .x:hover { background: var(--sun); color: #1D1535; }
+.reward .unlocked { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .06em; background: var(--sun); color: #1D1535; border: 2px solid var(--line); border-radius: 999px; padding: 3px 12px 3px 5px; }
+.reward .unlocked .stars { display: inline-flex; gap: 2px; }
+.reward .unlocked .stars i { width: 11px; height: 11px; border-radius: 50%; background: #fff; border: 1.5px solid #1D1535; }
+.reward .who { display: flex; align-items: center; gap: 14px; margin: 18px 0 10px; }
+.reward .dot.big { width: 58px; height: 58px; border-radius: 16px; background: var(--accent); border: 3px solid var(--line); box-shadow: 3px 3px 0 var(--line);
+  display: grid; place-items: center; color: #fff; font: 800 20px "Bricolage Grotesque", Inter, sans-serif; transform: rotate(-6deg); flex: none; }
+.reward h2 { font: 800 1.7rem/1.1 "Bricolage Grotesque", Inter, sans-serif; letter-spacing: -.02em; margin: 0; }
+.reward .who p { margin: 2px 0 0; color: var(--ink-2); font-weight: 600; font-size: 14.5px; }
+.reward .msg { color: var(--ink-2); margin: 0 0 16px; }
+.reward .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.reward .actions .btn { justify-content: center; text-align: center; padding: 12px 14px; font-size: 15px; }
+.reward .addr { margin: 8px 0 0; font-size: 13px; color: var(--muted); text-align: center; }
+.reward .links { list-style: none; padding: 14px 0 0; margin: 14px 0 0; border-top: 2px dashed var(--hair); display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.reward .links a { display: inline-block; padding: 6px 12px; border: 2px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink);
+  font-weight: 700; font-size: 13.5px; text-decoration: none; transition: transform .15s; }
+.reward .links a:hover { transform: translateY(-2px); }
+@media (max-width: 420px) { .reward .actions { grid-template-columns: 1fr; } .reward-card { padding: 22px 18px 18px; } }
+@media (prefers-reduced-motion: reduce) { .reward-card, dialog.reward::backdrop { animation: none !important; } }
+.reward .unlocked { margin-right: 42px; }
+@media (max-width: 420px) { .reward .unlocked { font-size: 11px; letter-spacing: .04em; } }
