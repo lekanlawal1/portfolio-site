@@ -184,13 +184,13 @@
         const w = (Math.abs(v) / max) * 78;
         fill = `left:0;width:${w}%`; numPos = `left:calc(${w}% + 6px)`;
       } else {
-        const w = (Math.abs(v) / max) * 24;
+        const w = (Math.abs(v) / max) * 18;
         fill = v >= 0 ? `left:50%;width:${w}%` : `left:${50 - w}%;width:${w}%`;
         numPos = v >= 0 ? `left:calc(${50 + w}% + 6px)` : `right:calc(${50 + w}% + 6px)`;
       }
       const col = typeof colour === "function" ? colour(v) : colour;
       return `<div class="lab" title="${esc(label)}">${esc(label)}</div><div class="track">${diverging ? '<div class="axis" style="left:50%"></div>' : ""}`
-        + `<div class="fill" style="${fill};background:${col}"></div><div class="num" style="${numPos}">${fmt(v)}</div></div>`;
+        + `<div class="fill" style="${fill};background:${col}"></div><div class="val" style="${numPos}">${fmt(v)}</div></div>`;
     }).join("");
   }
 
@@ -198,7 +198,7 @@
 
   function renderCharts(c) {
     bars("c-type", c.types, css("--bad"));
-    bars("c-reason", c.reasons, css("--accent-2"));
+    bars("c-reason", c.reasons, css("--sky"));
     bars("c-client", c.clients, (v) => (v >= 0 ? css("--amber") : css("--accent-2")), money);
   }
 
@@ -362,11 +362,14 @@
     ["Dashboard", "Counts", `=COUNTA(Inventory!$A$2:$A$500)\n=COUNTIF(Inventory!$F$2:$F$500,"Check")`,
       "COUNTA counts the rows filled in; COUNTIF counts the rows marked Check. Ranges run to row 500 so new rows are picked up."],
     ["Dashboard", "Billing variance", `=SUMIF(Billing!$H$2:$H$500,"Check",\n  Billing!$G$2:$G$500)`,
-      "Adds the variance of flagged invoices only. On this page it is split into overbilled and underbilled, because a net figure lets the two cancel out."],
+      "Adds the variance of flagged invoices only. This page splits it into overbilled and underbilled, so the two can't cancel out."],
   ];
   $("formulas").innerHTML = F.map(([where, title, code, text, alt]) => `<div class="f-card"><div class="where">${where}</div><h4>${title}</h4>`
     + `<code class="mono">${esc(code)}</code><p>${text}</p>`
     + (alt ? `<div class="alt">In Excel 365 with XLOOKUP:<code class="mono">${esc(alt)}</code></div>` : "") + "</div>").join("");
+
+  // Re-colour the charts when the day/night theme changes.
+  new MutationObserver(() => current && renderCharts(current)).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
   loadSample();
 })();

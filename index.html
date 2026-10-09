@@ -4,50 +4,75 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lekan Lawal | Data & AI Solutions Analyst</title>
-<meta name="description" content="Portfolio of Lekan Lawal: BI dashboards, applied-AI automation, data pipelines, and AI agents. Computer Science, Trent University.">
+<meta name="description" content="Portfolio of Lekan Lawal: BI dashboards, data pipelines, Excel tools and AI with guardrails. Explore it as a little town where every building is a project.">
+<meta property="og:title" content="Lekan Lawal | Data & AI Solutions Analyst">
+<meta property="og:description" content="Seven projects, six of them live in your browser. Explore the town: every building is a project.">
+<meta property="og:image" content="https://lekanlawal1.github.io/portfolio-site/assets/og-home.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="site.js"></script>
 </head>
 <body>
 
 <header class="site">
   <div class="wrap">
-    <a class="brand" href="#top">Lekan Lawal</a>
+    <a class="brand" href="#top"><span class="dot">LL</span>Lekan Lawal</a>
     <nav class="top">
       <a href="#projects">Projects</a>
-      <a href="#about">About</a>
+      <a href="#about" class="hide-sm">About</a>
       <a href="#contact">Contact</a>
     </nav>
   </div>
 </header>
 
 <main id="top">
-  <div class="hero wrap">
-    <p class="kicker">Data Analyst · BI Analyst · AI Solutions Analyst</p>
-    <h1>I turn messy data into decisions,<br>and AI into tools people can trust.</h1>
-    <p class="lead">Computer Science graduate (Trent University, 2026) based in Canada. I build
-    dashboards that expose where profit leaks, pipelines that survive messy real-world data, and
-    LLM systems engineered around the fact that AI gets things wrong. Every project below is
-    documented decision-by-decision and built to be defended in an interview, and six of the seven
-    run live in your browser.</p>
-    <div class="cta">
-      <a class="btn primary" href="#projects">See the work</a>
-      <a class="btn" href="https://github.com/lekanlawal1">GitHub</a>
+  <div class="hero">
+    <div class="stars-bg"></div>
+    <div class="cloud" style="top:12%;animation-duration:70s;animation-delay:-20s;--s:1"></div>
+    <div class="cloud" style="top:30%;animation-duration:95s;animation-delay:-60s;--s:.7"></div>
+    <div class="cloud" style="top:62%;animation-duration:80s;animation-delay:-5s;--s:.85"></div>
+    <div class="wrap">
+      <div>
+        <span class="kicker"><span class="live"></span>Data, BI and AI analyst · Canada</span>
+        <h1>I turn messy data into <span class="hl">decisions</span>, and AI into tools people can trust.</h1>
+        <p class="lead">Computer Science graduate, Trent University 2026. I build dashboards that find where profit
+          leaks, pipelines that survive real-world data, and AI that gets checked before anyone relies on it.</p>
+        <div class="cta">
+          <a class="btn primary" href="#projects">See the work <span class="arrow">&rarr;</span></a>
+          <a class="btn" href="#contact">Say hi</a>
+        </div>
+        <div class="hint">
+          <span class="quest" id="quest"><span class="stars"></span><span class="count"></span></span>
+          <span>This is my town. Each building is a project: tap one to visit it, or tap the grass to plant a tree.</span>
+        </div>
+      </div>
+      <div class="town-wrap">
+        <svg id="town" class="town" role="group" aria-label="An island town where each building links to a project"></svg>
+      </div>
     </div>
   </div>
 
-  <section id="projects" class="alt">
+  <div class="marquee" aria-hidden="true">
+    <div class="track">
+      <span>Python</span><span>SQL</span><span>DuckDB</span><span>Excel</span><span>Power BI</span><span>pandas</span><span>Plotly</span><span>statsmodels</span><span>scikit-learn</span><span>Gemini API</span><span>Swift</span><span>GitHub Actions</span><span>JavaScript</span>
+      <span>Python</span><span>SQL</span><span>DuckDB</span><span>Excel</span><span>Power BI</span><span>pandas</span><span>Plotly</span><span>statsmodels</span><span>scikit-learn</span><span>Gemini API</span><span>Swift</span><span>GitHub Actions</span><span>JavaScript</span>
+    </div>
+  </div>
+
+  <section id="projects">
     <div class="wrap">
-      <h2 class="section">Projects</h2>
-      <p class="section-sub">Seven builds: an iOS app that checks contracts against Ontario law, a
-      self-refreshing economic data platform, an Excel workbook that audits warehouse counts, receipts and billing, business intelligence, applied AI with guardrails, a full
-      data pipeline with a predictive model, and an AI agent on top of it.</p>
+      <h2 class="section">Seven builds. Six run live.</h2>
+      <p class="section-sub">An iOS app that checks contracts against Ontario law, a self-refreshing economic data platform,
+        an Excel tool for warehouse audits, business intelligence, applied AI with guardrails, a full data pipeline with a
+        model, and an AI agent on top of it. Click through: most of them you can use right now.</p>
 
       <div class="cards">
-        <div class="card wide">
-          <a class="shot" href="projects/fine-print.html"><img src="assets/fine-print/banner.png" alt="Fine Print iOS app: home, results and clause detail screens"></a>
+        <div class="card wide c-fine" id="fine-print">
+          <span class="badge">iPhone app</span>
+          <a class="shot" href="projects/fine-print.html"><div class="frame"><img src="assets/fine-print/banner.png" alt="Fine Print iOS app: home, results and clause detail screens" loading="lazy"></div></a>
           <div class="body">
             <h3><a href="projects/fine-print.html">Fine Print: iOS Contract Checker</a></h3>
             <p class="hook">An iPhone app that reads leases, job offers and terms of service, then separates
@@ -63,8 +88,9 @@
           </div>
         </div>
 
-        <div class="card wide">
-          <a class="shot" href="projects/project5.html"><img src="assets/p5.png" alt="Canada Economy Intelligence dashboard: headline indicators and the AI monthly briefing"></a>
+        <div class="card wide c-econ" id="economy">
+          <span class="badge">Refreshes itself</span>
+          <a class="shot" href="projects/project5.html"><div class="frame"><img src="assets/p5.png" alt="Canada Economy Intelligence dashboard: headline indicators and the AI monthly briefing" loading="lazy"></div></a>
           <div class="body">
             <h3><a href="projects/project5.html">Canada Economy Intelligence Platform</a></h3>
             <p class="hook">A pipeline on live Statistics Canada data that refreshes itself after every release.
@@ -80,14 +106,15 @@
           </div>
         </div>
 
-        <div class="card wide">
-          <a class="shot" href="demos/discrepancy-checker/"><img src="assets/discrepancy-checker.png" alt="Discrepancy Checker: totals for count, receiving and billing exceptions with charts by type, reason and client"></a>
+        <div class="card wide c-wh" id="discrepancy">
+          <span class="badge">New</span>
+          <a class="shot" href="demos/discrepancy-checker/"><div class="frame"><img src="assets/discrepancy-checker.png" alt="Discrepancy Checker: totals for count, receiving and billing exceptions with charts by type, reason and client" loading="lazy"></div></a>
           <div class="body">
             <h3><a href="demos/discrepancy-checker/">Shipment and Inventory Discrepancy Checker</a></h3>
             <p class="hook">An Excel workbook for warehouse and 3PL operations that checks cycle counts against the
             system, receipts against the packing slip and PO, and storage invoices against the rate card, then
-            totals every exception on one dashboard. A browser version reads the same workbook, lets you edit
-            counts and watch the checks update, and runs the checks on your own file without uploading it.</p>
+            totals every exception on one dashboard. The browser version reads the same workbook, lets you edit
+            counts and watch the checks update, and checks your own file without uploading it.</p>
             <div class="tags"><span class="tag">Excel</span><span class="tag">INDEX/MATCH</span><span class="tag">SUMIFS</span><span class="tag">Conditional formatting</span><span class="tag">JavaScript</span><span class="tag">SheetJS</span></div>
             <div class="links">
               <a href="demos/discrepancy-checker/">Try it in your browser</a>
@@ -96,8 +123,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <a class="shot" href="projects/project1.html"><img src="assets/p1.png" alt="Superstore Margin Console dashboard"></a>
+        <div class="card c-store" id="superstore">
+          <a class="shot" href="projects/project1.html"><div class="frame"><img src="assets/p1.png" alt="Superstore Margin Console dashboard" loading="lazy"></div></a>
           <div class="body">
             <h3><a href="projects/project1.html">Superstore Margin Console</a></h3>
             <p class="hook">Revenue grew every year, while 1 in 5 order lines lost money. A profitability
@@ -110,8 +137,8 @@
           </div>
         </div>
 
-        <div class="card">
-          <a class="shot" href="projects/project2.html"><img src="assets/p2.png" alt="AI Support Ticket Triage demo"></a>
+        <div class="card c-triage" id="triage">
+          <a class="shot" href="projects/project2.html"><div class="frame"><img src="assets/p2.png" alt="AI Support Ticket Triage demo" loading="lazy"></div></a>
           <div class="body">
             <h3><a href="projects/project2.html">AI Support Ticket Triage</a></h3>
             <p class="hook">An LLM sorts support tickets by category, priority, and routing, wrapped in the
@@ -124,11 +151,11 @@
           </div>
         </div>
 
-        <div class="card">
-          <a class="shot" href="projects/project3.html"><img src="assets/p3.png" alt="FIFA Player Churn Explorer dashboard"></a>
+        <div class="card c-fifa" id="churn">
+          <a class="shot" href="projects/project3.html"><div class="frame"><img src="assets/p3.png" alt="FIFA Player Churn Explorer dashboard" loading="lazy"></div></a>
           <div class="body">
             <h3><a href="projects/project3.html">FIFA Player Churn Pipeline</a></h3>
-            <p class="hook">Raw CSVs → DuckDB → versioned SQL → churn model. Predicts which players leave
+            <p class="hook">Raw CSVs to DuckDB to versioned SQL to a churn model. Predicts which players leave
             their club, with every prediction shown next to what actually happened.</p>
             <div class="tags"><span class="tag">DuckDB</span><span class="tag">SQL</span><span class="tag">scikit-learn</span><span class="tag">Plotly.js</span></div>
             <div class="links">
@@ -138,10 +165,10 @@
           </div>
         </div>
 
-        <div class="card">
-          <a class="shot" href="projects/project4.html"><img src="assets/p4.png" alt="NL-to-SQL Churn Analyst Agent demo"></a>
+        <div class="card c-agent" id="agent">
+          <a class="shot" href="projects/project4.html"><div class="frame"><img src="assets/p4.png" alt="NL-to-SQL Churn Analyst Agent demo" loading="lazy"></div></a>
           <div class="body">
-            <h3><a href="projects/project4.html">NL→SQL Analyst Agent</a></h3>
+            <h3><a href="projects/project4.html">NL to SQL Analyst Agent</a></h3>
             <p class="hook">Ask the churn database questions in plain English. Read-only by construction,
             schema-grounded, and it asks for clarification instead of guessing. 3/3 injection attempts refused.</p>
             <div class="tags"><span class="tag">Gemini API</span><span class="tag">DuckDB</span><span class="tag">AI safety</span><span class="tag">Streamlit</span></div>
@@ -152,65 +179,76 @@
           </div>
         </div>
       </div>
+
+      <div class="stats">
+        <div class="stat"><div class="v" data-count="11" data-suffix="/11">11/11</div><div class="l">headline figures matching Statistics Canada's official releases</div></div>
+        <div class="stat"><div class="v" data-count="80">80</div><div class="l">data tests that block a bad deploy</div></div>
+        <div class="stat"><div class="v" data-count="15" data-suffix="/15">15/15</div><div class="l">planted errors caught by the AI briefing's number checker</div></div>
+        <div class="stat"><div class="v" data-count="0">0</div><div class="l">wrong legal verdicts across Fine Print's 12-document test set</div></div>
+      </div>
     </div>
   </section>
 
-  <section id="about">
+  <section id="about" class="alt">
     <div class="wrap">
       <h2 class="section">About</h2>
       <div class="about-grid">
         <div>
-          <p>I'm a Computer Science graduate from Trent University (2026) targeting data and AI
+          <p>I'm a Computer Science graduate from Trent University (2026) looking for data, BI and AI
           analyst roles in Canada. What I care about is the judgment layer: not just making a chart
-          or calling an API, but documenting why each cleaning decision was made, what a model's
+          or calling an API, but knowing why each cleaning decision was made, what a model's
           honest ceiling is, and what a business should actually do differently on Monday.</p>
-          <p style="margin-top:12px">Four of the projects above are deliberately one story: a BI
-          dashboard, an AI tool with error-handling as the headline feature, an end-to-end pipeline
-          with a model, and an AI agent that queries that same pipeline's database safely. Fine Print
-          takes the same principle to an iPhone app: the AI reads and quotes, and code decides. The
-          Canada Economy platform puts it all into production: scheduled ingestion, data tests that
-          block a bad deploy, honest forecasts, and an AI briefing that code verifies. Each repo has a
-          decision log; nothing is a black box.</p>
+          <p style="margin-top:14px">Four of the projects are deliberately one story: a BI dashboard, an AI tool
+          with error-handling as the headline feature, an end-to-end pipeline with a model, and an AI agent that
+          queries that same pipeline's database safely. Fine Print takes the same principle to an iPhone app: the
+          AI reads and quotes, and code decides. The Canada Economy platform puts it all into production, and the
+          Discrepancy Checker brings it to the warehouse floor in the tool operations teams already use: Excel.</p>
         </div>
         <div class="skill-groups">
           <div>
-            <h4>Languages & Data</h4>
+            <h4>Languages and data</h4>
             <p>Python · SQL · JavaScript · pandas · DuckDB · scikit-learn · statsmodels</p>
           </div>
           <div>
-            <h4>BI & Visualization</h4>
+            <h4>BI and visualization</h4>
             <p>Excel (INDEX/MATCH, SUMIFS, conditional formatting, data validation) · Power BI · Tableau · Plotly · dashboard design</p>
           </div>
           <div>
-            <h4>Web & Cloud</h4>
+            <h4>Web and cloud</h4>
             <p>React · Firebase · Streamlit · GitHub Pages · GitHub Actions (CI and scheduled pipelines)</p>
           </div>
           <div>
-            <h4>AI Tooling</h4>
-            <p>Gemini API (structured output, guardrails) · Claude · ChatGPT · prompt engineering & evaluation</p>
+            <h4>AI tooling</h4>
+            <p>Gemini API (structured output, guardrails) · Claude · ChatGPT · prompt engineering and evaluation</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="contact" class="alt">
+  <section id="contact">
     <div class="wrap">
-      <h2 class="section">Contact</h2>
-      <ul class="contact-list">
-        <li><b>Name</b> Lekan Lawal</li>
-        <li><b>Email</b> <a href="mailto:lekanlawal@trentu.ca">lekanlawal@trentu.ca</a></li>
-        <li><b>Phone</b> +1 (289) 671 5308</li>
-        <li><b>GitHub</b> <a href="https://github.com/lekanlawal1">github.com/lekanlawal1</a></li>
-        <li><b>LinkedIn</b> <a href="https://www.linkedin.com/in/lekan-lawal/">linkedin.com/in/lekanlawal</a></li>
-      </ul>
+      <div class="contact-card">
+        <div class="blob" aria-hidden="true"></div>
+        <div style="position:relative">
+          <h2>Got messy data?<br>Let's talk.</h2>
+          <p>Open to data analyst, BI analyst and AI solutions roles in Canada.</p>
+        </div>
+        <ul class="contact-list">
+          <li><button type="button" data-copy="lekanlawal@trentu.ca">lekanlawal@trentu.ca <small>Copy</small></button></li>
+          <li><a href="https://www.linkedin.com/in/lekan-lawal/">LinkedIn <small>lekan-lawal</small></a></li>
+          <li><a href="https://github.com/lekanlawal1">GitHub <small>lekanlawal1</small></a></li>
+          <li><a href="tel:+12896715308">+1 (289) 671 5308 <small>Call</small></a></li>
+        </ul>
+      </div>
     </div>
   </section>
 </main>
 
 <footer class="site">
-  <div class="wrap">© 2026 Lekan Lawal · Built by hand, no frameworks, so it loads fast on purpose.</div>
+  <div class="wrap">© 2026 Lekan Lawal · Built by hand, no frameworks. The town is plain SVG, drawn in code.</div>
 </footer>
 
+<script src="town.js"></script>
 </body>
 </html>
