@@ -210,7 +210,7 @@ function start() {
   const PROJECTS = [
     { id: "econ", color: "#E63946", x: 1.2, z: 1.2, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "projects/project5.html" },
     { id: "store", color: "#FFB020", x: 5.0, z: 1.0, w: 3, d: 2, name: "Superstore Margin Console", sub: "BI dashboard", href: "projects/project1.html" },
-    { id: "triage", color: "#3E8BFF", x: 1.2, z: 3.9, w: 2.2, d: 2, name: "AI Ticket Triage", sub: "LLM with guardrails", href: "projects/project2.html" },
+    { id: "triage", color: "#3E8BFF", x: 1.2, z: 3.9, w: 2.2, d: 2, name: "App Review Insights", sub: "Real App Store reviews", href: "projects/app-reviews.html" },
     { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "Football Stats Agent", sub: "Ask football in English", href: "projects/football-agent.html" },
     { id: "fine", color: "#FF4F8B", x: 4.0, z: 9.6, w: 1.7, d: 0.5, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
     { id: "wh", color: "#FF6B35", x: 8.0, z: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },

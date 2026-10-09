@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Review Insights | Lekan Lawal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script src="../site.js"></script>
+</head>
+<body class="c-triage">
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="dot">LL</span>Lekan Lawal</a>
+    <nav class="top">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about" class="hide-sm">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+<div class="page-band"></div>
+
+<main class="wrap">
+  <div class="project-hero">
+    <a class="backlink" href="../index.html#triage">&larr; All projects</a>
+    <h1>App Review Insights: What an App's Users Love, Hate and Ask For</h1>
+    <p class="one-liner">Pick any iPhone app and see how its ratings are trending, whether the latest update helped or
+    hurt, and what its users complain about, praise and ask for, from its real App Store reviews. Every quote is
+    checked against the review it came from.</p>
+    <div class="meta-row">
+      <span class="tag">JavaScript</span><span class="tag">Gemini API</span><span class="tag">Cloudflare Workers</span>
+      <span class="tag">Data visualization</span><span class="tag">AI evaluation</span>
+    </div>
+  </div>
+
+  <div class="project-links" style="margin:0 0 26px">
+    <a class="btn primary" href="https://lekanlawal1.github.io/app-review-insights/">Try it on any app</a>
+    <a class="btn" href="https://github.com/lekanlawal1/app-review-insights">View the code</a>
+  </div>
+
+  <a class="big-shot" href="https://lekanlawal1.github.io/app-review-insights/">
+    <img src="../assets/app-reviews.png" alt="App Review Insights for Wealthsimple: recent reviews average 3.5 stars against an all-time 4.6, with ratings by version">
+  </a>
+
+  <article class="case">
+    <h2>What it does</h2>
+    <p>App Store ratings hide a lot. An app can show 4.6 stars because of years of happy users while this month's users
+    are struggling. Type the name of any iPhone app and this tool pulls its 500 most recent reviews straight from Apple,
+    then answers the questions a product or support team actually asks: are things getting better or worse, did the
+    last update cause it, and what exactly are people unhappy about?</p>
+    <p>For Wealthsimple, the answer is striking. Its all-time rating is 4.6 stars, but its 500 most recent Canadian
+    reviews average 3.5, and a third of them are 1 or 2 stars. The themes say why: crashes when markets get busy,
+    an update loop that locks people out, slow transfers, and an iPad layout that broke in the latest version.</p>
+
+    <h2>Two kinds of answers</h2>
+    <p><b>Numbers, with no AI at all.</b> The star breakdown, ratings week by week, and the average rating for each app
+    version are counted directly from the reviews, so they're exact. The version table is often the most useful part:
+    it shows which update made ratings drop.</p>
+    <p><b>Themes, suggested by AI and checked by code.</b> Google's Gemini reads the reviews and groups them into
+    complaints, praise and feature requests, with a few quotes for each. Then the page checks its work. Every quote
+    must appear word for word in a real review, and that review must be one the AI put in the same theme. The AI
+    never produces a number: how many reviews mention a theme, and their average rating, are counted by code.</p>
+    <a class="big-shot" href="https://lekanlawal1.github.io/app-review-insights/" style="margin:6px 0 16px">
+      <img src="../assets/app-reviews-themes.png" alt="Themes for Wealthsimple: intuitive design praised, crashes and slow transfers criticised, each with verified quotes">
+    </a>
+
+    <h2>How I know the themes are trustworthy</h2>
+    <div class="numbers">
+      <div class="num"><div class="v">28/28</div><div class="l">AI quotes found word for word, in a review from the right theme (Wealthsimple, 500 reviews)</div></div>
+      <div class="num"><div class="v">2.1 vs 5.0</div><div class="l">average stars of complaint themes versus praise themes: the labels match how people actually rated</div></div>
+      <div class="num"><div class="v">0</div><div class="l">numbers written by the AI: every count, share and average is worked out from the reviews</div></div>
+    </div>
+    <p>Testing found a gap in my first version. Checking that a quote exists isn't enough: a real quote from an
+    unrelated review could still be shown as evidence. A happy "the premise of the app is exceptional" turned up under
+    "Slow customer support". Now a quote only counts if its review belongs to that theme. A "complaint" whose reviews
+    average 4 stars or more is flagged instead of trusted.</p>
+
+    <h2>Why it replaced my ticket triage project</h2>
+    <p>My earlier project sorted support tickets with AI, and it measured 90% accuracy, but on tickets I wrote myself.
+    Nobody could check that against reality. This works on real, public data that anyone can look up, and it answers
+    a question real teams have. It keeps the part of that project I cared about: the AI suggests, and code checks.</p>
+
+    <h2>Limits</h2>
+    <ul>
+      <li>Apple only shares an app's 500 most recent written reviews per country, so this covers recent months, not an
+      app's whole history.</li>
+      <li>The checks prove every quote is real and comes from the right reviews. They don't prove the AI grouped every
+      review the way a person would; a hand-labelled sample would measure that.</li>
+      <li>The first look at an app takes about 40 seconds while the AI reads 500 reviews. After that it's saved for a
+      day, so it loads in a few seconds for everyone.</li>
+    </ul>
+  </article>
+
+  <div class="project-links">
+    <a class="btn primary" href="https://lekanlawal1.github.io/app-review-insights/">Try it on any app</a>
+    <a class="btn" href="https://github.com/lekanlawal1/app-review-insights">View the code</a>
+  </div>
+</main>
+
+<footer class="site"><div class="wrap">&copy; 2026 Lekan Lawal</div></footer>
+</body>
+</html>
