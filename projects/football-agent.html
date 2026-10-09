@@ -70,10 +70,10 @@
     keep awake, so the page works instantly whenever someone opens it.</p>
 
     <h2>How I know the answers are right</h2>
-    <p>I wrote 48 test questions and worked out the correct answer to each one by hand. Every time I
+    <p>I wrote 51 test questions and worked out the correct answer to each one by hand. Every time I
     change the AI's instructions, all of them run again automatically. The latest results:</p>
     <div class="numbers">
-      <div class="num"><div class="v">19/19</div><div class="l">questions answered correctly: same player and same number as my hand-checked answer (3 more wait on data still loading)</div></div>
+      <div class="num"><div class="v">22/22</div><div class="l">questions answered correctly: same player and same number as my hand-checked answer (3 more wait on data still loading)</div></div>
       <div class="num"><div class="v">14/14</div><div class="l">vague or unanswerable questions handled properly: it asked for detail, or said the data can't answer</div></div>
       <div class="num"><div class="v">12/12</div><div class="l">attempts to break it stopped, like "ignore your instructions" or "delete the table"</div></div>
     </div>
@@ -88,8 +88,11 @@
     only Napoli's home goals.</p>
     <p>Instead of patching that one question, I changed how the data is stored: there's now a table with
     one row per team per game, so adding up a team's season is simple and hard to get wrong. The next run
-    caught a similar mistake with assists, and I fixed it the same way. The last two runs got everything
-    right. AI models don't give exactly the same answer every time, which is why the tests keep running.</p>
+    caught a similar mistake with assists, and I fixed it the same way. Later, someone asked which defenders
+    kept clean sheets in the first half of home games, and it said it couldn't. The positions and
+    half-time scores were in the raw data, just not where the AI could use them, so I added them. That
+    question is now one of the tests. AI models don't give exactly the same answer every time, which is
+    why the tests keep running.</p>
 
     <h2>My own expected goals model</h2>
     <p>Expected goals (xG) is the chance that a shot ends up in the net, based on where and how it was
