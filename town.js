@@ -156,7 +156,7 @@
       box(g, x + 2.5, y + 1.6, 0, 0.35, 0.35, 0.7, "#3E8BFF");
       return 3.8;
     },
-    fifa(g, x, y) { // Player Churn: a little stadium with floodlights
+    fifa(g, x, y) { // Football Stats Agent: a stadium with floodlights and a SQL scoreboard
       box(g, x, y, 0, 3, 3, 0.5, "#E9E3D7");
       el("polygon", { points: pts([[x + 0.35, y + 0.35, 0.5], [x + 2.65, y + 0.35, 0.5], [x + 2.65, y + 2.65, 0.5], [x + 0.35, y + 2.65, 0.5]]), fill: "#3DBE6A", ...STROKE }, g);
       el("polyline", { points: pts([[x + 1.5, y + 0.35, 0.5], [x + 1.5, y + 2.65, 0.5]]), stroke: "#fff", "stroke-width": 1.6, fill: "none" }, g);
@@ -168,23 +168,10 @@
         el("line", { x1: lx, y1: ly, x2: hx, y2: hy, stroke: "#1D1535", "stroke-width": 2 }, g);
         el("rect", { x: hx - 7, y: hy - 6, width: 14, height: 8, rx: 2, fill: "#FFE66B", ...STROKE, "stroke-width": 1.2, class: "blink" }, g);
       }
+      const [sx, sy] = P(x + 1.5, y + 0.05, 1.5);
+      el("rect", { x: sx - 22, y: sy - 8, width: 44, height: 15, rx: 3, fill: "#22C3A6", ...STROKE, "stroke-width": 1.2 }, g);
+      el("text", { x: sx, y: sy + 3, "text-anchor": "middle", "font-size": 8, "font-weight": 800, fill: "#1D1535", "font-family": "JetBrains Mono, monospace" }, g).textContent = "SELECT";
       return 3;
-    },
-    agent(g, x, y) { // NL to SQL agent: a robot
-      box(g, x, y, 0, 0.5, 0.5, 0.9, "#6B5CA5");
-      box(g, x + 0.9, y + 0.9, 0, 0.5, 0.5, 0.9, "#6B5CA5");
-      box(g, x - 0.1, y - 0.1, 0.9, 1.6, 1.6, 1.3, "#8A4DFF");
-      const [px, py] = P(x + 0.7, y + 1.5, 1.55);
-      el("rect", { x: px - 13, y: py - 7, width: 26, height: 14, rx: 3, fill: "#22C3A6", ...STROKE, "stroke-width": 1.2 }, g);
-      el("text", { x: px, y: py + 4, "text-anchor": "middle", "font-size": 9, "font-weight": 800, fill: "#1D1535", "font-family": "JetBrains Mono, monospace" }, g).textContent = "SQL";
-      box(g, x + 0.2, y + 0.2, 2.2, 1.0, 1.0, 0.8, "#B39BFF");
-      const [e1x, e1y] = P(x + 0.45, y + 1.2, 2.65), [e2x, e2y] = P(x + 0.95, y + 1.2, 2.65);
-      el("circle", { cx: e1x, cy: e1y, r: 3.2, fill: "#fff", ...STROKE, "stroke-width": 1 }, g);
-      el("circle", { cx: e2x, cy: e2y, r: 3.2, fill: "#fff", ...STROKE, "stroke-width": 1 }, g);
-      const [ax, ay] = P(x + 0.7, y + 0.7, 3.0), [bx, by] = P(x + 0.7, y + 0.7, 3.7);
-      el("line", { x1: ax, y1: ay, x2: bx, y2: by, stroke: "#1D1535", "stroke-width": 2 }, g);
-      el("circle", { cx: bx, cy: by, r: 4, fill: "#FF4F8B", ...STROKE, "stroke-width": 1.2, class: "blink" }, g);
-      return 4;
     },
     fine(g, x, y) { // Fine Print: a giant phone showing a contract
       box(g, x, y, 0, 0.5, 1.7, 3.4, "#1D1535", { left: "#2A2148", right: "#140F28", top: "#3A2F63" });
@@ -217,14 +204,15 @@
   const PROJECTS = [
     { id: "econ", color: "#E63946", x: 1.2, y: 1.0, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "projects/project5.html" },
     { id: "store", color: "#FFB020", x: 5.0, y: 0.8, w: 3, d: 2, name: "Superstore Margin Console", sub: "BI dashboard", href: "projects/project1.html" },
-    { id: "agent", color: "#8A4DFF", x: 9.6, y: 1.2, w: 1.4, d: 1.4, name: "NL to SQL Agent", sub: "Ask data in English", href: "projects/project4.html" },
     { id: "triage", color: "#3E8BFF", x: 1.0, y: 4.0, w: 2.2, d: 2, name: "AI Ticket Triage", sub: "LLM with guardrails", href: "projects/project2.html" },
-    { id: "fifa", color: "#22C3A6", x: 4.8, y: 4.6, w: 3, d: 3, name: "Player Churn Pipeline", sub: "SQL + ML model", href: "projects/project3.html" },
+    { id: "fifa", color: "#22C3A6", x: 4.8, y: 4.6, w: 3, d: 3, name: "Football Stats Agent", sub: "Ask football in English", href: "projects/football-agent.html" },
     { id: "fine", color: "#FF4F8B", x: 4.2, y: 9.2, w: 0.5, d: 1.7, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
     { id: "wh", color: "#FF6B35", x: 8.4, y: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
   ];
 
-  const visited = new Set(JSON.parse((() => { try { return localStorage.getItem("town-visited") || "[]"; } catch { return "[]"; } })()));
+  // keep only buildings that still exist (the old robot, "agent", merged into the stadium)
+  const visited = new Set(JSON.parse((() => { try { return localStorage.getItem("town-visited") || "[]"; } catch { return "[]"; } })())
+    .filter((id) => PROJECTS.some((p) => p.id === id)));
   const saveVisited = () => { try { localStorage.setItem("town-visited", JSON.stringify([...visited])); } catch {} };
 
   for (const p of PROJECTS) {
@@ -266,7 +254,7 @@
   }
 
   // scenery trees
-  const TREES = [[0.6, 0.5, 0.8], [4.0, 0.6, 0.9], [8.6, 0.5, 0.7], [11.3, 0.7, 0.8], [0.5, 3.2, 0.7], [3.9, 3.2, 0.8], [8.6, 3.7, 0.9],
+  const TREES = [[0.6, 0.5, 0.8], [4.0, 0.6, 0.9], [8.6, 0.5, 0.7], [11.3, 0.7, 0.8], [10.2, 1.6, 0.85], [0.5, 3.2, 0.7], [3.9, 3.2, 0.8], [8.6, 3.7, 0.9],
     [11.2, 3.6, 0.7], [4.0, 6.3, 0.7], [0.6, 10.2, 0.8], [6.0, 9.2, 0.7], [7.3, 10.0, 0.9], [11.4, 11.4, 0.6], [3.4, 11.2, 0.6], [9.6, 5.0, 0.6]];
   const COLORS = ["#2FBF71", "#22A863", "#5AD17F", "#FFB020", "#FF7AA8"];
   TREES.forEach(([x, y, s], i) => { const g = el("g"); tree(g, x, y, s, COLORS[i % 3]); place(g, x - 0.3, y - 0.3, 0.6, 0.6); });

@@ -201,7 +201,7 @@ function start() {
     island.add(t);
     return t;
   }
-  const TREES = [[3.9, 1.3, 0.9], [8.6, 1.1, 1], [3.9, 3.4, 0.8], [8.6, 3.6, 0.9], [10.3, 3.9, 0.8], [4.0, 6.6, 0.75],
+  const TREES = [[3.9, 1.3, 0.9], [8.6, 1.1, 1], [10.0, 1.5, 0.85], [9.3, 2.4, 0.65], [3.9, 3.4, 0.8], [8.6, 3.6, 0.9], [10.3, 3.9, 0.8], [4.0, 6.6, 0.75],
     [1.3, 9.6, 0.9], [3.5, 10.4, 0.7], [6.4, 9.0, 0.8], [7.3, 10.4, 1], [10.4, 10.4, 0.8], [9.8, 5.6, 0.7], [6.6, 3.7, 0.7], [10.5, 9.4, 0.6]];
   const treeSpots = [];
   TREES.forEach(([x, z, s], i) => { makeTree(x, z, s, TREE_COLORS[i % 3], i % 4 === 1); treeSpots.push([x, z]); });
@@ -210,9 +210,8 @@ function start() {
   const PROJECTS = [
     { id: "econ", color: "#E63946", x: 1.2, z: 1.2, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "projects/project5.html" },
     { id: "store", color: "#FFB020", x: 5.0, z: 1.0, w: 3, d: 2, name: "Superstore Margin Console", sub: "BI dashboard", href: "projects/project1.html" },
-    { id: "agent", color: "#8A4DFF", x: 9.4, z: 1.2, w: 1.4, d: 1.4, name: "NL to SQL Agent", sub: "Ask data in English", href: "projects/project4.html" },
     { id: "triage", color: "#3E8BFF", x: 1.2, z: 3.9, w: 2.2, d: 2, name: "AI Ticket Triage", sub: "LLM with guardrails", href: "projects/project2.html" },
-    { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "Player Churn Pipeline", sub: "SQL + ML model", href: "projects/project3.html" },
+    { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "Football Stats Agent", sub: "Ask football in English", href: "projects/football-agent.html" },
     { id: "fine", color: "#FF4F8B", x: 4.0, z: 9.6, w: 1.7, d: 0.5, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
     { id: "wh", color: "#FF6B35", x: 8.0, z: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
   ];
@@ -282,22 +281,13 @@ function start() {
         lamp.position.set(gx(p.x + a), 2.65, gz(p.z + b)); lamp.lookAt(gx(p.x + 1.5), 0, gz(p.z + 1.5));
         lamps.push(lamp);
       }
+      const board = new THREE.Group(); board.position.set(gx(p.x + 1.5), 0.5, gz(p.z + 0.05)); g.add(board);
+      for (const dx of [-0.5, 0.5]) { const leg = mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.9, 6), mat(INK), board); leg.position.set(dx, 0.45, 0); }
+      mesh(new THREE.BoxGeometry(1.5, 0.62, 0.12), mat(INK), board, { edges: true }).position.y = 1.2;
+      const sqlM = new THREE.MeshStandardMaterial({ map: textTexture((c, w, h) => { c.fillStyle = "#22C3A6"; c.fillRect(0, 0, w, h); c.fillStyle = "#1D1535"; c.font = `800 ${h * 0.5}px "JetBrains Mono", monospace`; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("SELECT", w / 2, h / 2 + 3); }, 256, 96), emissive: 0x22c3a6, emissiveIntensity: 0.25 });
+      const scr = mesh(new THREE.PlaneGeometry(1.36, 0.5), sqlM, board); scr.position.set(0, 1.2, 0.065);
+      animated.push((t) => { sqlM.emissiveIntensity = 0.2 + (Math.sin(t * 2.2) > 0.6 ? 0.35 : 0); });
       return 3.0;
-    },
-    agent(g, p) {
-      box(g, p.x + 0.15, p.z + 0.4, 0.35, 0.5, 0.9, 0x6b5ca5);
-      box(g, p.x + 0.9, p.z + 0.4, 0.35, 0.5, 0.9, 0x6b5ca5);
-      box(g, p.x - 0.05, p.z, 1.5, 1.4, 1.3, 0x8a4dff, 0.9);
-      const screen = mesh(new THREE.PlaneGeometry(0.9, 0.5), new THREE.MeshStandardMaterial({ map: textTexture((c, w, h) => { c.fillStyle = "#22C3A6"; c.fillRect(0, 0, w, h); c.fillStyle = "#1D1535"; c.font = `800 ${h * 0.55}px "JetBrains Mono", monospace`; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("SQL", w / 2, h / 2 + 3); }, 192, 108), emissive: 0x22c3a6, emissiveIntensity: 0.25 }), g);
-      screen.position.set(gx(p.x + 0.7), 1.55, gz(p.z + 1.4) + 0.012);
-      const head = new THREE.Group(); head.position.set(gx(p.x + 0.7), 2.6, gz(p.z + 0.7)); g.add(head);
-      mesh(new THREE.BoxGeometry(1.0, 0.8, 0.9), mat(0xb39bff), head, { edges: true });
-      for (const dx of [-0.22, 0.22]) { const e = mesh(new THREE.SphereGeometry(0.11, 10, 8), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.2 }), head); e.position.set(dx, 0.05, 0.46); }
-      const ant = mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.55, 6), mat(INK), head); ant.position.y = 0.66;
-      const tipM = new THREE.MeshStandardMaterial({ color: 0xff4f8b, emissive: 0xff4f8b, emissiveIntensity: 0.6 });
-      const tip = mesh(new THREE.SphereGeometry(0.1, 10, 8), tipM, head); tip.position.y = 0.98;
-      animated.push((t) => { head.rotation.y = Math.sin(t * 0.7) * 0.6; tipM.emissiveIntensity = 0.3 + (Math.sin(t * 5) > 0 ? 0.9 : 0); });
-      return 3.7;
     },
     fine(g, p) {
       const body = box(g, p.x, p.z, 1.7, 0.5, 3.4, 0x2a2148);

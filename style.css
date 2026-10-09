@@ -370,3 +370,7 @@ article.case p + p { margin-top: 14px; }
   .reveal { opacity: 1; transform: none; }
   .cloud { display: none; }
 }
+
+.archived { margin: 14px 0 0; padding: 10px 14px; border: 2px solid var(--ink); border-radius: 12px;
+  background: var(--sun); color: #1D1535; font-size: 0.95rem; max-width: 70ch; }
+.archived a { color: inherit; font-weight: 700; }

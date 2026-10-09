@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Football Stats Agent | Lekan Lawal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script src="../site.js"></script>
+</head>
+<body class="c-fifa">
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="dot">LL</span>Lekan Lawal</a>
+    <nav class="top">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about" class="hide-sm">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+<div class="page-band"></div>
+
+<main class="wrap">
+  <div class="project-hero">
+    <a class="backlink" href="../index.html#football">&larr; All projects</a>
+    <h1>Football Stats Agent: Ask in English, Get an Answer You Can Check</h1>
+    <p class="one-liner">Type a question like "who made the most tackles in the last 20 minutes of Premier
+    League games in 2015/16?" and an AI writes the SQL, the page checks it, and your own browser runs it
+    on 1,853 matches of real event data. The query is always shown, so every number can be checked.</p>
+    <div class="meta-row">
+      <span class="tag">Python</span><span class="tag">DuckDB</span><span class="tag">DuckDB-WASM</span>
+      <span class="tag">SQL</span><span class="tag">scikit-learn</span><span class="tag">Gemini API</span>
+      <span class="tag">Cloudflare Workers</span><span class="tag">GitHub Actions</span>
+    </div>
+  </div>
+
+  <a class="big-shot" href="https://lekanlawal1.github.io/football-agent/">
+    <img src="../assets/football-agent.png" alt="Football Stats Agent: a question about late-game tackles answered with a ranked table and the SQL behind it">
+  </a>
+
+  <article class="case">
+    <h2>The story</h2>
+    <p>This replaces two earlier projects, a player churn pipeline and a SQL agent on top of it, with one
+    thing people actually want to use. The data is StatsBomb's open event data: every tackle, shot, foul
+    and card with the minute it happened, across four complete 2015/16 leagues, two World Cups, two Euros
+    and Copa America 2024. Season totals for the 2024/25 top five leagues and MLS 2024 come from
+    API-Football's free plan and fill in a little every day, inside its 100-request quota.</p>
+    <p>There is no database server. The site publishes the tables as parquet files, and DuckDB runs inside
+    the visitor's browser, downloading only the parts of a file a query needs. The only server is a small
+    Cloudflare Worker that keeps the Gemini key secret, rate-limits visitors, caches repeated questions
+    and only ever returns one SELECT statement. Nothing sleeps, so the demo works the moment a recruiter
+    clicks it.</p>
+
+    <h2>Evidence, not assertions</h2>
+    <div class="numbers">
+      <div class="num"><div class="v">19/19</div><div class="l">answer questions where the top row matches hand-written gold SQL, player and number</div></div>
+      <div class="num"><div class="v">12/12</div><div class="l">attacks stopped: prompt injection, DROP and COPY, file and URL reads, prompt extraction</div></div>
+      <div class="num"><div class="v">14/14</div><div class="l">clarify or decline cases right: it asks on "best striker" and refuses wages and injuries</div></div>
+      <div class="num"><div class="v">0.804</div><div class="l">ROC AUC of my own xG model, against 0.812 for StatsBomb's professional model on the same shots</div></div>
+    </div>
+
+    <h2>What the evaluation found</h2>
+    <p>The first run scored 18 of 19, and the miss was the dangerous kind: a confident wrong answer.
+    Asked which team scored the most in Serie A 2015/16, the model ranked home goals and away goals as
+    separate lists and reported Napoli's 49 home goals. I fixed the data model, not the question: a
+    table with one row per team per match, so a team total never needs a home and away union. Roma's 83
+    is now the answer. The next run caught a cousin, grouping by the assist count itself, fixed with a
+    rule that totals come from the pre-summed tables. The model is not fully deterministic even at
+    temperature 0, so the evaluation reruns on every prompt or schema change.</p>
+
+    <h2>Key decisions I'd defend in an interview</h2>
+    <ul>
+      <li><b>Checked twice before anything runs</b>: the Worker and the page both reject anything but a single SELECT, block file, URL and settings functions, then EXPLAIN the query against the real tables. A failure goes back to the model once with the error; a second failure is shown, never papered over.</li>
+      <li><b>The data proves itself</b>: every match's shots plus own goals must equal the official final score. That test caught StatsBomb naming "Olympique de Marseille" in one file and "Marseille" in another, which turned a 1-1 into a 1-0.</li>
+      <li><b>Honest xG</b>: rules fixed before any result, every shot scored by a model that never saw its match (cross-validation grouped by match), and penalties given the observed 74.5% rather than modelled.</li>
+      <li><b>What was tested is what runs</b>: one prompt and one schema file, bundled into the Worker and used by the evaluation. The schema guide is generated from the live database and the deploy fails if it is stale; the answer cache is keyed to the prompt version.</li>
+      <li><b>Free, within limits it states</b>: the free data plan stops at 2024/25 and has no minute-by-minute data for it, so late-game questions about 2024/25 are declined rather than guessed.</li>
+    </ul>
+  </article>
+
+  <div class="project-links">
+    <a class="btn primary" href="https://lekanlawal1.github.io/football-agent/">Ask it a question</a>
+    <a class="btn" href="https://github.com/lekanlawal1/football-agent">View code &amp; evaluation</a>
+  </div>
+</main>
+
+<footer class="site"><div class="wrap">© 2026 Lekan Lawal</div></footer>
+</body>
+</html>
