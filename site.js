@@ -137,21 +137,69 @@
       if (card && CARD_TO_ID[card.id]) markVisited(CARD_TO_ID[card.id]);
     });
 
+    // the checklist: which projects are explored and which are left, opened from the counter
+    const TOUR = [
+      { id: "fine", name: "Fine Print", href: "projects/fine-print.html" },
+      { id: "econ", name: "Canada Economy Platform", href: "projects/project5.html" },
+      { id: "wh", name: "Discrepancy Checker", href: "demos/discrepancy-checker/" },
+      { id: "store", name: "Superstore Margin Console", href: "projects/project1.html" },
+      { id: "triage", name: "AI Ticket Triage", href: "projects/project2.html" },
+      { id: "fifa", name: "Football Stats Agent", href: "projects/football-agent.html" },
+    ];
+    let panel = null;
+    const drawPanel = () => {
+      if (!panel || !window.Town) return;
+      const v = window.Town.visited, n = TOUR.filter((t) => v.has(t.id)).length, done = n >= TOUR.length;
+      panel.innerHTML = `
+        <p class="tour-head">${done ? "Every project explored. Your reward is ready." : `Explore all ${TOUR.length} to unlock a surprise. ${TOUR.length - n} to go.`}</p>
+        <ul>${TOUR.map((t) => `<li class="${v.has(t.id) ? "seen" : ""}">
+          <span class="tour-mark" aria-hidden="true">${v.has(t.id) ? "&#10003;" : ""}</span>
+          <a href="${t.href}">${t.name}</a>
+          <span class="tour-state">${v.has(t.id) ? "Explored" : "Not yet"}</span></li>`).join("")}</ul>
+        ${done ? `<button type="button" class="btn primary tour-reward">Open your reward</button>` : ""}`;
+      panel.querySelector(".tour-reward")?.addEventListener("click", () => { closePanel(); openReward(); });
+    };
+    const closePanel = () => { if (panel) { panel.hidden = true; quest.setAttribute("aria-expanded", "false"); } };
+    const openPanel = () => {
+      if (!panel) {
+        panel = document.createElement("div");
+        panel.className = "tour-panel"; panel.id = "tour-panel"; panel.hidden = true;
+        panel.setAttribute("role", "region"); panel.setAttribute("aria-label", "Island tour progress");
+        quest.insertAdjacentElement("afterend", panel);
+        document.addEventListener("click", (e) => { if (!panel.hidden && !panel.contains(e.target) && !quest.contains(e.target)) closePanel(); });
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePanel(); });
+      }
+      drawPanel(); panel.hidden = false; quest.setAttribute("aria-expanded", "true");
+    };
+
     const update = () => {
       if (!quest || !window.Town) return;
       const n = window.Town.visited.size, total = window.Town.total, done = n >= total;
       quest.querySelector(".stars").innerHTML = Array.from({ length: total }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("");
-      quest.querySelector(".count").textContent = done ? "Town explored! Open your reward" : `${n}/${total} explored · see all ${total} to unlock a surprise`;
+      quest.querySelector(".count").textContent = done ? "Town explored! Open your reward" : `${n}/${total} explored · see what's left`;
       quest.classList.toggle("done", done);
+      drawPanel();
       if (done) {
-        quest.setAttribute("role", "button"); quest.tabIndex = 0;
         let seen = false; try { seen = localStorage.getItem("reward-seen") === "1"; } catch {}
         if (!seen) setTimeout(() => { openReward(); confetti(innerWidth / 2, innerHeight * 0.3, 110); }, 700);
       }
     };
     if (quest) {
-      quest.addEventListener("click", () => { if (quest.classList.contains("done")) openReward(); });
-      quest.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && quest.classList.contains("done")) { e.preventDefault(); openReward(); } });
+      quest.setAttribute("role", "button"); quest.tabIndex = 0;
+      quest.setAttribute("aria-controls", "tour-panel"); quest.setAttribute("aria-expanded", "false");
+      const act = () => {
+        if (quest.classList.contains("done")) openReward();
+        else if (panel && !panel.hidden) closePanel(); else openPanel();
+      };
+      quest.addEventListener("click", act);
+      quest.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } });
+      // arriving from a project's "Tour 3/6" link: show the checklist (or the reward, once earned)
+      const arrive = () => {
+        if (location.hash !== "#tour" && location.hash !== "#reward") return;
+        quest.scrollIntoView({ block: "center" });
+        if (quest.classList.contains("done")) openReward(); else openPanel();
+      };
+      if (window.Town) setTimeout(arrive, 300); else document.addEventListener("town-ready", () => setTimeout(arrive, 300));
     }
     if (window.Town) update(); else document.addEventListener("town-ready", update);
     // coming back from a project page via the back button restores this page as it was: catch up
@@ -212,6 +260,19 @@
       if (e.detail === 1) toast("You planted a tree. Keep going!");
       else if (e.detail === 10 && treeToasts++ === 0) toast("10 trees. This town owes you one.");
     });
+
+    // case studies: tour progress next to the "All projects" link
+    const backlink = document.querySelector("a.backlink");
+    if (backlink && here) {
+      const seen = new Set(readVisited()), total = Object.keys(BODY_TO_ID).length;
+      const n = Object.values(BODY_TO_ID).filter((id) => seen.has(id)).length;
+      const pill = document.createElement("a");
+      pill.className = "tour-pill" + (n >= total ? " done" : "");
+      pill.href = backlink.getAttribute("href").replace(/#.*$/, "") + (n >= total ? "#reward" : "#tour");
+      pill.innerHTML = `<span class="stars">${Array.from({ length: total }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>`
+        + (n >= total ? "Reward unlocked" : `Tour ${n}/${total} · see what's left`);
+      backlink.insertAdjacentElement("afterend", pill);
+    }
 
     // "All projects" links on project pages wipe back home in the page's colour
     document.querySelectorAll("a.backlink").forEach((a) => a.addEventListener("click", (e) => {
