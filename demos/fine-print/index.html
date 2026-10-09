@@ -57,6 +57,26 @@ h1 { font-family: "Source Serif 4", Georgia, serif; font-size: clamp(2rem, 5vw, 
 .tab:focus-visible, .switch:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
 .blurb { color: var(--ink-2); margin: -6px 0 16px; }
+.tab.own { border-color: var(--accent); color: var(--accent); }
+.tab.own[aria-selected="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.own { background: var(--card); border: 2px solid var(--accent); border-radius: 18px; padding: 16px 18px; margin-bottom: 18px; }
+.own h2 { font-family: "Source Serif 4", Georgia, serif; margin: 0 0 4px; font-size: 1.3rem; }
+.own p { margin: 0 0 10px; color: var(--ink-2); }
+.own textarea { width: 100%; min-height: 190px; resize: vertical; font: 14px/1.5 Inter, system-ui, sans-serif; color: var(--ink);
+  background: var(--field); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+.own textarea:focus { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.own-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.own-row .count-chars { font-size: 13px; color: var(--ink-2); }
+.own-row .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.own button.btn { cursor: pointer; font: inherit; font-weight: 600; font-size: 14px; }
+.own button.btn:disabled { opacity: .55; cursor: progress; }
+.own .privacy { font-size: 13px; margin: 12px 0 0; padding: 10px 12px; background: var(--field); border-radius: 12px; }
+.own .status { font-weight: 600; color: var(--ink); margin: 10px 0 0; min-height: 1.4em; }
+.own .status.bad { color: var(--violation); }
+.checks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 14px; }
+.checks div { background: var(--field); border-radius: 12px; padding: 8px 10px; font-size: 13px; color: var(--ink-2); }
+.checks b { display: block; font-size: 1.15rem; color: var(--ink); }
+@media (max-width: 560px) { .checks { grid-template-columns: 1fr; } }
 .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 20px; align-items: start; }
 @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 .panel { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px; min-width: 0; }
@@ -136,8 +156,9 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
     <div class="eyebrow">Fine Print &middot; interactive demo</div>
     <h1>The AI reads. The code decides.</h1>
     <p class="lead">Fine Print is an iPhone app that checks leases, job offers and terms of service against Ontario law.
-      Pick a document below to see what it finds, with the law cited for every verdict. Then open
-      <b>Try to break it</b> and switch off the safety check that stops a wrong legal verdict.</p>
+      Pick a sample below to see what it finds, with the law cited for every verdict, or open
+      <b>Check your own document</b> and paste one in. Then try <b>Try to break it</b> and switch off the safety check
+      that stops a wrong legal verdict.</p>
   </header>
 
   <section class="steps" aria-label="How Fine Print works">
@@ -149,6 +170,24 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
   <div class="tabs" role="tablist" aria-label="Sample documents" id="tabs"></div>
   <p class="blurb" id="blurb"></p>
   <div id="trap"></div>
+  <section class="own" id="own" hidden aria-label="Check your own document">
+    <h2>Check your own document</h2>
+    <p>Paste an Ontario residential lease, job offer or employment contract, or a set of terms of service. The AI reads
+      it live; everything after that (quote checks, label checks, the cited rules) runs in your browser.</p>
+    <textarea id="own-text" maxlength="40000" placeholder="Paste the document text here..." aria-label="Document text"></textarea>
+    <div class="own-row">
+      <span class="count-chars" id="own-count">0 of 40,000 characters</span>
+      <span class="actions">
+        <button type="button" class="btn" id="own-sample">Paste a sample lease</button>
+        <button type="button" class="btn primary" id="own-go">Check it</button>
+      </span>
+    </div>
+    <p class="status" id="own-status" role="status"></p>
+    <p class="privacy"><b>Before you paste:</b> email addresses, phone numbers, postal codes and SIN-shaped numbers are removed
+      in your browser before anything is sent. The text then goes to Google's Gemini through a small server of mine that
+      stores nothing. Google may use text sent to its free API to improve its products, so take out names and addresses
+      first. This is not legal advice.</p>
+  </section>
 
   <div class="grid">
     <section class="panel" aria-label="Document">
@@ -184,9 +223,11 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
       <li><b>Real:</b> the documents, the rule packs (with citations and verified dates) and the verdict logic.
         Verdicts are computed in your browser by the app's rule engine and label check, ported from Swift to
         JavaScript and tested against the app's own rule tests (97 checks, all passing).</li>
-      <li><b>Pre-recorded:</b> step 1. In the app, Gemini or Apple's on-device model reads the document live. Here the
-        clause tags are the ones from the app's evaluation run, where Gemini found every one of them (34 of 34 clauses,
-        20 of 20 numbers read correctly). This keeps the demo free and private: nothing you do here is sent anywhere.</li>
+      <li><b>Samples are pre-recorded:</b> for the sample documents, step 1 uses the clause tags from the app's evaluation
+        run, where Gemini found every one of them (34 of 34 clauses, 20 of 20 numbers read correctly). Nothing is sent
+        anywhere when you browse them.</li>
+      <li><b>Your own document is live:</b> Gemini reads it through a small server that holds the API key and stores
+        nothing. Quote checks, label checks and verdicts then run in your browser, exactly as for the samples.</li>
       <li><b>Not legal advice.</b> Fine Print points to the law and says what it covers; it does not replace a lawyer,
         a tenant clinic or the Landlord and Tenant Board.</li>
     </ul>
@@ -197,14 +238,18 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
 </div>
 
 <script src="engine.js"></script>
+<script src="pipeline.js"></script>
+<script>window.FINE_PRINT_API = "https://fine-print.lekanlawal.workers.dev";</script>
 <script>
 const E = FinePrintEngine;
 const ICON = { rule_violation: "!", needs_human: "?", worth_a_look: "•", rule_compliant: "✓" };
 const TYPE_NAME = (t) => t.replaceAll("_", " ");
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
 let data, current = 0, guardOn = true;
+let own = null;   // the last analysis of a pasted document
 
 function results(doc) {
+  if (doc === own) return { findings: E.evaluate(doc.clauses, doc.document_type, data.packs, data.heuristics), dropped: doc.labelRejected };
   const { kept, dropped } = E.guardLabels(doc.clauses, doc === data.trap ? guardOn : true);
   return { findings: E.evaluate(kept, doc.document_type, data.packs, data.heuristics), dropped };
 }
@@ -245,10 +290,21 @@ function findingCard(f, doc) {
 }
 
 function render() {
-  const doc = current === "trap" ? data.trap : data.documents[current];
+  document.getElementById("own").hidden = current !== "own";
+  if (current === "own" && !own) {
+    document.getElementById("doc-title").textContent = "Your document";
+    document.getElementById("blurb").textContent = "";
+    document.getElementById("results-sub").textContent = "";
+    document.getElementById("counts").innerHTML = "";
+    document.getElementById("doc").innerHTML = `<p class="empty">Your document will appear here with every clause the app found highlighted.</p>`;
+    document.getElementById("findings").innerHTML = `<p class="empty">Paste a document above and press Check it.</p>`;
+    renderTrap([], []);
+    return;
+  }
+  const doc = current === "own" ? own : current === "trap" ? data.trap : data.documents[current];
   const { findings, dropped } = results(doc);
   document.getElementById("doc-title").textContent = doc.title === "Try to break it" ? "A pet-friendly lease" : doc.title;
-  document.getElementById("blurb").textContent = current === "trap" ? "" : doc.blurb;
+  document.getElementById("blurb").textContent = current === "trap" || current === "own" ? "" : doc.blurb;
   const scoped = data.packs.some((p) => p.document_types.includes(doc.document_type));
   document.getElementById("results-sub").textContent = scoped
     ? `Identified as: ${TYPE_NAME(doc.document_type)}. Ontario rules apply.`
@@ -260,7 +316,7 @@ function render() {
       <div class="num">${n}</div><div class="lbl">${E.TIERS[t].label}</div></div>`;
   }).join("");
 
-  let html = "";
+  let html = current === "own" ? ownSummary(doc) : "";
   for (const t of E.ORDER) {
     const fs = findings.filter((f) => f.tier === t);
     if (!fs.length) continue;
@@ -275,6 +331,7 @@ function render() {
           <blockquote data-start="${d.clause.start}">“${esc(d.clause.quote)}”</blockquote>
           <p>Label rejected: ${esc(d.reason)}. No legal verdict given.</p></article>`).join("");
   }
+  if (current === "own") html += ownRejected(doc);
   document.getElementById("findings").innerHTML = html || `<p class="empty">Nothing found.</p>`;
   document.querySelectorAll(".finding blockquote").forEach((q) => q.addEventListener("click", () => select(+q.dataset.start, false)));
   renderDoc(doc, findings, dropped);
@@ -302,6 +359,58 @@ function renderTrap(findings, dropped) {
   document.getElementById("guard").addEventListener("click", () => { guardOn = !guardOn; render(); });
 }
 
+// ---------------------------------------------------------------- your own document
+function ownSummary(doc) {
+  const quoteRejected = doc.rejected.filter((r) => r.quoteFailure).length;
+  const failed = doc.failed.length ? `<p class="note" style="color:var(--violation);font-style:normal">${doc.failed.length} section(s) of
+    your document couldn't be read (${esc(doc.failed[0].reason)}). Read those parts yourself.</p>` : "";
+  return `<div class="checks">
+      <div><b>${doc.clauses.length + doc.rejected.length}</b>clauses the AI tagged</div>
+      <div><b>${quoteRejected}</b>thrown out: quote not in your document</div>
+      <div><b>${doc.labelRejected.length}</b>thrown out: label contradicted the wording</div>
+    </div>${failed}`;
+}
+function ownRejected(doc) {
+  const rest = doc.rejected.filter((r) => !r.label);
+  if (!rest.length) return "";
+  return `<div class="tier-head"><span class="icon" style="background:var(--ink-2)" aria-hidden="true">×</span>Thrown out before any verdict</div>
+    <p class="tier-meaning">The AI claimed these, but code could not confirm them in your document, so they were never judged.</p>`
+    + rest.map((r) => `<article class="finding"><span class="ai-label">AI's label: ${esc(TYPE_NAME(r.clause.type))}</span>
+      <blockquote>“${esc(r.clause.quote)}”</blockquote><p>Rejected: ${esc(r.reason)}.</p></article>`).join("");
+}
+
+const ownText = document.getElementById("own-text");
+const ownStatus = (msg, bad = false) => { const el = document.getElementById("own-status"); el.textContent = msg; el.classList.toggle("bad", bad); };
+ownText.addEventListener("input", () => {
+  document.getElementById("own-count").textContent = `${ownText.value.length.toLocaleString("en-CA")} of 40,000 characters`;
+});
+document.getElementById("own-sample").addEventListener("click", () => {
+  ownText.value = data.documents[0].text;
+  ownText.dispatchEvent(new Event("input"));
+  ownText.focus();
+});
+document.getElementById("own-go").addEventListener("click", async () => {
+  const go = document.getElementById("own-go");
+  const raw = ownText.value.trim();
+  if (raw.length < 200) return ownStatus("Paste a little more: at least a few clauses of the document.", true);
+  if (!window.FINE_PRINT_API) return ownStatus("The live service isn't connected yet. Try the sample documents for now.", true);
+  const { text, count } = FinePrintPipeline.redact(raw);
+  if (count) { ownText.value = text; ownText.dispatchEvent(new Event("input")); }
+  go.disabled = true;
+  try {
+    const r = await FinePrintPipeline.analyze(text, window.FINE_PRINT_API, (m) => ownStatus(m));
+    own = { title: "Your document", text, ...r, labelRejected: r.rejected.filter((x) => x.label) };
+    ownStatus(`Done in ${r.seconds.toFixed(1)} s.${count ? ` ${count} contact detail(s) were removed before sending.` : ""}`);
+    render();
+    document.querySelector(".grid").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (err) {
+    const offline = err instanceof TypeError;   // the request never reached the service
+    ownStatus(offline ? "The live checker isn't reachable right now. The sample documents above still work." : `Couldn't check it: ${err.message}`, true);
+  } finally {
+    go.disabled = false;
+  }
+});
+
 function select(start, fromDoc) {
   document.querySelectorAll(".active").forEach((el) => el.classList.remove("active"));
   const card = document.querySelector(`.finding[data-start="${start}"]`);
@@ -314,15 +423,16 @@ function select(start, fromDoc) {
 function tabs() {
   const el = document.getElementById("tabs");
   el.innerHTML = data.documents.map((d, i) => `<button class="tab" role="tab" data-i="${i}">${esc(d.title)}</button>`).join("")
-    + `<button class="tab trap" role="tab" data-i="trap">Try to break it</button>`;
+    + `<button class="tab trap" role="tab" data-i="trap">Try to break it</button>`
+    + `<button class="tab own" role="tab" data-i="own">Check your own document</button>`;
   el.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => {
-    current = b.dataset.i === "trap" ? "trap" : +b.dataset.i;
+    current = ["trap", "own"].includes(b.dataset.i) ? b.dataset.i : +b.dataset.i;
     el.querySelectorAll(".tab").forEach((x) => x.setAttribute("aria-selected", x === b));
-    history.replaceState(null, "", current === "trap" ? "#break-it" : `#${data.documents[current].id}`);
+    history.replaceState(null, "", current === "trap" ? "#break-it" : current === "own" ? "#your-document" : `#${data.documents[current].id}`);
     render();
   }));
   const hash = location.hash.slice(1);
-  const start = hash === "break-it" ? "trap" : Math.max(0, data.documents.findIndex((d) => d.id === hash));
+  const start = hash === "break-it" ? "trap" : hash === "your-document" ? "own" : Math.max(0, data.documents.findIndex((d) => d.id === hash));
   el.querySelector(`[data-i="${start}"]`).click();
 }
 
