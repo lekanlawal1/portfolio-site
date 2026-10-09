@@ -66,7 +66,7 @@
     <div class="wrap">
       <h2 class="section">Six builds. Click into any of them.</h2>
       <p class="section-sub">An iOS app that checks contracts against Ontario law, a self-refreshing economic data platform,
-        an Excel tool for warehouse audits, business intelligence, applied AI with guardrails, and a football stats agent
+        an Excel tool for warehouse audits, business intelligence, an App Store review analyzer, and a football stats agent
         that turns plain English into checked SQL. Every one of them has something you can use right now.</p>
 
       <div class="cards">
@@ -138,15 +138,17 @@
         </div>
 
         <div class="card c-triage" id="triage">
-          <a class="shot" href="projects/project2.html"><div class="frame"><img src="assets/p2.png" alt="AI Support Ticket Triage demo" loading="lazy"></div></a>
+          <span class="badge">New</span>
+          <a class="shot" href="projects/app-reviews.html"><div class="frame"><img src="assets/app-reviews.png" alt="App Review Insights: Wealthsimple's recent reviews average 3.5 stars against an all-time 4.6" loading="lazy"></div></a>
           <div class="body">
-            <h3><a href="projects/project2.html">AI Support Ticket Triage</a></h3>
-            <p class="hook">An LLM sorts support tickets by category, priority, and routing, wrapped in the
-            engineering that catches it when it's wrong. 90% accuracy on auto-routed tickets.</p>
-            <div class="tags"><span class="tag">Python</span><span class="tag">Gemini API</span><span class="tag">Streamlit</span><span class="tag">Prompt eng.</span></div>
+            <h3><a href="projects/app-reviews.html">App Review Insights</a></h3>
+            <p class="hook">Pick any iPhone app and see what its users love, hate and ask for, from its latest App Store
+            reviews: ratings by week and by version, plus AI themes where every quote is checked against the real
+            review. Wealthsimple's recent reviews average 3.5 stars, not the 4.6 it shows.</p>
+            <div class="tags"><span class="tag">JavaScript</span><span class="tag">Gemini API</span><span class="tag">Cloudflare Workers</span><span class="tag">Data viz</span></div>
             <div class="links">
-              <a href="https://project2-ai-ticket-triage-ubf6qjhxmukei7tzjp5xgo.streamlit.app">Live demo</a>
-              <a href="projects/project2.html">Case study</a>
+              <a href="https://lekanlawal1.github.io/app-review-insights/">Try it on any app</a>
+              <a href="projects/app-reviews.html">Case study</a>
             </div>
           </div>
         </div>
@@ -189,8 +191,8 @@
           analyst roles in Canada. What I care about is the judgment layer: not just making a chart
           or calling an API, but knowing why each cleaning decision was made, what a model's
           honest ceiling is, and what a business should actually do differently on Monday.</p>
-          <p style="margin-top:14px">One idea runs through all of them: the AI proposes, code checks. The ticket
-          triage tool catches its model when it is wrong. The football agent's SQL is checked twice and run in the
+          <p style="margin-top:14px">One idea runs through all of them: the AI proposes, code checks. The app review
+          analyzer checks every quote its AI picks. The football agent's SQL is checked twice and run in the
           open, so every number can be verified. Fine Print takes it to an iPhone app: the AI reads and quotes,
           and code decides. The Canada Economy platform puts it into production, and the Discrepancy Checker
           brings it to the warehouse floor in the tool operations teams already use: Excel.</p>

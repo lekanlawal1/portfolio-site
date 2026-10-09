@@ -143,7 +143,7 @@
       { id: "econ", name: "Canada Economy Platform", href: "projects/project5.html" },
       { id: "wh", name: "Discrepancy Checker", href: "demos/discrepancy-checker/" },
       { id: "store", name: "Superstore Margin Console", href: "projects/project1.html" },
-      { id: "triage", name: "AI Ticket Triage", href: "projects/project2.html" },
+      { id: "triage", name: "App Review Insights", href: "projects/app-reviews.html" },
       { id: "fifa", name: "Football Stats Agent", href: "projects/football-agent.html" },
     ];
     let panel = null;
