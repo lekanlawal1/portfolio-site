@@ -27,13 +27,20 @@
 <main class="wrap">
   <div class="project-hero">
     <a class="backlink" href="../index.html#fine-print">&larr; All projects</a>
-    <h1>Fine Print: an iOS app that checks contracts against Ontario law</h1>
-    <p class="one-liner">Paste a lease, open a PDF, or photograph a job offer. Fine Print finds the clauses
-    that matter and tells you, with the exact statute section, which ones Ontario law has already made void.</p>
+    <h1>Fine Print: Check a Lease or Job Offer Against Ontario Law</h1>
+    <p class="one-liner">Paste a lease, job offer or terms of service and it points out which clauses Ontario law has
+    already made void, with the exact section of the law for each one. It's an iPhone app, and now you can try it on
+    your own document in the browser.</p>
     <div class="meta-row">
       <span class="tag">Swift 6</span><span class="tag">SwiftUI</span><span class="tag">Apple Foundation Models</span>
       <span class="tag">Gemini API</span><span class="tag">Vision OCR</span><span class="tag">Swift Testing</span>
+      <span class="tag">JavaScript</span><span class="tag">Cloudflare Workers</span>
     </div>
+  </div>
+
+  <div class="project-links" style="margin:0 0 26px">
+    <a class="btn primary" href="../demos/fine-print/#your-document">Check your own document</a>
+    <a class="btn" href="../demos/fine-print/">See the sample documents</a>
   </div>
 
   <div class="phone-row">
@@ -46,46 +53,67 @@
   iOS Simulator with real Gemini analysis: a problem lease, a scanned photo, and a contractor agreement.</p>
 
   <article class="case">
-    <h2>The story</h2>
-    <p>Tenants and new hires sign documents full of clauses Ontario law has already made void: "no pets" rules,
-    damage deposits, non-competes. An AI model can read a contract in seconds, but one that confidently calls a
-    legal clause illegal does real harm. So in Fine Print the AI only reads. It tags clauses from a closed list and
-    must quote each one word for word. Ordinary, unit-tested code then checks that the quote exists, checks that
-    the document's own wording supports the AI's label, and only then applies cited rules from the Residential
-    Tenancies Act and the Employment Standards Act. Every rule was checked against the official statute text, and
-    the app shows the date it was checked.</p>
-    <p>A 12-document test set built to break the system found the failure that mattered: both AI engines labelled
-    "Pets are welcome" as a pet ban, and the rules then called it void. Quote checking couldn't catch it because the
-    quote was real. A deterministic label check brought wrong legal verdicts to zero for every engine.</p>
+    <h2>What it does</h2>
+    <p>Leases and job offers often contain clauses that look binding but aren't. In Ontario, a "no pets" rule in a
+    lease is void. So is a damage deposit, and so are most non-compete clauses in a job offer. Most people never find
+    out, because nobody reads the law next to the contract.</p>
+    <p>Fine Print does that for you. You paste the text, open a PDF or take a photo. It finds the clauses that matter
+    and sorts them into four groups: conflicts with the law, things to check yourself, things worth a second look, and
+    clauses that are fine. Every legal claim comes with the section of the law it relies on, a link to the official
+    text, and the date I last checked that rule against it.</p>
 
-    <h2>Headline numbers</h2>
+    <h2>Try it on your own document</h2>
+    <p>Recruiters can't install an iPhone app from a portfolio, so the browser demo now runs the real thing. Paste a
+    lease or job offer and it's checked live, usually in about three seconds. Before anything is sent, your browser
+    strips email addresses, phone numbers and postal codes. You also see the safety checks working: any clause the AI
+    claims but can't back up with an exact quote from your document is shown as thrown out, not quietly hidden.</p>
+
+    <h2>How it avoids wrong answers</h2>
+    <p>An AI that tells a tenant a legal clause is illegal does real harm, so the AI is never the one deciding. Its
+    only job is to read: tag each clause from a fixed list and copy it word for word. Then ordinary code takes over.
+    It checks that the quote really is in your document. It checks that the wording supports the AI's label. Only
+    then does a written rule from the Residential Tenancies Act or the Employment Standards Act decide.</p>
+    <p>That second check exists because of a real test failure. I built 12 test documents designed to trip the app
+    up. Both AI models read "Pets are welcome. The Tenant may keep cats and dogs" and tagged it as a no-pets rule.
+    The quote was real, so the first check passed, and the app told the tenant the clause was void. Now code checks
+    the wording against the label, and the demo has a "Try to break it" switch so you can turn that check off and see
+    the wrong answer for yourself.</p>
+
+    <h2>The results</h2>
     <div class="numbers">
-      <div class="num"><div class="v">0</div><div class="l">wrong legal verdicts across 12 test documents, for every engine</div></div>
-      <div class="num"><div class="v">100%</div><div class="l">of labelled clauses found by Gemini, with every number read correctly</div></div>
-      <div class="num"><div class="v">175 s &rarr; 2 s</div><div class="l">per document after capping Gemini's runaway hidden reasoning</div></div>
+      <div class="num"><div class="v">0</div><div class="l">wrong legal verdicts across the 12 test documents, for every AI model tried</div></div>
+      <div class="num"><div class="v">100%</div><div class="l">of the clauses in those documents found by Gemini, with every number read correctly</div></div>
+      <div class="num"><div class="v">175 s &rarr; 2 s</div><div class="l">per document, after I capped how long the AI was allowed to "think"</div></div>
     </div>
+    <p>I tested the browser version the same way. Three test documents it had never seen, including one with
+    instructions hidden in it to trick the AI and one full of "no deposit" and "pets are welcome" wording, came back
+    with every expected clause found and no wrong verdicts. A pasted recipe was recognised as not a contract and got
+    no legal verdicts at all.</p>
 
-    <h2>In the app</h2>
+    <h2>In the iPhone app</h2>
     <div class="shots">
       <figure><img src="../assets/fine-print/2-results.png" alt="Results for a problem lease"><figcaption>8 conflicts found, each cited</figcaption></figure>
       <figure><img src="../assets/fine-print/5-detail-source.png" alt="Clause detail with statute citation"><figcaption>The clause in context, with its source</figcaption></figure>
-      <figure><img src="../assets/fine-print/6-scan-results.png" alt="Results for a scanned photo of a lease"><figcaption>A photo, read on the device</figcaption></figure>
-      <figure><img src="../assets/fine-print/7-contractor.png" alt="Contractor agreement with no legal verdicts"><figcaption>Not employment, so no ESA verdict</figcaption></figure>
+      <figure><img src="../assets/fine-print/6-scan-results.png" alt="Results for a scanned photo of a lease"><figcaption>A photo, read on the phone</figcaption></figure>
+      <figure><img src="../assets/fine-print/7-contractor.png" alt="Contractor agreement with no legal verdicts"><figcaption>Not employment, so no employment-law verdict</figcaption></figure>
     </div>
+    <p>The app can read a document on the phone itself with Apple's built-in AI, so nothing leaves the device. In
+    testing, that on-device model found about half the clauses Gemini found, so the app prefers Gemini but asks
+    permission before sending anything.</p>
 
-    <h2>Key decisions I'd defend in an interview</h2>
+    <h2>Limits</h2>
     <ul>
-      <li><b>The AI never issues a legal verdict.</b> Verdicts come only from rule packs written as data, each with a citation, an official source link, and a verified date. A rule I couldn't verify against the statute doesn't ship.</li>
-      <li><b>Verify the quote, then verify the label.</b> Quote checks catch invented clauses but not a real clause with the wrong label, which was the dangerous failure in testing.</li>
-      <li><b>Test capability, don't trust the flag.</b> In the iOS Simulator Apple's on-device model reports "available" but every request fails, so the app picks its engine with a real test request at launch.</li>
-      <li><b>Gemini first, by measurement, with consent.</b> Gemini found 100% of clauses versus 49% on-device, so it's preferred, but the app asks before any document leaves the phone.</li>
-      <li><b>Prompt changes get regression tests.</b> A stricter prompt quietly broke overtime detection; the evaluation caught it and one clearer description fixed it.</li>
+      <li>Ontario only, and only residential leases and employment contracts get legal verdicts. Other documents get
+      the "worth a look" flags, with no legal claim.</li>
+      <li>It is not legal advice. It points to the law; a tenant clinic, a lawyer or the Landlord and Tenant Board decides.</li>
+      <li>The browser demo sends text to Google's Gemini on its free plan, which Google may use to improve its
+      products. The page says so before you paste.</li>
     </ul>
   </article>
 
   <div class="project-links">
-    <a class="btn primary" href="../demos/fine-print/">Try the interactive demo</a>
-    <a class="btn" href="https://github.com/lekanlawal1/fine-print">View the code and evaluation</a>
+    <a class="btn primary" href="../demos/fine-print/#your-document">Check your own document</a>
+    <a class="btn" href="https://github.com/lekanlawal1/fine-print">View the code and test results</a>
     <a class="btn" href="../assets/fine-print/demo.mp4">Download the demo video</a>
   </div>
 </main>
