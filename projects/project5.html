@@ -27,10 +27,9 @@
 <main class="wrap">
   <div class="project-hero">
     <a class="backlink" href="../index.html#economy">&larr; All projects</a>
-    <h1>Canada Economy Intelligence Platform: Live StatCan Data, Tested and Self-Refreshing</h1>
-    <p class="one-liner">The production-style project: a pipeline on Statistics Canada open data that
-    checks for new releases every weekday, rebuilds a tested warehouse, re-runs honest forecasts, has an
-    AI draft the monthly briefing, and redeploys the dashboard. No server, no cost, no manual steps.</p>
+    <h1>Canada Economy Intelligence Platform: Live Statistics Canada Data, and Your Own Inflation Rate</h1>
+    <p class="one-liner">A dashboard of Canada's economy that updates itself every time Statistics Canada releases new
+    numbers, explains them in plain language, and works out your personal inflation rate from what you actually spend.</p>
     <div class="meta-row">
       <span class="tag">Python</span><span class="tag">DuckDB</span><span class="tag">SQL</span>
       <span class="tag">statsmodels</span><span class="tag">GitHub Actions</span><span class="tag">Gemini API</span>
@@ -38,51 +37,73 @@
     </div>
   </div>
 
+  <div class="project-links" style="margin:0 0 26px">
+    <a class="btn primary" href="https://lekanlawal1.github.io/project5-canada-economy-platform/#mine-section">Work out your inflation rate</a>
+    <a class="btn" href="https://lekanlawal1.github.io/project5-canada-economy-platform/">Open the dashboard</a>
+  </div>
+
   <a class="big-shot" href="https://lekanlawal1.github.io/project5-canada-economy-platform/">
     <img src="../assets/p5.png" alt="Canada Economy Intelligence dashboard: headline indicators and the AI monthly briefing">
   </a>
 
   <article class="case">
-    <h2>The story</h2>
-    <p>The other projects are built once and stay still. This one keeps running. Five StatCan tables
-    (labour force, consumer prices, new housing prices, job vacancies, GDP) arrive as 1.4 GB of CSV,
-    including one 1.18 GB file that DuckDB streams and filters instead of loading into memory. Versioned
-    SQL turns them into raw, staging and mart layers, and every cleaning decision is logged with the rows
-    it affected. A daily job asks StatCan whether anything changed, and rebuilds only when it did.</p>
-    <p>The theme is not claiming more than the data supports. A monthly job loss of 41,700 sounds like
-    news, but it sits inside StatCan's own margin of error, so the chart shows it grey. Forecasts were
-    judged by rules committed before any result: a seasonal model wins for next month's inflation, and
-    for unemployment no model beats "next month equals this month", so that is what the site publishes.
-    Gemini writes the monthly briefing, and code checks every number for the right value, the right
-    measure and the right direction before anything goes live.</p>
+    <h2>What it does</h2>
+    <p>Every month Statistics Canada publishes the numbers people care about: jobs, unemployment, inflation, house
+    prices, job vacancies and the size of the economy. This site gathers them in one place, by province, and keeps
+    itself current. Every weekday it checks whether anything new has been published. If so, it downloads it, rebuilds
+    everything, re-checks it and puts the new version online, with no one pressing a button.</p>
+    <p>It also explains the numbers. A "What it means for you" section turns them into plain sentences for a renter,
+    a job seeker and an employer in your province. A monthly briefing summarises what changed. And it tells you when a
+    move is just noise: a monthly job loss of 41,700 sounds like news, but if it's inside StatCan's own margin of
+    error, the chart shows it in grey.</p>
 
-    <h2>Evidence, not assertions</h2>
+    <h2>Your own inflation rate</h2>
+    <a class="big-shot" href="https://lekanlawal1.github.io/project5-canada-economy-platform/#mine-section" style="margin:6px 0 16px">
+      <img src="../assets/p5-calculator.png" alt="Inflation calculator: a household that drives a lot has a 4.5% rate against the official 3.0%, mostly because of gas">
+    </a>
+    <p>The official inflation rate averages everyone's spending, but nobody spends like the average. Someone who
+    drives to work feels gas prices; someone who rents feels rent. Enter roughly what you spend in a month and the
+    site works out your own rate, for Canada or your province. It then tells you why yours differs, for example
+    "gas, up 23%, is 12% of your spending versus 4% for a typical household", and what that costs you in dollars.
+    Nothing you type leaves your browser.</p>
+    <p>The part I'm most careful about is whether the math is right. The "typical household" isn't my guess: it's
+    Statistics Canada's own record of how households split their spending. If the calculator is correct, feeding it
+    that typical spending must give back the official inflation rate. It does, to within 0.08 percentage points on
+    average across every province and month I checked. The site refuses to publish an update if that check ever
+    fails.</p>
+
+    <h2>How I know the numbers are right</h2>
     <div class="numbers">
-      <div class="num"><div class="v">11/11</div><div class="l">headline figures match StatCan's official releases exactly, checked on every build</div></div>
-      <div class="num"><div class="v">80</div><div class="l">data tests run before every deploy; each failure mode proven by injecting it</div></div>
-      <div class="num"><div class="v">15/15</div><div class="l">planted errors caught by the briefing's number verifier, 0 false alarms on correct drafts</div></div>
-      <div class="num"><div class="v">20/20</div><div class="l">live AI briefings verified after fixes, up from 5/10 in the first batch</div></div>
+      <div class="num"><div class="v">11/11</div><div class="l">headline figures match Statistics Canada's official releases exactly, checked on every update</div></div>
+      <div class="num"><div class="v">89</div><div class="l">automatic checks run before every update; if one fails, the site keeps its last good version</div></div>
+      <div class="num"><div class="v">0.08</div><div class="l">percentage points: how close the inflation calculator gets to the official rate using official spending</div></div>
+      <div class="num"><div class="v">15/15</div><div class="l">deliberately planted mistakes caught by the code that checks the AI-written briefing</div></div>
     </div>
 
-    <h2>What the evaluation found</h2>
-    <p>The first batch of 10 live Gemini briefings published only 5. Reading every failure showed most
-    were my verifier's false alarms: in "a change of 0.00 and rose 1.4", it read "rose" as describing
-    the 0.00. The fixes went in on both sides, every real failing sentence became a permanent test, and
-    the next 20 runs all published a verified briefing. The 15 planted errors still had to be caught, so
-    the verifier could not be loosened by accident.</p>
+    <h2>The AI briefing, and keeping it honest</h2>
+    <p>Each month an AI model (Google's Gemini) drafts a short briefing on what changed. AI is good at writing and
+    bad at numbers, so code checks every number in the draft before it's published: the right value, the right
+    measure, the right direction. In the first batch of 10 drafts, only 5 passed. Reading every failure showed most
+    were my checker being too strict. In one case it read "rose" as describing the wrong number in the sentence. After
+    fixing both sides, the next 20 drafts all passed, and the checker still catches all 15 mistakes I planted to test it.</p>
 
-    <h2>Key decisions I'd defend in an interview</h2>
+    <h2>Forecasts that admit when they lose</h2>
+    <p>The site forecasts unemployment and inflation for the next few months, but only publishes a forecast that beats
+    the simplest possible guess. For unemployment, nothing I tried beat "next month will be the same as this month",
+    so that is what the site shows, and it says so.</p>
+
+    <h2>Limits</h2>
     <ul>
-      <li><b>Months matched by calendar, not by row</b>: StatCan suppresses small-group cells, which leaves gaps; <code>LAG()</code> would silently compare against the wrong month.</li>
-      <li><b>Robust anomaly scores</b>: a classic z-score called the September 2020 unemployment drop normal, because COVID inflated the variance for three years. Median and MAD flag it at -6.7.</li>
-      <li><b>Significance before narrative</b>: a forecast only "beats the baseline" with a Diebold-Mariano test, and a monthly move is only news when it beats StatCan's published standard error.</li>
-      <li><b>AI drafts, code verifies</b>: a failed draft gets one retry with its exact failures listed, then a verified template is published. An API error never blocks the deploy.</li>
-      <li><b>Failure keeps the last good site</b>: data tests run before export, so a bad StatCan release fails the job and the live page does not change.</li>
+      <li>It shows what Statistics Canada publishes, about one to two months after the fact. It isn't a live feed.</li>
+      <li>The inflation calculator uses the 8 broad spending groups StatCan publishes for every province. Your real
+      basket is more detailed than that, so treat your rate as a good estimate, not an exact figure.</li>
+      <li>"Other home costs" and "other transportation" are worked out from StatCan's published groups minus rent and
+      gas, because StatCan doesn't publish them separately.</li>
     </ul>
   </article>
 
   <div class="project-links">
-    <a class="btn primary" href="https://lekanlawal1.github.io/project5-canada-economy-platform/">Open the live dashboard</a>
+    <a class="btn primary" href="https://lekanlawal1.github.io/project5-canada-economy-platform/#mine-section">Work out your inflation rate</a>
     <a class="btn" href="https://github.com/lekanlawal1/project5-canada-economy-platform">View code &amp; decision docs</a>
   </div>
 </main>
