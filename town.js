@@ -215,13 +215,13 @@
   };
 
   const PROJECTS = [
-    { id: "econ", x: 1.2, y: 1.0, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "projects/project5.html" },
-    { id: "store", x: 5.0, y: 0.8, w: 3, d: 2, name: "Superstore Margin Console", sub: "BI dashboard", href: "projects/project1.html" },
-    { id: "agent", x: 9.6, y: 1.2, w: 1.4, d: 1.4, name: "NL to SQL Agent", sub: "Ask data in English", href: "projects/project4.html" },
-    { id: "triage", x: 1.0, y: 4.0, w: 2.2, d: 2, name: "AI Ticket Triage", sub: "LLM with guardrails", href: "projects/project2.html" },
-    { id: "fifa", x: 4.8, y: 4.6, w: 3, d: 3, name: "Player Churn Pipeline", sub: "SQL + ML model", href: "projects/project3.html" },
-    { id: "fine", x: 4.2, y: 9.2, w: 0.5, d: 1.7, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
-    { id: "wh", x: 8.4, y: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
+    { id: "econ", color: "#E63946", x: 1.2, y: 1.0, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "projects/project5.html" },
+    { id: "store", color: "#FFB020", x: 5.0, y: 0.8, w: 3, d: 2, name: "Superstore Margin Console", sub: "BI dashboard", href: "projects/project1.html" },
+    { id: "agent", color: "#8A4DFF", x: 9.6, y: 1.2, w: 1.4, d: 1.4, name: "NL to SQL Agent", sub: "Ask data in English", href: "projects/project4.html" },
+    { id: "triage", color: "#3E8BFF", x: 1.0, y: 4.0, w: 2.2, d: 2, name: "AI Ticket Triage", sub: "LLM with guardrails", href: "projects/project2.html" },
+    { id: "fifa", color: "#22C3A6", x: 4.8, y: 4.6, w: 3, d: 3, name: "Player Churn Pipeline", sub: "SQL + ML model", href: "projects/project3.html" },
+    { id: "fine", color: "#FF4F8B", x: 4.2, y: 9.2, w: 0.5, d: 1.7, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
+    { id: "wh", color: "#FF6B35", x: 8.4, y: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
   ];
 
   const visited = new Set(JSON.parse((() => { try { return localStorage.getItem("town-visited") || "[]"; } catch { return "[]"; } })()));
@@ -248,7 +248,12 @@
     el("rect", { x: lx - w / 2, y: ly - 44, width: w, height: 36, rx: 9 }, tipG);
     el("text", { x: lx, y: ly - 29, "text-anchor": "middle" }, tipG).textContent = p.name;
     el("text", { x: lx, y: ly - 15, "text-anchor": "middle", class: "sub" }, tipG).textContent = p.sub;
-    a.addEventListener("click", () => { visited.add(p.id); saveVisited(); });
+    a.addEventListener("click", (e) => {
+      visited.add(p.id); saveVisited();
+      if (e.metaKey || e.ctrlKey || e.shiftKey || !window.Fun) return;   // new tab: leave the link alone
+      e.preventDefault();
+      Fun.wipeTo(p.href, { x: e.clientX || innerWidth / 2, y: e.clientY || innerHeight / 2, color: p.color, name: p.name });
+    });
     place(a, p.x, p.y, p.w, p.d);
   }
   function starPath(cx, cy, R, r) {
