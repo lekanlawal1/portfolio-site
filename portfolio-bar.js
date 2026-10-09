@@ -29,6 +29,7 @@
 .pf-strip a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 5px 10px; }
 .pf-strip a:hover, .pf-strip a:focus-visible { background: rgba(255, 247, 234, .14); outline: none; }
 .pf-strip .pf-arrow { font-size: 16px; line-height: 1; }
+.pf-strip .pf-label, .pf-strip .pf-label-long { font: inherit; }
 .pf-strip .pf-tour { border: 1.5px solid rgba(255, 247, 234, .35); }
 .pf-strip .pf-dots { display: inline-flex; gap: 3px; }
 .pf-strip .pf-dots i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #FFF7EA; }
@@ -45,7 +46,7 @@
   strip.setAttribute("aria-label", "Portfolio");
   const back = base + "index.html" + (project ? `#${CARD[project]}` : "#projects");
   strip.innerHTML = `
-    <a class="pf-back" href="${back}"><span class="pf-arrow" aria-hidden="true">&larr;</span>Back to <span class="pf-label-long">all </span>projects</a>
+    <a class="pf-back" href="${back}"><span class="pf-arrow" aria-hidden="true">&larr;</span><span class="pf-label">Back to <span class="pf-label-long">all </span>projects</span></a>
     <a class="pf-tour${done ? " done" : ""}" href="${base}index.html#${done ? "reward" : "tour"}"
        aria-label="Island tour: ${n} of ${TOUR.length} projects explored${done ? ", reward unlocked" : ""}">
       <span class="pf-dots" aria-hidden="true">${TOUR.map((_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>
