@@ -444,11 +444,16 @@ function start() {
   const flyTarget = new THREE.Vector3(), flyPoint = new THREE.Vector3();
   function startFly(b) {
     fly = { b, t0: performance.now(), wiped: false };
-    spinV = 0; label.classList.remove("on"); canvas.style.cursor = "default";
+    spinV = 0; canvas.style.cursor = "default";
+    // keep the name on screen during the zoom, so a single tap still tells you where you're going
+    hovered = b;
+    label.querySelector("b").textContent = b.userData.p.name;
+    label.querySelector("span").textContent = b.userData.p.sub;
+    label.classList.add("on");
     b.userData.targetLift = 0.3;
     wake();
   }
-  addEventListener("pageshow", (e) => { if (e.persisted && fly) { fly.b.userData.targetLift = 0; fly = null; hovered = null; wake(); } });
+  addEventListener("pageshow", (e) => { if (e.persisted && fly) { fly.b.userData.targetLift = 0; fly = null; hovered = null; label.classList.remove("on"); wake(); } });
 
   canvas.addEventListener("pointerdown", (e) => {
     if (fly) return;
@@ -457,9 +462,11 @@ function start() {
     if (e.pointerType === "mouse") canvas.setPointerCapture(e.pointerId);
   });
   canvas.addEventListener("pointermove", (e) => {
+    if (fly) return;
     if (drag && drag.id === e.pointerId) {
       const dx = e.clientX - drag.lastX;
-      if (Math.abs(e.clientX - drag.x) > 6 || Math.abs(e.clientY - drag.y) > 6) drag.moved = true;
+      const slop = e.pointerType === "mouse" ? 6 : 12;   // fingers wobble during a tap
+      if (Math.abs(e.clientX - drag.x) > slop || Math.abs(e.clientY - drag.y) > slop) drag.moved = true;
       if (drag.moved) {
         rot.target += dx * 0.009; spinV = dx * 0.009;
         if (e.pointerType === "mouse") view.el = Math.min(0.95, Math.max(0.28, view.el + e.movementY * 0.004));
@@ -480,7 +487,6 @@ function start() {
     const b = h.object.userData.building;
     if (b) {
       const p = b.userData.p;
-      if (e.pointerType !== "mouse" && hovered !== b) { setHover(b); positionLabel(); return; }   // first tap shows the name
       visited.add(p.id);
       try { localStorage.setItem("town-visited", JSON.stringify([...visited])); } catch {}
       if (e.metaKey || e.ctrlKey || e.shiftKey) { open(p.href, "_blank"); return; }
@@ -492,7 +498,8 @@ function start() {
   };
   canvas.addEventListener("pointerup", end);
   canvas.addEventListener("pointercancel", (e) => { if (drag && drag.id === e.pointerId) drag = null; });
-  canvas.addEventListener("pointerleave", () => { if (!drag) setHover(null); });
+  // Touch screens fire pointerleave after every tap; only a mouse can actually leave.
+  canvas.addEventListener("pointerleave", (e) => { if (!drag && e.pointerType === "mouse") setHover(null); });
 
   // planting trees
   let planted = 0;
@@ -647,7 +654,7 @@ function start() {
   requestAnimationFrame(() => wrap.classList.add("ready3d"));
   const hint = document.querySelector(".hero .hint > span:last-child");
   if (hint) hint.textContent = coarse
-    ? "This is my town. Each building is a project: tap one to see its name, tap again to visit. Swipe sideways to spin it, tap the grass to plant a tree."
+    ? "This is my town. Each building is a project: tap one to visit it. Swipe sideways to spin the island, tap the grass to plant a tree."
     : "This is my town. Each building is a project: click one to visit it. Drag to spin the island, click the grass to plant a tree.";
   window.Town3D = { renderer, scene, camera, quality: () => quality,
     screenOf(id) { const b = buildings.find((x) => x.userData.p.id === id); const p = b.userData.p; const v = new THREE.Vector3(gx(p.x + p.w / 2), b.userData.top * 0.5, gz(p.z + p.d / 2)); island.localToWorld(v); v.project(camera); const r = canvas.getBoundingClientRect(); return [r.left + (v.x + 1) / 2 * r.width, r.top + (1 - v.y) / 2 * r.height]; },
