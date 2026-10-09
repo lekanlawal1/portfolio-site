@@ -28,9 +28,8 @@
   <div class="project-hero">
     <a class="backlink" href="../index.html#football">&larr; All projects</a>
     <h1>Football Stats Agent: Ask in English, Get an Answer You Can Check</h1>
-    <p class="one-liner">Type a question like "who made the most tackles in the last 20 minutes of Premier
-    League games in 2015/16?" and an AI writes the SQL, the page checks it, and your own browser runs it
-    on 1,853 matches of real event data. The query is always shown, so every number can be checked.</p>
+    <p class="one-liner">Ask a football question in plain English and get the answer as a table, along
+    with the database query that produced it, so you can check the working yourself.</p>
     <div class="meta-row">
       <span class="tag">Python</span><span class="tag">DuckDB</span><span class="tag">DuckDB-WASM</span>
       <span class="tag">SQL</span><span class="tag">scikit-learn</span><span class="tag">Gemini API</span>
@@ -43,43 +42,71 @@
   </a>
 
   <article class="case">
-    <h2>The story</h2>
-    <p>This replaces two earlier projects, a player churn pipeline and a SQL agent on top of it, with one
-    thing people actually want to use. The data is StatsBomb's open event data: every tackle, shot, foul
-    and card with the minute it happened, across four complete 2015/16 leagues, two World Cups, two Euros
-    and Copa America 2024. Season totals for the 2024/25 top five leagues and MLS 2024 come from
-    API-Football's free plan and fill in a little every day, inside its 100-request quota.</p>
-    <p>There is no database server. The site publishes the tables as parquet files, and DuckDB runs inside
-    the visitor's browser, downloading only the parts of a file a query needs. The only server is a small
-    Cloudflare Worker that keeps the Gemini key secret, rate-limits visitors, caches repeated questions
-    and only ever returns one SELECT statement. Nothing sleeps, so the demo works the moment a recruiter
-    clicks it.</p>
-
-    <h2>Evidence, not assertions</h2>
-    <div class="numbers">
-      <div class="num"><div class="v">19/19</div><div class="l">answer questions where the top row matches hand-written gold SQL, player and number</div></div>
-      <div class="num"><div class="v">12/12</div><div class="l">attacks stopped: prompt injection, DROP and COPY, file and URL reads, prompt extraction</div></div>
-      <div class="num"><div class="v">14/14</div><div class="l">clarify or decline cases right: it asks on "best striker" and refuses wages and injuries</div></div>
-      <div class="num"><div class="v">0.804</div><div class="l">ROC AUC of my own xG model, against 0.812 for StatsBomb's professional model on the same shots</div></div>
-    </div>
-
-    <h2>What the evaluation found</h2>
-    <p>The first run scored 18 of 19, and the miss was the dangerous kind: a confident wrong answer.
-    Asked which team scored the most in Serie A 2015/16, the model ranked home goals and away goals as
-    separate lists and reported Napoli's 49 home goals. I fixed the data model, not the question: a
-    table with one row per team per match, so a team total never needs a home and away union. Roma's 83
-    is now the answer. The next run caught a cousin, grouping by the assist count itself, fixed with a
-    rule that totals come from the pre-summed tables. The model is not fully deterministic even at
-    temperature 0, so the evaluation reruns on every prompt or schema change.</p>
-
-    <h2>Key decisions I'd defend in an interview</h2>
+    <h2>What it does</h2>
+    <p>You type a question the way you'd ask a friend, and it answers with a table. A few that work:</p>
     <ul>
-      <li><b>Checked twice before anything runs</b>: the Worker and the page both reject anything but a single SELECT, block file, URL and settings functions, then EXPLAIN the query against the real tables. A failure goes back to the model once with the error; a second failure is shown, never papered over.</li>
-      <li><b>The data proves itself</b>: every match's shots plus own goals must equal the official final score. That test caught StatsBomb naming "Olympique de Marseille" in one file and "Marseille" in another, which turned a 1-1 into a 1-0.</li>
-      <li><b>Honest xG</b>: rules fixed before any result, every shot scored by a model that never saw its match (cross-validation grouped by match), and penalties given the observed 74.5% rather than modelled.</li>
-      <li><b>What was tested is what runs</b>: one prompt and one schema file, bundled into the Worker and used by the evaluation. The schema guide is generated from the live database and the deploy fails if it is stale; the answer cache is keyed to the prompt version.</li>
-      <li><b>Free, within limits it states</b>: the free data plan stops at 2024/25 and has no minute-by-minute data for it, so late-game questions about 2024/25 are declined rather than guessed.</li>
+      <li>Who made the most tackles in the last 20 minutes of Premier League games in 2015/16?</li>
+      <li>Which strikers scored more goals than their chances were worth?</li>
+      <li>Who scored the most goals at the 2022 World Cup?</li>
     </ul>
+    <p>Under every answer there's a "Show the SQL" button. SQL is the database query behind the numbers,
+    so anyone who reads SQL can see exactly how the answer was worked out. If a question is too vague
+    ("who's the best striker?") it asks what you mean. If the data doesn't have the answer (wages,
+    injuries, this season's games) it says so instead of making something up.</p>
+
+    <h2>What's in the data</h2>
+    <p>Most of it is StatsBomb's free match data, which logs every tackle, shot, foul and card with the
+    minute it happened. It covers the whole 2015/16 season in England, Spain, Italy and France, the 2018
+    and 2022 World Cups, Euro 2020 and 2024, and Copa América 2024: 1,853 matches in all.</p>
+    <p>For more recent football there are season totals for the 2024/25 top five European leagues and the
+    2024 MLS season, from API-Football. I'm on their free plan, which allows 100 requests a day, so that
+    part fills in a little more each day.</p>
+
+    <h2>How it works</h2>
+    <p>Your question goes to Google's Gemini model, which writes the query. Before anything runs, the
+    query is checked twice: it may only read data, never change or delete it, and it can't reach anything
+    outside the football tables. Then it runs in your own browser. The data sits on the website as files,
+    and your browser downloads only the pieces the query needs. There's no database server to pay for or
+    keep awake, so the page works instantly whenever someone opens it.</p>
+
+    <h2>How I know the answers are right</h2>
+    <p>I wrote 48 test questions and worked out the correct answer to each one by hand. Every time I
+    change the AI's instructions, all of them run again automatically. The latest results:</p>
+    <div class="numbers">
+      <div class="num"><div class="v">19/19</div><div class="l">questions answered correctly: same player and same number as my hand-checked answer (3 more wait on data still loading)</div></div>
+      <div class="num"><div class="v">14/14</div><div class="l">vague or unanswerable questions handled properly: it asked for detail, or said the data can't answer</div></div>
+      <div class="num"><div class="v">12/12</div><div class="l">attempts to break it stopped, like "ignore your instructions" or "delete the table"</div></div>
+    </div>
+    <p>The data gets checked too. For every one of the 1,853 matches, the goals in the event data have to
+    add up to the official final score. That check found a match where one file said "Olympique de
+    Marseille" and another said "Marseille", which made a 1-1 draw look like a 1-0.</p>
+
+    <h2>What went wrong, and how I fixed it</h2>
+    <p>The first test run got one answer wrong, and it looked completely believable. Asked which team
+    scored the most goals in Serie A 2015/16, it said Napoli with 49. The real answer is Roma with 83.
+    The model had counted home goals and away goals separately and never added them together, so 49 was
+    only Napoli's home goals.</p>
+    <p>Instead of patching that one question, I changed how the data is stored: there's now a table with
+    one row per team per game, so adding up a team's season is simple and hard to get wrong. The next run
+    caught a similar mistake with assists, and I fixed it the same way. The last two runs got everything
+    right. AI models don't give exactly the same answer every time, which is why the tests keep running.</p>
+
+    <h2>My own expected goals model</h2>
+    <p>Expected goals (xG) is the chance that a shot ends up in the net, based on where and how it was
+    taken. I built my own from about 46,000 shots, using distance, angle, defenders in the way and the
+    keeper's position. Each shot was scored by a version of the model that had never seen that match, so
+    it couldn't cheat. It ranks shots almost as well as StatsBomb's professional model: 0.804 against
+    0.812 on the standard score, where 0.5 is a coin flip and 1.0 is perfect. You can ask the agent to use
+    either one.</p>
+
+    <h2>Limits</h2>
+    <ul>
+      <li>Nothing after the 2024/25 season. The free data plan stops there.</li>
+      <li>For 2024/25 there are season totals but no minute-by-minute events, so "tackles in the last 10
+      minutes in 2024/25" gets an honest no.</li>
+      <li>It runs on free plans, so each visitor gets about eight questions a minute.</li>
+    </ul>
+    <p>The code, the full test results and the technical write-up are on GitHub.</p>
   </article>
 
   <div class="project-links">
