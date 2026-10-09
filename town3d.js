@@ -208,13 +208,13 @@ function start() {
 
   // ------------------------------------------------------------------ buildings
   const PROJECTS = [
-    { id: "econ", x: 1.2, z: 1.2, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "projects/project5.html" },
-    { id: "store", x: 5.0, z: 1.0, w: 3, d: 2, name: "Superstore Margin Console", sub: "BI dashboard", href: "projects/project1.html" },
-    { id: "agent", x: 9.4, z: 1.2, w: 1.4, d: 1.4, name: "NL to SQL Agent", sub: "Ask data in English", href: "projects/project4.html" },
-    { id: "triage", x: 1.2, z: 3.9, w: 2.2, d: 2, name: "AI Ticket Triage", sub: "LLM with guardrails", href: "projects/project2.html" },
-    { id: "fifa", x: 4.8, z: 4.6, w: 3, d: 3, name: "Player Churn Pipeline", sub: "SQL + ML model", href: "projects/project3.html" },
-    { id: "fine", x: 4.0, z: 9.6, w: 1.7, d: 0.5, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
-    { id: "wh", x: 8.0, z: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
+    { id: "econ", color: "#E63946", x: 1.2, z: 1.2, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "projects/project5.html" },
+    { id: "store", color: "#FFB020", x: 5.0, z: 1.0, w: 3, d: 2, name: "Superstore Margin Console", sub: "BI dashboard", href: "projects/project1.html" },
+    { id: "agent", color: "#8A4DFF", x: 9.4, z: 1.2, w: 1.4, d: 1.4, name: "NL to SQL Agent", sub: "Ask data in English", href: "projects/project4.html" },
+    { id: "triage", color: "#3E8BFF", x: 1.2, z: 3.9, w: 2.2, d: 2, name: "AI Ticket Triage", sub: "LLM with guardrails", href: "projects/project2.html" },
+    { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "Player Churn Pipeline", sub: "SQL + ML model", href: "projects/project3.html" },
+    { id: "fine", color: "#FF4F8B", x: 4.0, z: 9.6, w: 1.7, d: 0.5, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
+    { id: "wh", color: "#FF6B35", x: 8.0, z: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
   ];
   const animated = [];   // per-frame callbacks for small motions
   const BUILD = {
@@ -439,7 +439,19 @@ function start() {
     } else label.classList.remove("on");
     wake();
   }
+  // Flying into a building: the camera swoops down to it, then the page wipes to the project.
+  let fly = null;
+  const flyTarget = new THREE.Vector3(), flyPoint = new THREE.Vector3();
+  function startFly(b) {
+    fly = { b, t0: performance.now(), wiped: false };
+    spinV = 0; label.classList.remove("on"); canvas.style.cursor = "default";
+    b.userData.targetLift = 0.3;
+    wake();
+  }
+  addEventListener("pageshow", (e) => { if (e.persisted && fly) { fly.b.userData.targetLift = 0; fly = null; hovered = null; wake(); } });
+
   canvas.addEventListener("pointerdown", (e) => {
+    if (fly) return;
     drag = { x: e.clientX, y: e.clientY, moved: false, id: e.pointerId, lastX: e.clientX, t: performance.now() };
     lastInteract = performance.now();
     if (e.pointerType === "mouse") canvas.setPointerCapture(e.pointerId);
@@ -471,7 +483,8 @@ function start() {
       if (e.pointerType !== "mouse" && hovered !== b) { setHover(b); positionLabel(); return; }   // first tap shows the name
       visited.add(p.id);
       try { localStorage.setItem("town-visited", JSON.stringify([...visited])); } catch {}
-      location.href = p.href;
+      if (e.metaKey || e.ctrlKey || e.shiftKey) { open(p.href, "_blank"); return; }
+      startFly(b);
       return;
     }
     if (h.object === grass && h.face && h.face.normal.y > 0.5) plant(h.point);
@@ -546,15 +559,31 @@ function start() {
 
     // idle spin, drag momentum
     const idle = now - lastInteract > 2500 && !hovered && !drag;
-    if (!drag) { rot.target += spinV; spinV *= 0.92; if (idle) rot.target += dt * 0.12; }
+    if (!drag && !fly) { rot.target += spinV; spinV *= 0.92; if (idle) rot.target += dt * 0.12; }
     rot.y += (rot.target - rot.y) * Math.min(1, dt * 8);
     world.rotation.y = rot.y + (1 - ease) * -1.2;
     island.position.y = Math.sin(t * 0.9) * 0.18 - (1 - ease) * 3;
 
     // camera
-    const az = view.az, el = view.el, d = view.dist * (1 + (1 - ease) * 0.35);
-    camera.position.set(target.x + Math.cos(el) * Math.sin(az) * d, target.y + Math.sin(el) * d, target.z + Math.cos(el) * Math.cos(az) * d);
-    camera.lookAt(target);
+    const az = view.az; let el = view.el, d = view.dist * (1 + (1 - ease) * 0.35), tgt = target;
+    if (fly) {
+      const k = Math.min(1, (now - fly.t0) / 1150);
+      const e2 = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;   // ease in and out
+      const p = fly.b.userData.p;
+      flyPoint.set(gx(p.x + p.w / 2), fly.b.userData.top * 0.42 + fly.b.userData.lift, gz(p.z + p.d / 2));
+      island.localToWorld(flyPoint);
+      tgt = flyTarget.copy(target).lerp(flyPoint, e2);
+      d += (Math.max(6, fly.b.userData.top * 1.9) - d) * e2;
+      el += (0.3 - el) * e2;
+      if (k > 0.58 && !fly.wiped) {
+        fly.wiped = true;
+        const v = flyPoint.clone().project(camera), r = canvas.getBoundingClientRect();
+        const at = { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height, color: p.color, name: p.name };
+        if (window.Fun && Fun.wipeTo) Fun.wipeTo(p.href, at); else location.href = p.href;
+      }
+    }
+    camera.position.set(tgt.x + Math.cos(el) * Math.sin(az) * d, tgt.y + Math.sin(el) * d, tgt.z + Math.cos(el) * Math.cos(az) * d);
+    camera.lookAt(tgt);
 
     // night transition
     if (Math.abs(nightTarget - night) > 0.001) { night += (nightTarget - night) * Math.min(1, dt * 3); applyNight(night); }

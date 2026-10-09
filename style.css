@@ -272,6 +272,21 @@ footer.site { padding: 30px 0 44px; color: var(--muted); font-size: .9rem; }
 .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s cubic-bezier(.22,1,.36,1); }
 .reveal.in { opacity: 1; transform: none; }
 
+/* page transition */
+html.arriving body { visibility: hidden; }
+html.arriving { background: var(--arrive); }
+.wipe { position: fixed; inset: 0; z-index: 200; pointer-events: none; display: grid; place-items: center;
+  clip-path: circle(0 at var(--wx, 50%) var(--wy, 50%)); transition: clip-path .6s cubic-bezier(.7,0,.25,1); }
+.wipe.grow { clip-path: circle(150% at var(--wx, 50%) var(--wy, 50%)); }
+.wipe span { font: 800 clamp(2rem, 6vw, 4.2rem)/1.05 "Bricolage Grotesque", Inter, sans-serif; letter-spacing: -.035em; color: #fff;
+  text-align: center; padding: 0 24px; opacity: 0; transform: translateY(18px) scale(.96); transition: opacity .35s .22s, transform .45s .22s cubic-bezier(.34,1.56,.64,1);
+  text-shadow: 3px 3px 0 rgba(29,21,53,.35); }
+.wipe.grow span { opacity: 1; transform: none; }
+.wipe.arrive { clip-path: circle(150% at 50% 50%); transition: clip-path .7s cubic-bezier(.7,0,.25,1); }
+.wipe.arrive span { opacity: 1; transform: none; transition: opacity .25s; }
+.wipe.arrive.shrink { clip-path: circle(0 at 50% 50%); }
+.wipe.arrive.shrink span { opacity: 0; }
+
 /* confetti */
 .confetti { position: fixed; z-index: 100; pointer-events: none; width: 10px; height: 14px; border-radius: 2px; top: 0; left: 0; }
 

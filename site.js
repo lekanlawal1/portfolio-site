@@ -35,9 +35,43 @@
     toastEl.textContent = msg; toastEl.classList.add("show");
     clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2600);
   }
-  window.Fun = { confetti, toast };
+  // ---- page transition: a circle in the project's colour bursts out from where you clicked,
+  // carries the project's name across the page change, then shrinks away on the next page.
+  const WIPE_KEY = "page-wipe";
+  function wipeTo(href, { x = innerWidth / 2, y = innerHeight / 2, color = "#FF5D3A", name = "" } = {}) {
+    if (reduced) { location.href = href; return; }
+    const w = document.createElement("div");
+    w.className = "wipe";
+    w.style.setProperty("--wx", x + "px"); w.style.setProperty("--wy", y + "px"); w.style.background = color;
+    w.innerHTML = name ? `<span>${name.replace(/[<>&]/g, "")}</span>` : "";
+    document.body.appendChild(w);
+    try { sessionStorage.setItem(WIPE_KEY, JSON.stringify({ color, name, t: Date.now() })); } catch {}
+    requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add("grow")));
+    setTimeout(() => { location.href = href; }, 620);
+  }
+  // Arriving after a wipe: cover the page in the same colour before it paints, then reveal it.
+  let arriving = null;
+  try {
+    const a = JSON.parse(sessionStorage.getItem(WIPE_KEY) || "null");
+    sessionStorage.removeItem(WIPE_KEY);
+    if (a && Date.now() - a.t < 5000 && !reduced) arriving = a;
+  } catch {}
+  if (arriving) { root.classList.add("arriving"); root.style.setProperty("--arrive", arriving.color); }
+  // Back/forward cache restores the old page exactly as it was left, wipe and all: clear it.
+  addEventListener("pageshow", (e) => { if (e.persisted) document.querySelectorAll(".wipe").forEach((w) => w.remove()); });
+
+  window.Fun = { confetti, toast, wipeTo };
 
   document.addEventListener("DOMContentLoaded", () => {
+    if (arriving) {
+      const cover = document.createElement("div");
+      cover.className = "wipe arrive"; cover.style.background = arriving.color;
+      cover.innerHTML = arriving.name ? `<span>${arriving.name.replace(/[<>&]/g, "")}</span>` : "";
+      document.body.appendChild(cover);
+      root.classList.remove("arriving");
+      setTimeout(() => cover.classList.add("shrink"), 180);
+      setTimeout(() => cover.remove(), 1000);
+    }
     // theme toggle in the header
     const nav = document.querySelector("nav.top");
     if (nav) {
@@ -103,6 +137,14 @@
       if (e.detail === 1) toast("You planted a tree. Keep going!");
       else if (e.detail === 10 && treeToasts++ === 0) toast("10 trees. This town owes you one.");
     });
+
+    // "All projects" links on project pages wipe back home in the page's colour
+    document.querySelectorAll("a.backlink").forEach((a) => a.addEventListener("click", (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      const c = getComputedStyle(document.body).getPropertyValue("--c").trim() || "#FF5D3A";
+      wipeTo(a.href, { x: e.clientX, y: e.clientY, color: c, name: "All projects" });
+    }));
 
     // arriving from a building: flash the matching card
     if (location.hash) {
