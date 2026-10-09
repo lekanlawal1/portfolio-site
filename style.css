@@ -119,6 +119,19 @@ nav.top a:hover { color: var(--ink); background: var(--bg-soft); text-decoration
 .quest .stars i { width: 14px; height: 14px; border-radius: 50%; background: var(--hair); border: 1.5px solid var(--line); transition: background .3s, transform .3s; }
 .quest .stars i.on { background: var(--sun); transform: scale(1.15); }
 .town-wrap { position: relative; min-height: 420px; }
+.town-wrap.is3d { aspect-ratio: 1 / .9; min-height: 0; }
+.town-wrap.is3d #town { display: none; }
+.town3d { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; touch-action: pan-y; cursor: grab;
+  opacity: 0; transition: opacity .8s ease; -webkit-tap-highlight-color: transparent; }
+.town-wrap.ready3d .town3d { opacity: 1; }
+.t3-label { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; background: var(--card); color: var(--ink); border: 2.5px solid var(--line);
+  border-radius: 12px; padding: 6px 12px; box-shadow: 3px 3px 0 var(--line); text-align: center; white-space: nowrap; opacity: 0; transition: opacity .15s; }
+.t3-label.on { opacity: 1; }
+.t3-label b { display: block; font: 800 .92rem "Bricolage Grotesque", Inter, sans-serif; }
+.t3-label span { display: block; font-size: .74rem; color: var(--muted); font-weight: 600; }
+.t3-hint { position: absolute; right: 8px; bottom: 6px; z-index: 3; font-size: .78rem; font-weight: 700; color: var(--ink-2); background: color-mix(in srgb, var(--card) 80%, transparent);
+  border: 2px solid var(--line); border-radius: 999px; padding: 3px 10px; pointer-events: none; animation: hintfade 6s 3s forwards; }
+@keyframes hintfade { to { opacity: 0; } }
 .town { width: 100%; height: auto; display: block; overflow: visible; touch-action: manipulation; }
 .cloud { position: absolute; z-index: 1; width: 120px; height: 40px; background: #fff; border-radius: 40px; opacity: .9; animation: drift linear infinite; pointer-events: none; }
 .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
