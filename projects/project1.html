@@ -120,11 +120,11 @@
     <ul>
       <li>Margins need a profit or cost column. Many point-of-sale exports don't have one; those files still get sales,
       discounts, products and locations, and the dashboard says why margins are missing.</li>
-      <li>The card fee checker reads two statement layouts in full: CardPointe, which Fiserv prints for many US
-      resellers, and TSYS in Canada. Any other statement gets a quick check, filled in from its labelled totals for the
-      owner to confirm. I looked for public sample statements to build more from, but the big processors either don't
-      publish one or only publish annotated pictures, and a parser built from a picture would be a guess. Scanned
-      statements have no text to read.</li>
+      <li>The card fee checker has dedicated readers for two layouts (CardPointe in the US, TSYS in Canada) and a
+      general reader for everything else. The general reader doesn't know the layout: it looks for the sections of the
+      statement that add up exactly to its printed fee total, and refuses if none, or more than one, do. Read that way,
+      both real statements gave the same answers as their dedicated readers, to the cent. Interchange names it doesn't
+      recognise are marked "not checked", and scanned statements have no text to read.</li>
       <li>Visa's rates come from Visa's own schedule. Mastercard doesn't publish its schedule openly, so its rates come
       from a published summary, and the page says so. It's a check, not financial advice.</li>
       <li>It shows what happened, not what would happen if prices changed. I left out "what if" simulators: without
