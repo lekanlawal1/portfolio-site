@@ -27,18 +27,19 @@
 <main class="wrap">
   <div class="project-hero">
     <a class="backlink" href="../index.html#superstore">&larr; All projects</a>
-    <h1>Margin Console: Drop In Your Sales Data, See Where the Profit Goes</h1>
-    <p class="one-liner">A dashboard that builds itself from any sales export. It shows which discounts cost money, which
-    products lose it and how margin moves month by month, with the SQL behind every chart. Your file never leaves
-    your browser.</p>
+    <h1>Margin Console: Where Does a Small Business's Money Go?</h1>
+    <p class="one-liner">Two separate checks in one tool. A dashboard that builds itself from any sales export, showing
+    which discounts and products lose money. And a card fee checker that reads a processor's statement, checks every
+    fee against published rates, and shows which part is negotiable. Your files never leave your browser.</p>
     <div class="meta-row">
       <span class="tag">SQL</span><span class="tag">DuckDB-WASM</span><span class="tag">JavaScript</span>
-      <span class="tag">Data visualization</span><span class="tag">BI</span><span class="tag">Python tests</span>
+      <span class="tag">Data visualization</span><span class="tag">BI</span><span class="tag">PDF parsing</span><span class="tag">Python tests</span>
     </div>
   </div>
 
   <div class="project-links" style="margin:0 0 26px">
-    <a class="btn primary" href="https://lekanlawal1.github.io/project1-bi-dashboard/">Try it with your data</a>
+    <a class="btn primary" href="https://lekanlawal1.github.io/project1-bi-dashboard/">Check your margins</a>
+    <a class="btn primary" href="https://lekanlawal1.github.io/project1-bi-dashboard/#fees">Check your card fees</a>
     <a class="btn" href="https://github.com/lekanlawal1/project1-bi-dashboard">View the code and tests</a>
   </div>
 
@@ -76,6 +77,32 @@
     <p>Testing with a Shopify-style file caught a real bug. The database guessed that "#" starts a comment line, and
     Shopify names every order "#1001", so an entire export would have disappeared. That file is now a permanent test.</p>
 
+    <h2>The second check: card fees</h2>
+    <p>The same shop owner also pays to take cards, usually 2.5% to 3.5% of sales. The monthly statement lists dozens of
+    fees with codes like "VI NTWK ACQ PROC FEE" and labels that don't say who gets the money. Three different parties
+    are paid out of it: the bank that issued the customer's card (interchange), the card networks like Visa and
+    Mastercard, and the processor. Only the processor's share can be negotiated, and statements make it hard to see.</p>
+    <p>Drop the statement PDF into the second tab and the tool reads it in the browser. Before showing anything, it
+    checks that the statement adds up: the daily sales and every fee line must match the statement's own totals to the
+    cent, or it shows nothing. Then it sorts every fee by who gets it, using written rules on each line's description
+    rather than the statement's labels, which mix them up. It compares each interchange line with the rate Visa,
+    Mastercard or Amex publishes for that program, and recalculates every fee that prints its own arithmetic.</p>
+    <a class="big-shot" href="https://lekanlawal1.github.io/project1-bi-dashboard/#fees" style="margin:6px 0 16px">
+      <img src="../assets/card-fee-checker.png" alt="Card fee checker on the sample statement: $2,665 in fees, 2.77% of sales, $622 kept by the processor, and a list of things worth asking about">
+    </a>
+    <p>The result is a plain summary ("you paid 2.77% of every sale; $622 of it went to your processor, and that's the
+    part you can negotiate") and a short list of things worth asking about, biggest first: a line billed above its
+    published rate, a sale that fell to the most expensive "non-qualified" rate, a PCI non-compliance fee that usually
+    disappears once a yearly form is filed, and how much keyed-in sales cost compared with tapping the card. A box lets
+    the owner type in another processor's quote and see the difference. If both files cover the same month, each tab
+    shows card fees as a share of that month's profit.</p>
+    <p>I tested it on a real business's statement, read only on my machine and never published: all 12 checks passed,
+    all 75 fee lines and 28 interchange lines were read, and every one of the 25 interchange lines I had a published rate
+    for matched it. Checking it showed my own first rules were wrong in one place: a Mastercard licence fee is printed
+    like a processor markup ("DISC RATE TIMES"), and my rules counted it as one. The public sample is a made-up shop's
+    statement in the same layout, with four problems planted on purpose; the tests check that each is found and nothing
+    else is flagged.</p>
+
     <h2>How I know the numbers are right</h2>
     <div class="numbers">
       <div class="num"><div class="v">806</div><div class="l">junk rows in the raw sample found and skipped, matching my original cleaning pipeline</div></div>
@@ -90,8 +117,11 @@
     <ul>
       <li>Margins need a profit or cost column. Many point-of-sale exports don't have one; those files still get sales,
       discounts, products and locations, and the dashboard says why margins are missing.</li>
-      <li>It reads sales exports, one row per sale or item. A monthly merchant statement (card fees and deposits) is a
-      different kind of document.</li>
+      <li>The card fee checker reads one statement layout so far: CardPointe, which Fiserv prints for many resellers.
+      Square, Clover and Stripe each need a real statement to build against; until then, any statement gets a quick
+      check from two numbers. Scanned statements have no text to read.</li>
+      <li>Visa's rates come from Visa's own schedule. Mastercard doesn't publish its schedule openly, so its rates come
+      from a published summary, and the page says so. It's a check, not financial advice.</li>
       <li>It shows what happened, not what would happen if prices changed. I left out "what if" simulators: without
       data on how customers react to prices, they'd present guesses as findings.</li>
     </ul>
@@ -100,7 +130,8 @@
   </article>
 
   <div class="project-links">
-    <a class="btn primary" href="https://lekanlawal1.github.io/project1-bi-dashboard/">Try it with your data</a>
+    <a class="btn primary" href="https://lekanlawal1.github.io/project1-bi-dashboard/">Check your margins</a>
+    <a class="btn primary" href="https://lekanlawal1.github.io/project1-bi-dashboard/#fees">Check your card fees</a>
     <a class="btn" href="https://github.com/lekanlawal1/project1-bi-dashboard">View code & decision log</a>
   </div>
 </main>
