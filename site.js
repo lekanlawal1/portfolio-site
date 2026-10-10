@@ -142,7 +142,7 @@
       { id: "fine", name: "Fine Print", href: "projects/fine-print.html" },
       { id: "econ", name: "Canada Economy Platform", href: "projects/project5.html" },
       { id: "wh", name: "Discrepancy Checker", href: "demos/discrepancy-checker/" },
-      { id: "store", name: "Margin Console", href: "projects/project1.html" },
+      { id: "store", name: "Money Snitch", href: "projects/project1.html" },
       { id: "triage", name: "App Review Insights", href: "projects/app-reviews.html" },
       { id: "fifa", name: "Football Stats Agent", href: "projects/football-agent.html" },
     ];

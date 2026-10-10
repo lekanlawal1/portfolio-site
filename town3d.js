@@ -209,7 +209,7 @@ function start() {
   // ------------------------------------------------------------------ buildings
   const PROJECTS = [
     { id: "econ", color: "#E63946", x: 1.2, z: 1.2, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "projects/project5.html" },
-    { id: "store", color: "#FFB020", x: 5.0, z: 1.0, w: 3, d: 2, name: "Margin Console", sub: "Your sales, your dashboard", href: "projects/project1.html" },
+    { id: "store", color: "#FFB020", x: 5.0, z: 1.0, w: 3, d: 2, name: "Money Snitch", sub: "Who's taking your money?", href: "projects/project1.html" },
     { id: "triage", color: "#3E8BFF", x: 1.2, z: 3.9, w: 2.2, d: 2, name: "App Review Insights", sub: "Real App Store reviews", href: "projects/app-reviews.html" },
     { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "Football Stats Agent", sub: "Ask football in English", href: "projects/football-agent.html" },
     { id: "fine", color: "#FF4F8B", x: 4.0, z: 9.6, w: 1.7, d: 0.5, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
