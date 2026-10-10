@@ -96,6 +96,9 @@
     disappears once a yearly form is filed, and how much keyed-in sales cost compared with tapping the card. A box lets
     the owner type in another processor's quote and see the difference. If both files cover the same month, each tab
     shows card fees as a share of that month's profit.</p>
+    <p>It reads Canadian statements too. On a real one from TSYS, it matched the statement's own "effective rate"
+    table to the cent, then showed that table left out $243 of the $829 in fees, including two separate penalties for
+    an unfiled security form, and Mastercard fees in a month with no Mastercard sales.</p>
     <p>I tested it on a real business's statement, read only on my machine and never published: all 12 checks passed,
     all 75 fee lines and 28 interchange lines were read, and every one of the 25 interchange lines I had a published rate
     for matched it. Checking it showed my own first rules were wrong in one place: a Mastercard licence fee is printed
@@ -117,9 +120,11 @@
     <ul>
       <li>Margins need a profit or cost column. Many point-of-sale exports don't have one; those files still get sales,
       discounts, products and locations, and the dashboard says why margins are missing.</li>
-      <li>The card fee checker reads one statement layout so far: CardPointe, which Fiserv prints for many resellers.
-      Square, Clover and Stripe each need a real statement to build against; until then, any statement gets a quick
-      check from two numbers. Scanned statements have no text to read.</li>
+      <li>The card fee checker reads two statement layouts in full: CardPointe, which Fiserv prints for many US
+      resellers, and TSYS in Canada. Any other statement gets a quick check, filled in from its labelled totals for the
+      owner to confirm. I looked for public sample statements to build more from, but the big processors either don't
+      publish one or only publish annotated pictures, and a parser built from a picture would be a guess. Scanned
+      statements have no text to read.</li>
       <li>Visa's rates come from Visa's own schedule. Mastercard doesn't publish its schedule openly, so its rates come
       from a published summary, and the page says so. It's a check, not financial advice.</li>
       <li>It shows what happened, not what would happen if prices changed. I left out "what if" simulators: without
