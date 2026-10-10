@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Superstore Margin Console | Lekan Lawal</title>
+<title>Margin Console | Lekan Lawal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,49 +27,80 @@
 <main class="wrap">
   <div class="project-hero">
     <a class="backlink" href="../index.html#superstore">&larr; All projects</a>
-    <h1>Superstore Margin Console: Retail BI Dashboard</h1>
-    <p class="one-liner">A profitability audit for a retailer whose revenue grew every year while
-    nearly 1 in 5 order lines lost money.</p>
+    <h1>Margin Console: Drop In Your Sales Data, See Where the Profit Goes</h1>
+    <p class="one-liner">A dashboard that builds itself from any sales export. It shows which discounts cost money, which
+    products lose it and how margin moves month by month, with the SQL behind every chart. Your file never leaves
+    your browser.</p>
     <div class="meta-row">
-      <span class="tag">Python</span><span class="tag">pandas</span><span class="tag">Plotly.js</span>
-      <span class="tag">vanilla JS</span><span class="tag">GitHub Pages</span>
+      <span class="tag">SQL</span><span class="tag">DuckDB-WASM</span><span class="tag">JavaScript</span>
+      <span class="tag">Data visualization</span><span class="tag">BI</span><span class="tag">Python tests</span>
     </div>
   </div>
 
+  <div class="project-links" style="margin:0 0 26px">
+    <a class="btn primary" href="https://lekanlawal1.github.io/project1-bi-dashboard/">Try it with your data</a>
+    <a class="btn" href="https://github.com/lekanlawal1/project1-bi-dashboard">View the code and tests</a>
+  </div>
+
   <a class="big-shot" href="https://lekanlawal1.github.io/project1-bi-dashboard/">
-    <img src="../assets/p1.png" alt="Superstore Margin Console dashboard screenshot">
+    <img src="../assets/margin-console.png" alt="Margin Console: headline numbers, plain-English findings, and sales and margin by month">
   </a>
 
   <article class="case">
-    <h2>The story</h2>
-    <p>A US retailer's sales climbed steadily from 2015–2018, the chart every executive loves. But
-    overall margin sat at 12.5%, and 18% of order lines actually lost money. Leadership could see
-    the growth; nobody could see where profit was leaking. This dashboard is the audit that answers
-    it: which products, discount levels, and regions are quietly funding growth with losses.</p>
-    <p>The pipeline is a scripted, reproducible clean: every transformation writes to a decision
-    log explaining what was done and why, from dropping 806 phantom rows created by a multi-sheet
-    export to keeping a $22.6K outlier order because real revenue isn't noise. Row-level data is
-    exported into the page itself, so every KPI, chart, and the product table recompute live in the
-    browser as you search and filter, with no backend, free hosting, instant load.</p>
+    <h2>What it does</h2>
+    <p>Picture a small online shop whose sales are up 30% this year while there's less money in the bank. The owner
+    exports their orders from Shopify, drops the file in, and confirms which column is the date, the sales, the cost.
+    A few seconds later they're looking at a dashboard of their own business: margin is falling even as sales grow,
+    every discount over 25% loses money, and a handful of heavy products lose money on every sale because shipping
+    costs more than they charge.</p>
+    <p>That's what this does, for any sales export: Shopify, Square, Clover, QuickBooks or a spreadsheet. It shows
+    headline numbers against the previous period, the "discount cliff" where discounting starts costing more than it
+    brings in, profit by category, a region by category grid, which products make most of the profit, and the ones
+    that lose money. A short list of findings says it in plain English. Click any bar, cell or product and every
+    chart filters to it.</p>
 
-    <h2>Headline findings</h2>
+    <h2>Every chart shows its SQL</h2>
+    <p>Under each chart, "Show the SQL" opens the exact query that produced it. The data runs through DuckDB, a real
+    database, inside the visitor's browser, so nothing is uploaded and there's no server to pay for. For anyone
+    hiring an analyst, it means the numbers aren't a black box: each one comes from a query you can read and check.</p>
+    <a class="big-shot" href="https://lekanlawal1.github.io/project1-bi-dashboard/" style="margin:6px 0 16px">
+      <img src="../assets/margin-console-charts.png" alt="The discount cliff and profit by sub-category: discounts over 20% lose money, and Tables lose $18,000">
+    </a>
+
+    <h2>Built for messy real files</h2>
+    <p>Real exports are messy, so the tool reports problems instead of quietly counting them. The sample is the
+    Superstore dataset in its raw form, which ends with 806 rows from other sheets of the original workbook. The
+    data check says so: 806 rows skipped, 1 exact duplicate removed, 9,993 lines used. Dates are read whether the
+    file writes 03/04 for March 4 or April 3; costs can be per line or per unit; discounts a percentage or a dollar
+    amount.</p>
+    <p>Testing with a Shopify-style file caught a real bug. The database guessed that "#" starts a comment line, and
+    Shopify names every order "#1001", so an entire export would have disappeared. That file is now a permanent test.</p>
+
+    <h2>How I know the numbers are right</h2>
     <div class="numbers">
-      <div class="num"><div class="v">+33% → −90%</div><div class="l">margin collapse from no-discount to 41%+ discount: the "discount cliff"</div></div>
-      <div class="num"><div class="v">−$17.7K</div><div class="l">profit on $207K of Tables sales, a loss engine hiding inside revenue</div></div>
-      <div class="num"><div class="v">~50%</div><div class="l">of total profit generated by just three product sub-categories</div></div>
+      <div class="num"><div class="v">806</div><div class="l">junk rows in the raw sample found and skipped, matching my original cleaning pipeline</div></div>
+      <div class="num"><div class="v">9,993</div><div class="l">order lines used, and the same sales, profit and margin as an independent pandas calculation</div></div>
+      <div class="num"><div class="v">0</div><div class="l">AI involved: every finding is a fixed rule over the numbers</div></div>
     </div>
+    <p>The tests generate the same SQL the page runs, execute it in DuckDB on the raw file, and compare every result
+    with a separate calculation in pandas: totals, the discount cliff, the Tables loss, the product ranking and the
+    filters.</p>
 
-    <h2>Key decisions I'd defend in an interview</h2>
+    <h2>Limits</h2>
     <ul>
-      <li><b>Static Plotly.js over Power BI</b>: a public, link-accessible demo with zero licensing cost; Power BI public embedding needs a paid workspace.</li>
-      <li><b>Margin, not raw profit, as the comparison unit</b>: raw profit rewards big categories; margin exposes the discount cliff.</li>
-      <li><b>Flag, don't drop, suspect rows</b>: rows failing logistics checks keep their valid revenue but are excluded from shipping metrics only.</li>
-      <li><b>Recommendation shipped with the numbers</b>: cap discounts at 20% with manager approval above it; renegotiate or de-emphasize Tables.</li>
+      <li>Margins need a profit or cost column. Many point-of-sale exports don't have one; those files still get sales,
+      discounts, products and locations, and the dashboard says why margins are missing.</li>
+      <li>It reads sales exports, one row per sale or item. A monthly merchant statement (card fees and deposits) is a
+      different kind of document.</li>
+      <li>It shows what happened, not what would happen if prices changed. I left out "what if" simulators: without
+      data on how customers react to prices, they'd present guesses as findings.</li>
     </ul>
+    <p>The first version of this project, a fixed dashboard of the Superstore data, is still
+    <a href="https://lekanlawal1.github.io/project1-bi-dashboard/dashboard/">available</a>.</p>
   </article>
 
   <div class="project-links">
-    <a class="btn primary" href="https://lekanlawal1.github.io/project1-bi-dashboard/">Open the live dashboard</a>
+    <a class="btn primary" href="https://lekanlawal1.github.io/project1-bi-dashboard/">Try it with your data</a>
     <a class="btn" href="https://github.com/lekanlawal1/project1-bi-dashboard">View code & decision log</a>
   </div>
 </main>
