@@ -30,9 +30,9 @@
     <p class="archived">Archived. This project and its SQL agent grew into the
     <a href="football-agent.html">Football Stats Agent</a>, which answers questions on real match event data.
     The live demo below still works.</p>
-    <h1>FIFA Player Churn: End-to-End Pipeline + Prediction Model</h1>
-    <p class="one-liner">Football clubs lose players the way subscription businesses lose customers.
-    Two seasons of FIFA rosters, one pipeline, and a model that predicts who leaves next.</p>
+    <h1>FIFA Player Churn: Predicting Which Players Leave Their Club</h1>
+    <p class="one-liner">Football clubs lose players the way subscription businesses lose customers. Using two editions of the FIFA
+    game's player data, this predicts who is likely to leave their club next season.</p>
     <div class="meta-row">
       <span class="tag">DuckDB</span><span class="tag">versioned SQL</span><span class="tag">window functions</span>
       <span class="tag">scikit-learn</span><span class="tag">Plotly.js</span>
@@ -44,34 +44,32 @@
   </a>
 
   <article class="case">
-    <h2>The story</h2>
-    <p>Using two seasons of FIFA game data (~18K players each), this pipeline takes genuinely raw
-    CSVs (wages as "€565K" strings, duplicate IDs, club names that drift between editions)
-    through ingestion into DuckDB, logged Python cleaning, and versioned SQL transformation into a
-    churn model. The headline data-quality catch: club renames ("Real Madrid CF" → "Real Madrid")
-    masquerade as entire squads transferring at once. A majority-vote entity resolution written in
-    SQL caught 92 renames and removed 8.4 points of phantom churn. One command reproduces
-    everything from raw data to trained models.</p>
-    <p>Two models are compared honestly: gradient boosting wins ranking power (AUC 0.690), the
-    logistic regression supplies the why, and with 36.8% churn, the docs explain explicitly why
-    accuracy alone would be a lie ("nobody leaves" scores 63% while catching nothing). The live
-    dashboard shows every player's out-of-fold predicted risk next to what actually happened,
-    searchable by club, honest by design.</p>
+    <h2>What it does</h2>
+    <p>Each edition of the FIFA video game lists about 18,000 real players with their club, ratings, wage and
+    position. Comparing two editions shows who moved. I built a pipeline that takes the raw files, cleans them, and
+    trains a model to predict which players will leave, then a dashboard that shows every player's predicted risk
+    next to what actually happened.</p>
 
-    <h2>Headline numbers</h2>
+    <h2>The data problem that mattered</h2>
+    <p>Clubs sometimes change their names between editions ("Real Madrid CF" became "Real Madrid"). Taken at face
+    value, that looks like a whole squad leaving at once. A matching step written in SQL found 92 renamed clubs, and
+    fixing them removed 8.4 percentage points of churn that never happened.</p>
+
+    <h2>The results, honestly</h2>
     <div class="numbers">
-      <div class="num"><div class="v">0.690</div><div class="l">ROC-AUC (gradient boosting) vs 0.641 logistic baseline</div></div>
-      <div class="num"><div class="v">92</div><div class="l">club renames caught by SQL entity resolution, 8.4 pts of phantom churn removed</div></div>
-      <div class="num"><div class="v">44% vs 28%</div><div class="l">churn rate: forwards vs goalkeepers: attackers are the flight risk</div></div>
+      <div class="num"><div class="v">0.690</div><div class="l">ROC AUC: how well the model ranks players by risk (0.5 is a coin flip, 1.0 perfect), against 0.641 for a simpler model</div></div>
+      <div class="num"><div class="v">92</div><div class="l">renamed clubs caught, removing 8.4 points of fake churn</div></div>
+      <div class="num"><div class="v">44% vs 28%</div><div class="l">of forwards left their club, against goalkeepers</div></div>
     </div>
+    <p>0.69 is a modest score, and I say so. The data is missing the thing that matters most: when each player's
+    contract ends. Claiming more would be a warning sign. I also avoided a common trap: with 37% of players leaving,
+    a model that predicts "nobody leaves" is 63% accurate while catching no one, so accuracy alone would have looked
+    good and meant nothing. The model only uses information from the earlier edition; the later edition only says
+    who left.</p>
 
-    <h2>Key decisions I'd defend in an interview</h2>
-    <ul>
-      <li><b>DuckDB over a SQL server</b>: full analytical SQL, embedded, one-command reproducible; the SQL ports to Snowflake/BigQuery nearly unchanged.</li>
-      <li><b>Leakage rule</b>: features come only from the earlier season's snapshot; the later season contributes exactly one thing: the label.</li>
-      <li><b>Honest ceiling</b>: AUC 0.69 is what this data supports; the missing feature is contract expiry, and claiming more would be a red flag.</li>
-      <li><b>Star drain finding</b>: top-3-rated players churn <em>more</em> than squad fillers; retention risk concentrates on your best assets.</li>
-    </ul>
+    <h2>Why it's archived</h2>
+    <p>The game's data is a stand-in for real football. This project and its SQL agent grew into the
+    <a href="football-agent.html">Football Stats Agent</a>, which works on real match data.</p>
   </article>
 
   <div class="project-links">
