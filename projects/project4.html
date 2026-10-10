@@ -30,9 +30,9 @@
     <p class="archived">Archived. This project and its data pipeline grew into the
     <a href="football-agent.html">Football Stats Agent</a>, which answers questions on real match event data.
     The live demo below still works.</p>
-    <h1>NL→SQL Analyst Agent: Ask the Churn Database in Plain English</h1>
-    <p class="one-liner">The continuation of Project 3: a sporting director can now just <em>ask</em>.
-    An AI agent that writes and runs SQL: provably read-only, schema-grounded, and honest about uncertainty.</p>
+    <h1>NL-to-SQL Agent: Asking the Churn Database Questions in Plain English</h1>
+    <p class="one-liner">The follow-up to the churn project: instead of reading a dashboard, a club's director can type a question and
+    get an answer, with the database query that produced it.</p>
     <div class="meta-row">
       <span class="tag">Gemini API</span><span class="tag">DuckDB</span><span class="tag">AI safety</span>
       <span class="tag">Streamlit</span><span class="tag">evaluation</span>
@@ -44,33 +44,32 @@
   </a>
 
   <article class="case">
-    <h2>The story</h2>
-    <p>Text-to-SQL is easy to demo and hard to trust: models hallucinate columns, run whatever
-    they're told, and guess silently when questions are vague. This agent is the trust engineering.
-    The LLM only ever drafts; code decides, five layers deep. A single-statement SELECT-only shape
-    check, a keyword denylist, DuckDB's own <code>EXPLAIN</code> binding every table and column
-    before execution (a hallucinated column returns "couldn't verify this query is safe," never a
-    guess), and a read-only connection underneath, so even a total bypass cannot write. Every
-    answer shows the SQL that actually ran plus a plain-English restatement of what was computed.</p>
-    <p>It's tested, not asserted: an 18-question eval (analytical, prompt-injection, ambiguous, and
-    impossible questions) runs against the live agent with the full transcript committed. Getting
-    the agent to ask for clarification instead of silently defining "risky" for you took a
-    documented prompt iteration: v1 answered ambiguous questions confidently; v2's rule is that
-    defaults may decide presentation, never definition.</p>
+    <h2>What it does</h2>
+    <p>You type a question like "which forwards at big clubs are most likely to leave?" and an AI (Google's Gemini)
+    writes a database query to answer it. Every answer shows the query that ran and says in plain English what was
+    worked out.</p>
 
-    <h2>Eval scorecard (live run, transcript in repo)</h2>
+    <h2>Making it safe to trust</h2>
+    <p>AI-written queries go wrong in predictable ways: they refer to columns that don't exist, they do whatever text
+    in the question tells them, and they quietly guess when a question is vague. So the AI only drafts the query, and
+    code decides whether it runs. A query must be a single read-only question to the database. The database checks
+    that every table and column it names really exists before anything runs, so a made-up column produces "couldn't
+    verify this query" instead of a guess. And the connection itself is read-only, so even if every other check
+    failed, nothing could be changed.</p>
+
+    <h2>What testing found</h2>
     <div class="numbers">
-      <div class="num"><div class="v">3/3</div><div class="l">prompt-injection attempts refused, including fake-admin framing</div></div>
-      <div class="num"><div class="v">2/2</div><div class="l">ambiguous questions answered with a clarifying question, not a silent guess</div></div>
-      <div class="num"><div class="v">11/12</div><div class="l">analytical questions answered with correct SQL + explanation (1 over-asked, the safe direction)</div></div>
+      <div class="num"><div class="v">3/3</div><div class="l">attempts to trick it into ignoring its rules were refused</div></div>
+      <div class="num"><div class="v">2/2</div><div class="l">vague questions got a clarifying question instead of a silent guess</div></div>
+      <div class="num"><div class="v">11/12</div><div class="l">analysis questions answered correctly (the other asked a question it didn't need to)</div></div>
     </div>
+    <p>The first version answered vague questions confidently. Asked for "risky" players, it picked its own
+    definition of risky without saying so. I changed its instructions so it may choose how to present an answer but
+    never how to define what was asked, and the next test run asked for clarification instead.</p>
 
-    <h2>Key decisions I'd defend in an interview</h2>
-    <ul>
-      <li><b>Read-only enforced in code, not prompting</b>: a prompt is a request; code is a boundary. Injected text can steer what the model emits; it can't change what the validator returns.</li>
-      <li><b>DuckDB's EXPLAIN as the hallucination catcher</b>: the database's own parser verifies every identifier, instead of half-reimplementing SQL with regex.</li>
-      <li><b>Built on Project 3's real database</b>: the portfolio tells one story: pipeline → model → dashboard → self-serve agent, all on the same data.</li>
-    </ul>
+    <h2>Why it's archived</h2>
+    <p>It answered questions about game data. The same approach, tested much more thoroughly, now powers the
+    <a href="football-agent.html">Football Stats Agent</a> on real match data.</p>
   </article>
 
   <div class="project-links">
