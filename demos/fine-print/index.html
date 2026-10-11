@@ -73,6 +73,11 @@ h1 { font-family: "Source Serif 4", Georgia, serif; font-size: clamp(2rem, 5vw, 
 .own .privacy { font-size: 13px; margin: 12px 0 0; padding: 10px 12px; background: var(--field); border-radius: 12px; }
 .own .status { font-weight: 600; color: var(--ink); margin: 10px 0 0; min-height: 1.4em; }
 .own .status.bad { color: var(--violation); }
+.own-file { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; margin: 0 0 10px; border: 2px dashed var(--accent); border-radius: 14px; cursor: pointer; background: var(--field); }
+.own-file:hover, .own-file.over { background: color-mix(in srgb, var(--accent) 10%, var(--card)); }
+.own-file:focus-within { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.own-file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.own-file b { color: var(--accent); } .own-file span { font-size: 13px; color: var(--ink-2); }
 .checks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 14px; }
 .checks div { background: var(--field); border-radius: 12px; padding: 8px 10px; font-size: 13px; color: var(--ink-2); }
 .checks b { display: block; font-size: 1.15rem; color: var(--ink); }
@@ -172,8 +177,12 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
   <div id="trap"></div>
   <section class="own" id="own" hidden aria-label="Check your own document">
     <h2>Check your own document</h2>
-    <p>Paste an Ontario residential lease, job offer or employment contract, or a set of terms of service. The AI reads
-      it live; everything after that (quote checks, label checks, the cited rules) runs in your browser.</p>
+    <p>Paste an Ontario residential lease, job offer or employment contract, or a set of terms of service, or open it as a
+      PDF. The AI reads it live; everything after that (quote checks, label checks, the cited rules) runs in your browser.</p>
+    <label class="own-file" id="own-drop">
+      <input type="file" id="own-file" accept=".pdf,.txt,application/pdf,text/plain">
+      <b>Open a PDF or text file</b><span>or drop it here. It's read in your browser and put in the box below, so you can check the text and take out names before anything is sent.</span>
+    </label>
     <textarea id="own-text" maxlength="40000" placeholder="Paste the document text here..." aria-label="Document text"></textarea>
     <div class="own-row">
       <span class="count-chars" id="own-count">0 of 40,000 characters</span>
@@ -183,7 +192,7 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
       </span>
     </div>
     <p class="status" id="own-status" role="status"></p>
-    <p class="privacy"><b>Before you paste:</b> email addresses, phone numbers, postal codes and SIN-shaped numbers are removed
+    <p class="privacy"><b>Before you paste or open a file:</b> email addresses, phone numbers, postal codes and SIN-shaped numbers are removed
       in your browser before anything is sent. The text then goes to Google's Gemini through a small server of mine that
       stores nothing. Google may use text sent to its free API to improve its products, so take out names and addresses
       first. This is not legal advice.</p>
@@ -226,8 +235,9 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
       <li><b>Samples are pre-recorded:</b> for the sample documents, step 1 uses the clause tags from the app's evaluation
         run, where Gemini found every one of them (34 of 34 clauses, 20 of 20 numbers read correctly). Nothing is sent
         anywhere when you browse them.</li>
-      <li><b>Your own document is live:</b> Gemini reads it through a small server that holds the API key and stores
-        nothing. Quote checks, label checks and verdicts then run in your browser, exactly as for the samples.</li>
+      <li><b>Your own document is live:</b> paste it, or open a PDF or text file. A PDF is read in your browser
+        (pdf.js) and put in the box as text, with page numbers and repeated headers and footers taken out, so you can
+        check it first. Gemini then reads it through a small server that holds the API key and stores nothing. Quote checks, label checks and verdicts then run in your browser, exactly as for the samples.</li>
       <li><b>Not legal advice.</b> Fine Print points to the law and says what it covers; it does not replace a lawyer,
         a tenant clinic or the Landlord and Tenant Board.</li>
     </ul>
@@ -240,6 +250,7 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
 <script src="../../portfolio-bar.js" data-project="fine" data-portfolio="../../" defer></script>
 <script src="engine.js"></script>
 <script src="pipeline.js"></script>
+<script src="pdftext.js"></script>
 <script>window.FINE_PRINT_API = "https://fine-print.lekanlawal.workers.dev";</script>
 <script>
 const E = FinePrintEngine;
@@ -390,6 +401,43 @@ document.getElementById("own-sample").addEventListener("click", () => {
   ownText.dispatchEvent(new Event("input"));
   ownText.focus();
 });
+// a PDF or text file goes into the box, never straight to the AI: the person reads it first
+const LIMIT = 40000;
+async function openFile(file) {
+  try {
+    let text, pages = null;
+    if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") {
+      ownStatus(`Reading ${file.name} in your browser...`);
+      ({ text, pages } = await FinePrintPdf.textFromPdf(await file.arrayBuffer()));
+      if (text.replace(/\s/g, "").length < 50) return ownStatus("That PDF has no text to read. It's probably a scan or a photo; if you can, open the original document and save it as a PDF, or copy and paste the text.", true);
+    } else if (/\.txt$/i.test(file.name) || file.type.startsWith("text/")) {
+      text = (await file.text()).replace(/\r\n?/g, "\n").trim();
+    } else {
+      return ownStatus("That kind of file can't be read here. Open it and save it as a PDF, or copy and paste the text.", true);
+    }
+    let note = "";
+    if (text.length > LIMIT) {
+      const cut = text.lastIndexOf("\n\n", LIMIT);
+      text = text.slice(0, cut > LIMIT * 0.8 ? cut : LIMIT);
+      note = ` It's longer than ${LIMIT.toLocaleString("en-CA")} characters, so only the first part was loaded; the rest isn't checked.`;
+    }
+    ownText.value = text;
+    ownText.dispatchEvent(new Event("input"));
+    ownText.scrollTop = 0;
+    ownStatus(`Loaded ${file.name}${pages ? ` (${pages} page${pages > 1 ? "s" : ""})` : ""}. Check the text below, take out names and addresses, then press "Check it".${note}`, !!note);
+    ownText.focus();
+  } catch (err) {
+    if (err?.name === "PasswordException") return ownStatus("That PDF is password-protected. Open it, save a copy without the password, and try again.", true);
+    ownStatus(`Couldn't read that file: ${err.message}`, true);
+  }
+}
+document.getElementById("own-file").addEventListener("change", (e) => { if (e.target.files[0]) openFile(e.target.files[0]); e.target.value = ""; });
+for (const el of [document.getElementById("own-drop"), ownText]) {
+  ["dragenter", "dragover"].forEach((t) => el.addEventListener(t, (e) => { if (e.dataTransfer?.types?.includes("Files")) { e.preventDefault(); document.getElementById("own-drop").classList.add("over"); } }));
+  ["dragleave", "drop"].forEach((t) => el.addEventListener(t, () => document.getElementById("own-drop").classList.remove("over")));
+  el.addEventListener("drop", (e) => { const f = e.dataTransfer?.files?.[0]; if (f) { e.preventDefault(); openFile(f); } });
+}
+
 document.getElementById("own-go").addEventListener("click", async () => {
   const go = document.getElementById("own-go");
   const raw = ownText.value.trim();

@@ -124,5 +124,23 @@ fakeWorker({ answer: () => [
   check("money amounts are left alone", P.redact("Rent is $1,800 per month and the deposit is $1,800.").count === 0);
 }
 
+// ---------------------------------------------------------------- 7. a PDF's text, put back together
+{
+  const PDF = require("../../demos/fine-print/pdftext.js");
+  const items = [];
+  const page = (n, lines) => lines.forEach(([s, y], i) => items.push({ page: n, s, x: 72, y, w: s.length * 5, h: 11 }));
+  page(1, [["SAMPLE LEASE AGREEMENT", 760], ["4. USE OF THE UNIT", 700], ["4.1 No pets of any kind are permitted in the unit or the build-", 686],
+    ["ing without the Landlord's written approval.", 672], ["4.2 Guests may stay overnight.", 650], ["Page 1 of 2", 40]]);
+  page(2, [["SAMPLE LEASE AGREEMENT", 760], ["5. ACCESS", 700], ["5.1 The Landlord may enter with 24 hours' written notice.", 686], ["Page 2 of 2", 40]]);
+  // two pieces of one line, as pdf.js often gives them
+  items.push({ page: 2, s: "Signed", x: 72, y: 600, w: 30, h: 11 }, { page: 2, s: "by both parties.", x: 104, y: 600.4, w: 70, h: 11 });
+  const t = PDF.textFromItems(items);
+  check("headers and page numbers repeated on every page are dropped", !/SAMPLE LEASE AGREEMENT|Page \d/.test(t), t);
+  check("a word split across lines is joined", t.includes("or the building without"), t);
+  check("each clause starts its own line", /^4\.1 No pets/m.test(t) && /^4\.2 Guests/m.test(t) && /^5\.1 The Landlord/m.test(t), t);
+  check("pieces on one baseline make one line", t.includes("Signed by both parties."), t);
+  check("a one-page document keeps its first line", PDF.textFromItems([{ page: 1, s: "OFFER OF EMPLOYMENT", x: 72, y: 700, w: 100, h: 11 }]) === "OFFER OF EMPLOYMENT");
+}
+
 console.log(`${passed} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);
