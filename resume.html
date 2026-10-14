@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Résumé | Lekan Lawal</title>
+<meta name="description" content="Lekan Lawal: data, BI and AI analyst. Computer Science, Trent University 2026. Every project on this résumé is live.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=20261014">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script src="site.js?v=20261010"></script>
+<style>
+/* The résumé. On screen it wears the portfolio's look; printed (and as the PDF, which is printed
+   from this page by tools/build_resume.mjs) it's one plain column that screening software reads. */
+.cv-actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 4px 0 26px; }
+.cv { background: var(--card); border: 2.5px solid var(--line); border-radius: 22px; box-shadow: 6px 6px 0 var(--line); padding: 34px 40px; margin-bottom: 60px; }
+.cv header { border-bottom: 2.5px solid var(--line); padding-bottom: 14px; margin-bottom: 4px; }
+.cv h1 { font: 800 2.4rem/1.05 "Bricolage Grotesque", Inter, sans-serif; letter-spacing: -0.03em; margin: 0; }
+.cv .role { font-weight: 700; color: var(--accent); margin: 4px 0 6px; }
+.cv .contact { color: var(--ink-2); font-size: .95rem; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.cv .contact a { color: inherit; }
+.cv h2 { font: 800 1.05rem "Bricolage Grotesque", Inter, sans-serif; text-transform: uppercase; letter-spacing: .08em; margin: 22px 0 8px; color: var(--ink); }
+.cv h2::after { content: ""; display: block; height: 3px; width: 44px; background: var(--accent); margin-top: 4px; border-radius: 2px; }
+.cv p, .cv li { color: var(--ink-2); line-height: 1.5; }
+.cv .summary { margin: 14px 0 0; }
+.cv .skills p { margin: 0 0 3px; }
+.cv .skills b { color: var(--ink); }
+.cv .item { margin: 0 0 14px; }
+.cv .item h3 { font-size: 1.02rem; margin: 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 14px; align-items: baseline; }
+.cv .item h3 .where { font-weight: 600; color: var(--ink-2); }
+.cv .item h3 .when { font-weight: 600; color: var(--muted); font-size: .92rem; white-space: nowrap; }
+.cv .item h3 .stack { font-size: .86rem; font-weight: 500; color: var(--muted); }
+.cv .item .stack a { font-weight: 700; color: var(--accent); }
+.cv ul { margin: 2px 0 0; padding-left: 1.15rem; }
+.cv li { margin: 2px 0; }
+@media (max-width: 640px) {
+  .cv { padding: 22px 18px; border-radius: 18px; }
+  .cv h1 { font-size: 1.9rem; }
+}
+
+/* ---- paper: one plain column, black on white, no shadows, fits one Letter page ---- */
+@page { size: Letter; margin: 0.38in 0.5in; }
+@media print {
+  header.site, .page-band, .project-hero, .cv-actions, footer, .portfolio-bar, .tour-pill, .theme-toggle { display: none !important; }
+  html, body { background: #fff !important; }
+  body { font: 9.1pt/1.25 Inter, Arial, sans-serif; color: #111; }
+  .wrap { max-width: none; padding: 0; }
+  .cv { border: 0; box-shadow: none; padding: 0; margin: 0; background: #fff; }
+  .cv * { color: #111 !important; }
+  .cv .role, .cv .item .stack a { color: #B8381C !important; }
+  .cv header { border-bottom: 1.2pt solid #111; padding-bottom: 5pt; }
+  .cv h1 { font-size: 20pt; }
+  .cv .contact { font-size: 9pt; gap: 0 10pt; }
+  .cv .contact a { text-decoration: none; }
+  .cv h2 { font-size: 9.8pt; margin: 6pt 0 1.5pt; }
+  .cv h2::after { height: 1.5pt; width: 28pt; background: #B8381C; margin-top: 2pt; }
+  .cv .summary { margin-top: 6pt; }
+  .cv p, .cv li, .cv dd { color: #222 !important; line-height: 1.3; }
+  .cv .skills p { margin: 0 0 1pt; }
+  .cv .item { margin: 0 0 3pt; break-inside: avoid; }
+  .cv .item h3 { font-size: 9.8pt; }
+  .cv .item h3 .when { font-size: 9pt; }
+  .cv .item h3 .stack { font-size: 8.2pt; }
+  .cv .item .stack a { text-decoration: none; }
+  .cv ul { padding-left: 11pt; }
+  .cv li { margin: 0.5pt 0; }
+}
+</style>
+</head>
+<body class="c-resume">
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot">LL</span>Lekan Lawal</a>
+    <nav class="top">
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#about" class="hide-sm">About</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+<div class="page-band"></div>
+
+<main class="wrap">
+  <div class="project-hero" style="padding-bottom:10px">
+    <a class="backlink" href="index.html">&larr; Portfolio</a>
+  </div>
+  <div class="cv-actions">
+    <a class="btn primary" href="assets/Lekan_Lawal_Resume.pdf" download>Download PDF <span class="arrow">&darr;</span></a>
+    <a class="btn" href="index.html#projects">See the projects live</a>
+  </div>
+
+  <article class="cv">
+    <header>
+      <h1>Lekan Lawal</h1>
+      <p class="role">Data, BI and AI Analyst</p>
+      <p class="contact">
+        <span>Toronto, ON</span>
+        <a href="mailto:lekan1553@gmail.com">lekan1553@gmail.com</a>
+        <a href="tel:+12896715308">(289) 671-5308</a>
+        <a href="https://www.linkedin.com/in/lekan-lawal/">linkedin.com/in/lekan-lawal</a>
+        <a href="https://lekanlawal1.github.io/portfolio-site/">lekanlawal1.github.io/portfolio-site</a>
+      </p>
+    </header>
+
+    <p class="summary">Computer Science graduate (Trent University, 2026) who builds data and AI tools that check their own
+      work: dashboards on live data, AI whose answers are verified in code, and Excel tools for operations teams. Every
+      project below is live on my portfolio.</p>
+
+    <h2>Skills</h2>
+    <div class="skills">
+      <p><b>Languages:</b> Python, SQL, JavaScript, Swift, HTML/CSS · SwiftUI, React, Streamlit, Firebase, REST APIs</p>
+      <p><b>Data and ML:</b> pandas, DuckDB, scikit-learn, statsmodels, gradient boosting, logistic regression, forecasting, data testing</p>
+      <p><b>AI:</b> Gemini API, on-device AI, Vision OCR, structured JSON output, AI output validation, prompt-injection defences</p>
+      <p><b>BI and tools:</b> Excel (INDEX/MATCH, SUMIFS), Power BI, Tableau, Plotly.js, Git, GitHub Actions, Cloudflare Workers, Jira, HubSpot</p>
+    </div>
+
+    <h2>Projects</h2>
+    <div class="item">
+      <h3><span>Football Stats Agent</span><span class="stack">Python · DuckDB-WASM · SQL · scikit-learn · Gemini API · Cloudflare Workers · <a href="https://lekanlawal1.github.io/portfolio-site/projects/football-agent.html">live</a></span></h3>
+      <ul>
+        <li>Built an agent that turns plain-English football questions into SQL that runs in the user's browser on 1,853 matches of event data, always showing the query so every answer can be checked.</li>
+        <li>Answered 22 of 22 hand-checked questions correctly, handled 14 of 14 vague ones, and stopped 12 of 12 attempts to break it. Includes my own expected-goals model.</li>
+      </ul>
+    </div>
+    <div class="item">
+      <h3><span>Canada Economy Intelligence Platform</span><span class="stack">Python · DuckDB · statsmodels · GitHub Actions · Gemini API · Plotly.js · <a href="https://lekanlawal1.github.io/portfolio-site/projects/project5.html">live</a></span></h3>
+      <ul>
+        <li>Built a self-refreshing pipeline on live Statistics Canada data that runs 89 checks before every update, with 11 of 11 headline figures matching official releases.</li>
+        <li>Forecasts tested against a baseline (Diebold-Mariano), anomaly flags (median/MAD), AI briefings checked in code (15 of 15 planted errors caught), and a personal inflation calculator within 0.08 points of the official rate.</li>
+      </ul>
+    </div>
+    <div class="item">
+      <h3><span>Money Snitch: Margin and Card Fee Checker</span><span class="stack">SQL · DuckDB-WASM · JavaScript · pdf.js · Python tests · <a href="https://lekanlawal1.github.io/portfolio-site/projects/project1.html">live</a></span></h3>
+      <ul>
+        <li>Built a browser tool that turns any sales export into a margin dashboard with the SQL behind every chart, matching an independent pandas calculation.</li>
+        <li>Added a card fee checker that reads processor statements, reconciles every fee to the cent, and checks interchange against Visa's, Mastercard's and Amex's published rates.</li>
+      </ul>
+    </div>
+    <div class="item">
+      <h3><span>Fine Print: iOS Contract Checker</span><span class="stack">Swift 6 · SwiftUI · Vision OCR · On-device AI · Gemini API · Swift Testing · <a href="https://lekanlawal1.github.io/portfolio-site/projects/fine-print.html">live</a></span></h3>
+      <ul>
+        <li>Built an iPhone app that checks leases, job offers and terms of service against Ontario law, combining Vision OCR, on-device AI and the Gemini API, with AI output verified in code: zero wrong legal verdicts across 12 test documents.</li>
+      </ul>
+    </div>
+    <div class="item">
+      <h3><span>App Review Insights</span><span class="stack">JavaScript · Gemini API · Cloudflare Workers · data visualization · <a href="https://lekanlawal1.github.io/portfolio-site/projects/app-reviews.html">live</a></span></h3>
+      <ul>
+        <li>Built a tool that analyses any iPhone app's App Store reviews: rating trends, update impact, and AI-grouped themes with every quote verified against its source review (28 of 28 on 500 reviews).</li>
+      </ul>
+    </div>
+    <div class="item">
+      <h3><span>Shipment and Inventory Discrepancy Checker</span><span class="stack">Excel · INDEX/MATCH · SUMIFS · JavaScript · <a href="https://lekanlawal1.github.io/portfolio-site/demos/discrepancy-checker/">live</a></span></h3>
+      <ul>
+        <li>Built an Excel workbook for warehouse and 3PL teams that checks cycle counts, receipts and storage invoices against the system, purchase order and rate card, totalling every exception on one dashboard.</li>
+      </ul>
+    </div>
+
+    <h2>Work experience</h2>
+    <div class="item">
+      <h3><span>Business Development Representative <span class="where">· Anchorbase, Toronto</span></span><span class="when">Jun 2026 – Sep 2026</span></h3>
+      <ul>
+        <li>Logged and cross-checked call outcomes in the CRM daily under quota pressure, catching data entry mistakes before they became bad data downstream.</li>
+        <li>Worked through a full daily queue of calls and follow-ups, and reported activity metrics to my manager in a format built for quick decisions.</li>
+      </ul>
+    </div>
+    <div class="item">
+      <h3><span>Front of House Staff <span class="where">· Eggstatic, Ajax</span></span><span class="when">Jan 2024 – Jul 2026</span></h3>
+      <ul>
+        <li>Documented recurring operational issues and their fixes so a new team member could follow them.</li>
+        <li>Kept spreadsheet-based reservation and transaction tracking accurate during busy shifts.</li>
+      </ul>
+    </div>
+    <div class="item">
+      <h3><span>Sales Associate <span class="where">· Virtue Vintage, Oshawa</span></span><span class="when">Mar 2024 – Apr 2025</span></h3>
+      <ul>
+        <li>Traced a pricing error to two systems falling out of sync and corrected it at the source before it spread.</li>
+        <li>Reconciled inventory and online listings across two systems every week, catching discrepancies before customers did.</li>
+      </ul>
+    </div>
+
+    <h2>Education</h2>
+    <div class="item">
+      <h3><span>BSc (Honours) Computer Science, self-directed focus in Data Analytics <span class="where">· Trent University Durham</span></span><span class="when">June 2026</span></h3>
+    </div>
+  </article>
+</main>
+</body>
+</html>
