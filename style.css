@@ -441,3 +441,6 @@ dialog.reward.closing::backdrop { animation: fade .18s ease reverse forwards; }
 .tour-pill .stars i.on { background: var(--sun); }
 .tour-pill.done { background: var(--sun); color: #1D1535; }
 @media (max-width: 480px) { .tour-pill { margin: 8px 0 0; } }
+
+/* the nav keeps its theme toggle on small phones: the résumé link moves to the hero and contact list */
+@media (max-width: 440px) { .hide-xs { display: none; } }
