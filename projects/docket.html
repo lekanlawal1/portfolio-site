@@ -75,8 +75,8 @@
     Docket works backwards: pieces on the same baseline make a line, close lines make a paragraph, larger or bold
     lines on their own become headings, and indented runs of short lines become lists. Headers, footers and page
     numbers that repeat on every page are dropped, words hyphenated across a line are joined, and two-column pages
-    are read one column at a time. Bold and italic come from the fonts' names, and pictures come along, placed
-    between the paragraphs they sat between.</p>
+    are read one column at a time. Bold and italic come from the fonts' names, pictures come along, placed
+    between the paragraphs they sat between, and rows whose cells line up become real Word tables.</p>
     <a class="big-shot" href="https://lekanlawal1.github.io/docket/#/pdf-to-word" style="margin:6px 0 16px">
       <img src="../assets/docket/word.png" alt="PDF to Word preview of a two-page lease: headings, a bulleted list, bold and italic kept, and the page header and page numbers removed">
     </a>
@@ -103,7 +103,7 @@
     <div class="numbers">
       <div class="num"><div class="v">24</div><div class="l">working tools, from merging pages to reading scans</div></div>
       <div class="num"><div class="v">0</div><div class="l">files uploaded. There's no server; it's a static site</div></div>
-      <div class="num"><div class="v">60</div><div class="l">automated checks on every change, 36 of them driving the tools in a real browser</div></div>
+      <div class="num"><div class="v">64</div><div class="l">automated checks on every change, 38 of them driving the tools in a real browser</div></div>
     </div>
     <p>The browser tests build their own PDFs, push them through every tool and check the output: page counts,
     text, form values, file sizes, that a locked file really needs its password, and that redacted words are really
@@ -118,7 +118,7 @@
 
     <h2>Limits</h2>
     <ul>
-      <li>PDF to Word rebuilds structure, not layout. Tables come out as tab-separated text.</li>
+      <li>PDF to Word rebuilds structure, not layout. Simple tables become Word tables; ones with merged or wrapped cells may come out as tab-separated text.</li>
       <li>Reading scans works for English and French print. Handwriting and blurry photos come out poorly, and unsure pages are named.</li>
       <li>Redact and Grayscale turn pages into images, so their text can't be selected afterwards. Each tool says so first.</li>
       <li>Signatures are pictures of a signature, like signing a printout, not certificate-based digital signatures.</li>
