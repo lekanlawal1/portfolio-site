@@ -75,7 +75,8 @@
     Docket works backwards: pieces on the same baseline make a line, close lines make a paragraph, larger or bold
     lines on their own become headings, and indented runs of short lines become lists. Headers, footers and page
     numbers that repeat on every page are dropped, words hyphenated across a line are joined, and two-column pages
-    are read one column at a time. Bold and italic come from the fonts' names.</p>
+    are read one column at a time. Bold and italic come from the fonts' names, and pictures come along, placed
+    between the paragraphs they sat between.</p>
     <a class="big-shot" href="https://lekanlawal1.github.io/docket/#/pdf-to-word" style="margin:6px 0 16px">
       <img src="../assets/docket/word.png" alt="PDF to Word preview of a two-page lease: headings, a bulleted list, bold and italic kept, and the page header and page numbers removed">
     </a>
@@ -83,10 +84,17 @@
     against the official Office Open XML schema. On a two-page lease printed from a browser, with a running header,
     page numbers and drawn bullets, all 18 paragraphs and 5 headings came back exactly as written.</p>
 
+    <h2>Compression that keeps the text</h2>
+    <p>Most of a PDF's weight is usually its pictures. Compress decodes each large one, scales it to the level
+    chosen, saves it again as a JPEG and puts it back in place, so the text stays sharp and selectable. On a
+    4.7 MB test page the three levels gave 270 KB, 65 KB and 14 KB, and the page looked the same: on average the
+    pixels moved by about one shade in 255. Turning whole pages into pictures is still there, labelled as a last
+    resort.</p>
+
     <h2>Heavier tools, loaded only when needed</h2>
     <p>Two jobs need more than JavaScript. Password protection uses qpdf compiled to WebAssembly (1.3 MB), and the
     locked file is opened twice before you get it: without the password it must refuse, with it it must open.
-    Reading scanned pages uses Tesseract (about 7 MB), which writes the words it finds behind the scan as invisible
+    Reading scanned pages uses Tesseract (about 7 MB, plus 0.7 MB for French), which writes the words it finds behind the scan as invisible
     text, so the page looks the same but can be searched. Scans fed in sideways read as nonsense, so those pages are
     tried at every quarter turn and the reading with the most confident real words wins. Neither download happens
     until someone opens that tool.</p>
@@ -95,12 +103,13 @@
     <div class="numbers">
       <div class="num"><div class="v">24</div><div class="l">working tools, from merging pages to reading scans</div></div>
       <div class="num"><div class="v">0</div><div class="l">files uploaded. There's no server; it's a static site</div></div>
-      <div class="num"><div class="v">50</div><div class="l">automated checks on every change, 27 of them driving each tool in a real browser</div></div>
+      <div class="num"><div class="v">62</div><div class="l">automated checks on every change, 38 of them driving the tools in a real browser</div></div>
     </div>
     <p>The browser tests build their own PDFs, push them through every tool and check the output: page counts,
     text, form values, file sizes, that a locked file really needs its password, and that redacted words are really
-    gone. Writing them caught real bugs before anyone saw them: the summary silently dropping text near "e.g.",
-    the tool search not filtering, and PDF to Word treating every line as its own paragraph.</p>
+    gone. QR codes are decoded back with a real QR reader. Writing them caught real bugs before anyone saw them:
+    the summary silently dropping text near "e.g.", the tool search not filtering, PDF to Word treating every
+    line as its own paragraph, and a drawn signature being wiped when you switched tabs.</p>
 
     <h2>On a phone</h2>
     <div class="shots" style="grid-template-columns: repeat(auto-fit, minmax(170px, 260px)); justify-content: center">
@@ -109,9 +118,9 @@
 
     <h2>Limits</h2>
     <ul>
-      <li>PDF to Word rebuilds structure, not layout. Pictures aren't carried over and tables come out as tab-separated text.</li>
-      <li>Reading scans works for English print. Handwriting and blurry photos come out poorly, and unsure pages are named.</li>
-      <li>Redact, Grayscale and the stronger Compress levels turn pages into images, so their text can't be selected afterwards. Each tool says so first.</li>
+      <li>PDF to Word rebuilds structure, not layout. Tables come out as tab-separated text.</li>
+      <li>Reading scans works for English and French print. Handwriting and blurry photos come out poorly, and unsure pages are named.</li>
+      <li>Redact and Grayscale turn pages into images, so their text can't be selected afterwards. Each tool says so first.</li>
       <li>Signatures are pictures of a signature, like signing a printout, not certificate-based digital signatures.</li>
     </ul>
   </article>
