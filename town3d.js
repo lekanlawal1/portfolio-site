@@ -146,6 +146,7 @@ function start() {
   const waterMat = new THREE.MeshStandardMaterial({ color: 0x6fcfff, roughness: 0.15, metalness: 0.1, emissive: 0x1b6fa8, emissiveIntensity: 0.15 });
   box(island, 0.8, 6.9, 2.8, 1.7, 0.04, waterMat, 0.005, { shadow: false });
   box(island, 1.6, 8.4, 1.2, 3.6, 0.04, waterMat, 0.005, { shadow: false });
+  box(island, 8.7, 2.4, 2.4, 2.1, 0.04, waterMat, 0.005, { shadow: false });   // the lake by Docket's boathouse
   const fallTex = textTexture((g, w, h) => {
     const grd = g.createLinearGradient(0, 0, 0, h);
     grd.addColorStop(0, "rgba(127,211,255,1)"); grd.addColorStop(1, "rgba(127,211,255,0)");
@@ -201,7 +202,7 @@ function start() {
     island.add(t);
     return t;
   }
-  const TREES = [[3.9, 1.3, 0.9], [8.6, 1.1, 1], [10.0, 1.5, 0.85], [9.3, 2.4, 0.65], [3.9, 3.4, 0.8], [8.6, 3.6, 0.9], [10.3, 3.9, 0.8], [4.0, 6.6, 0.75],
+  const TREES = [[3.9, 1.3, 0.9], [8.6, 1.1, 1], [9.4, 5.6, 0.6], [9.0, 1.9, 0.65], [3.9, 3.4, 0.8], [8.2, 3.9, 0.9], [10.6, 5.4, 0.8], [4.0, 6.6, 0.75],
     [1.3, 9.6, 0.9], [3.5, 10.4, 0.7], [6.4, 9.0, 0.8], [7.3, 10.4, 1], [10.4, 10.4, 0.8], [9.8, 5.6, 0.7], [6.6, 3.7, 0.7], [10.5, 9.4, 0.6]];
   const treeSpots = [];
   TREES.forEach(([x, z, s], i) => { makeTree(x, z, s, TREE_COLORS[i % 3], i % 4 === 1); treeSpots.push([x, z]); });
@@ -214,6 +215,7 @@ function start() {
     { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "Football Stats Agent", sub: "Ask football in English", href: "projects/football-agent.html" },
     { id: "fine", color: "#FF4F8B", x: 4.0, z: 9.6, w: 1.7, d: 0.5, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
     { id: "wh", color: "#FF6B35", x: 8.0, z: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
+    { id: "dock", color: "#2E86AB", x: 9.9, z: 1.3, w: 1, d: 1, name: "Docket", sub: "Every PDF tool, private", href: "projects/docket.html" },
   ];
   const animated = [];   // per-frame callbacks for small motions
   const BUILD = {
@@ -316,6 +318,33 @@ function start() {
       box(g, p.x + 2.2, p.z + 2.75, 0.55, 0.55, 0.45, 0xc9955f);
       box(g, p.x + 2.25, p.z + 2.8, 0.45, 0.45, 0.4, 0xe0ae72, 0.45);
       return 3.3;
+    },
+    dock(g, p) {
+      // a boathouse on the lake's shore, a pier out of its door and a sailboat tied up beside it
+      box(g, p.x, p.z, 1, 1, 0.9, 0xf4ebdd);
+      const roofGeo = new THREE.CylinderGeometry(0.66, 0.66, 1.2, 3, 1);
+      roofGeo.rotateX(-Math.PI / 2);            // ridge runs along z, apex up
+      const roof = mesh(roofGeo, mat(0x2e86ab), g, { edges: true });
+      roof.scale.set(1, 0.62, 1);
+      roof.position.set(gx(p.x + 0.5), 0.9 + 0.33 * 0.62, gz(p.z + 0.5));
+      const door = mesh(new THREE.PlaneGeometry(0.4, 0.6), mat(0x2a4a5e), g);
+      door.position.set(gx(p.x + 0.5), 0.3, gz(p.z + 1) + 0.012);
+      windows(p.x, p.z, 1, 1, 0.3, 0.4, 1, 1, "ew");
+      box(g, p.x + 0.3, p.z + 1, 0.4, 1.4, 0.07, 0xb98a5e, 0.03);
+      for (const k of [0, 0.32]) box(g, p.x + 0.3 + k, p.z + 2.32, 0.08, 0.08, 0.3, 0x8a5a3b, -0.15);
+      const boat = new THREE.Group();
+      box(boat, -0.32, -0.12, 0.64, 0.24, 0.14, 0xfff7ea, 0);
+      const mast = mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.8, 6), mat(INK), boat);
+      mast.position.set(0, 0.5, 0);
+      const sailShape = new THREE.Shape(); sailShape.moveTo(0, 0); sailShape.lineTo(0, 0.62); sailShape.lineTo(0.36, 0); sailShape.closePath();
+      const sail = mesh(new THREE.ShapeGeometry(sailShape), new THREE.MeshStandardMaterial({ color: 0x2e86ab, side: THREE.DoubleSide, flatShading: true }), boat, { edges: true });
+      sail.position.set(0.03, 0.2, 0);
+      // the holder gets moved with the rest of the building; the boat bobs inside it
+      const holder = new THREE.Group();
+      holder.position.set(gx(p.x - 0.55), 0.02, gz(p.z + 2.2));
+      holder.add(boat); g.add(holder);
+      animated.push((t) => { boat.position.set(Math.sin(t * 0.4) * 0.05, Math.sin(t * 1.8) * 0.025, 0); boat.rotation.z = Math.sin(t * 1.4) * 0.05; });
+      return 2.0;
     },
   };
   const lamps = [], screens = [];
@@ -499,7 +528,7 @@ function start() {
     const x = local.x + N / 2, z = local.z + N / 2;
     if (x < 1.0 || z < 1.0 || x > N - 1.0 || z > N - 1.0) return;                         // road ring
     if (PROJECTS.some((p) => x > p.x - 0.35 && x < p.x + p.w + 0.35 && z > p.z - 0.35 && z < p.z + p.d + 0.35)) return;
-    if ((x > 0.6 && x < 3.8 && z > 6.7 && z < 8.8) || (x > 1.4 && x < 3.0 && z > 8.2)) return;  // water
+    if ((x > 0.6 && x < 3.8 && z > 6.7 && z < 8.8) || (x > 1.4 && x < 3.0 && z > 8.2) || (x > 8.5 && x < 11.3 && z > 2.2 && z < 4.7)) return;  // water
     if (treeSpots.some(([a, b]) => Math.hypot(a - x, b - z) < 0.55) || planted >= 40) return;
     const t = makeTree(x, z, 0.6 + Math.random() * 0.35, TREE_COLORS[Math.floor(Math.random() * TREE_COLORS.length)], Math.random() < 0.35);
     t.userData.s = t.scale.x; t.scale.setScalar(0.001); t.userData.t0 = performance.now();

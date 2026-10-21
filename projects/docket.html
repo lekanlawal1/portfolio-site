@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docket: Every PDF Tool, Private | Lekan Lawal</title>
+<meta name="description" content="24 PDF and document tools that run in the browser. Nothing is uploaded.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css?v=20261021">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script src="../site.js?v=20261021"></script>
+</head>
+<body class="c-dock">
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="dot">LL</span>Lekan Lawal</a>
+    <nav class="top">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#about" class="hide-sm">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+<div class="page-band"></div>
+
+<main class="wrap">
+  <div class="project-hero">
+    <a class="backlink" href="../index.html#docket">&larr; All projects</a>
+    <h1>Docket: Every PDF Tool, and Your Files Never Leave Your Device</h1>
+    <p class="one-liner">Merge, split, sign, fill forms, redact, lock with a password, compress, read scanned pages
+    and convert to Word: 24 tools in one site. All of it runs in your browser, so there's nothing to upload, no
+    account and no file limit.</p>
+    <div class="meta-row">
+      <span class="tag">JavaScript</span><span class="tag">PDF.js</span><span class="tag">pdf-lib</span>
+      <span class="tag">WebAssembly</span><span class="tag">Tesseract OCR</span><span class="tag">qpdf</span>
+      <span class="tag">Playwright</span><span class="tag">GitHub Actions</span>
+    </div>
+  </div>
+
+  <div class="project-links" style="margin:0 0 26px">
+    <a class="btn primary" href="https://lekanlawal1.github.io/docket/">Use Docket</a>
+    <a class="btn" href="https://github.com/lekanlawal1/docket">View the code</a>
+  </div>
+
+  <a class="big-shot" href="https://lekanlawal1.github.io/docket/">
+    <img src="../assets/docket/card.png" alt="Docket's tools grouped into piers: Organise, Convert, Edit and sign, Protect, each tool with its own sea-themed icon">
+  </a>
+
+  <article class="case">
+    <h2>What it does</h2>
+    <p>Most free PDF sites upload your file to their server to do something your own computer could do in a
+    second. That's fine for a menu. It isn't fine for a lease, a pay stub or a bank statement, which are exactly
+    the files people need to merge, sign or shrink. Docket does every job on your device. Open the page, drop a
+    file on the dock, and it suggests what you can do with it.</p>
+    <p>The tools sit on seven "piers": Organise, Convert, Edit and sign, Protect, Shrink, Read, and Images and
+    extras. The theme is a quiet harbour, with a night mode and a small boat bobbing on the waterline.</p>
+
+    <h2>Redaction that's checked, not trusted</h2>
+    <p>The classic redaction mistake is drawing a black box over text that's still there underneath, so anyone can
+    copy it out. Docket redraws each marked page as an image with the boxes burned in, then reads the finished file
+    back. If any redacted word can still be found anywhere in it, nothing is saved.</p>
+    <a class="big-shot" href="https://lekanlawal1.github.io/docket/#/redact" style="margin:6px 0 16px">
+      <img src="../assets/docket/redact.png" alt="Redact in night mode: every match for a name and an account number marked on the page">
+    </a>
+    <p>That check had a blind spot, and testing found it. Searching a page for "Jordan" drew a box that stopped
+    short of the "n". The check passed, because it reads text, and the text was gone, but the letter was still
+    visible in the picture. The box width had been estimated from the number of characters, which is wrong for
+    proportional fonts. It's now measured from the real font, with padding, and the page asks you to look over every
+    box before saving.</p>
+
+    <h2>Getting structure back out of a PDF</h2>
+    <p>A PDF doesn't store paragraphs or headings, only where each scrap of text is drawn. To convert one to Word,
+    Docket works backwards: pieces on the same baseline make a line, close lines make a paragraph, larger or bold
+    lines on their own become headings, and indented runs of short lines become lists. Headers, footers and page
+    numbers that repeat on every page are dropped, words hyphenated across a line are joined, and two-column pages
+    are read one column at a time. Bold and italic come from the fonts' names.</p>
+    <a class="big-shot" href="https://lekanlawal1.github.io/docket/#/pdf-to-word" style="margin:6px 0 16px">
+      <img src="../assets/docket/word.png" alt="PDF to Word preview of a two-page lease: headings, a bulleted list, bold and italic kept, and the page header and page numbers removed">
+    </a>
+    <p>The Word file is written by about 100 lines of code rather than a 400 KB library, and it passes validation
+    against the official Office Open XML schema. On a two-page lease printed from a browser, with a running header,
+    page numbers and drawn bullets, all 18 paragraphs and 5 headings came back exactly as written.</p>
+
+    <h2>Heavier tools, loaded only when needed</h2>
+    <p>Two jobs need more than JavaScript. Password protection uses qpdf compiled to WebAssembly (1.3 MB), and the
+    locked file is opened twice before you get it: without the password it must refuse, with it it must open.
+    Reading scanned pages uses Tesseract (about 7 MB), which writes the words it finds behind the scan as invisible
+    text, so the page looks the same but can be searched. Scans fed in sideways read as nonsense, so those pages are
+    tried at every quarter turn and the reading with the most confident real words wins. Neither download happens
+    until someone opens that tool.</p>
+
+    <h2>The results</h2>
+    <div class="numbers">
+      <div class="num"><div class="v">24</div><div class="l">working tools, from merging pages to reading scans</div></div>
+      <div class="num"><div class="v">0</div><div class="l">files uploaded. There's no server; it's a static site</div></div>
+      <div class="num"><div class="v">50</div><div class="l">automated checks on every change, 27 of them driving each tool in a real browser</div></div>
+    </div>
+    <p>The browser tests build their own PDFs, push them through every tool and check the output: page counts,
+    text, form values, file sizes, that a locked file really needs its password, and that redacted words are really
+    gone. Writing them caught real bugs before anyone saw them: the summary silently dropping text near "e.g.",
+    the tool search not filtering, and PDF to Word treating every line as its own paragraph.</p>
+
+    <h2>On a phone</h2>
+    <div class="shots" style="grid-template-columns: repeat(auto-fit, minmax(170px, 260px)); justify-content: center">
+      <figure><img src="../assets/docket/phone.png" alt="Docket's home page on a phone"><figcaption>The dock on a phone</figcaption></figure>
+    </div>
+
+    <h2>Limits</h2>
+    <ul>
+      <li>PDF to Word rebuilds structure, not layout. Pictures aren't carried over and tables come out as tab-separated text.</li>
+      <li>Reading scans works for English print. Handwriting and blurry photos come out poorly, and unsure pages are named.</li>
+      <li>Redact, Grayscale and the stronger Compress levels turn pages into images, so their text can't be selected afterwards. Each tool says so first.</li>
+      <li>Signatures are pictures of a signature, like signing a printout, not certificate-based digital signatures.</li>
+    </ul>
+  </article>
+  <div class="project-links">
+    <a class="btn primary" href="https://lekanlawal1.github.io/docket/">Use Docket</a>
+    <a class="btn" href="https://github.com/lekanlawal1/docket">View the code and tests</a>
+  </div>
+</main>
+<footer class="site"><div class="wrap">&copy; 2026 Lekan Lawal</div></footer>
+</body>
+</html>

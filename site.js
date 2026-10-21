@@ -122,8 +122,8 @@
     // the town quest: every project counts once it has been seen, however the visitor got there
     // (an island building, a project card, or the page itself). Finishing unlocks the contact card.
     const quest = document.getElementById("quest");
-    const BODY_TO_ID = { "c-econ": "econ", "c-store": "store", "c-triage": "triage", "c-fifa": "fifa", "c-fine": "fine", "c-wh": "wh" };
-    const CARD_TO_ID = { economy: "econ", superstore: "store", triage: "triage", football: "fifa", "fine-print": "fine", discrepancy: "wh" };
+    const BODY_TO_ID = { "c-econ": "econ", "c-store": "store", "c-triage": "triage", "c-fifa": "fifa", "c-fine": "fine", "c-wh": "wh", "c-dock": "dock" };
+    const CARD_TO_ID = { economy: "econ", superstore: "store", triage: "triage", football: "fifa", "fine-print": "fine", discrepancy: "wh", docket: "dock" };
     const readVisited = () => { try { return JSON.parse(localStorage.getItem("town-visited") || "[]"); } catch { return []; } };
     const markVisited = (id) => {
       if (window.Town) window.Town.visited.add(id);
@@ -140,6 +140,7 @@
     // the checklist: which projects are explored and which are left, opened from the counter
     const TOUR = [
       { id: "fine", name: "Fine Print", href: "projects/fine-print.html" },
+      { id: "dock", name: "Docket", href: "projects/docket.html" },
       { id: "econ", name: "Canada Economy Platform", href: "projects/project5.html" },
       { id: "wh", name: "Discrepancy Checker", href: "demos/discrepancy-checker/" },
       { id: "store", name: "Money Snitch", href: "projects/project1.html" },

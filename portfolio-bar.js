@@ -3,13 +3,13 @@
 
    Load it from any page on lekanlawal1.github.io:
      <script src="https://lekanlawal1.github.io/portfolio-site/portfolio-bar.js" data-project="econ" defer></script>
-   data-project is the island building's id (econ, store, triage, fifa, fine, wh). Opening the page
+   data-project is the island building's id (econ, store, triage, fifa, fine, wh, dock). Opening the page
    counts as visiting that project. Pages on this origin share localStorage with the portfolio, so the
    tour sees visits however people arrive. Leave data-project off for archived projects. */
 (() => {
   const PORTFOLIO = "https://lekanlawal1.github.io/portfolio-site/";
-  const TOUR = ["fine", "econ", "wh", "store", "triage", "fifa"];
-  const CARD = { fine: "fine-print", econ: "economy", wh: "discrepancy", store: "superstore", triage: "triage", fifa: "football" };
+  const TOUR = ["fine", "dock", "econ", "wh", "store", "triage", "fifa"];
+  const CARD = { fine: "fine-print", econ: "economy", wh: "discrepancy", store: "superstore", triage: "triage", fifa: "football", dock: "docket" };
   const me = document.currentScript;
   const project = me && me.dataset.project;
   const base = (me && me.dataset.portfolio) || PORTFOLIO;   // a relative path when served from the portfolio itself

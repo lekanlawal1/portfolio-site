@@ -160,6 +160,8 @@ nav.top a:hover { color: var(--ink); background: var(--bg-soft); text-decoration
 .town .win { fill: #CFEFFF; transition: fill .6s; }
 :root[data-theme="dark"] .town .win { fill: #FFD66B; }
 .town .bob { animation: bob 6s ease-in-out infinite; }
+.town .boat { animation: boat 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center bottom; }
+@keyframes boat { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-2px) rotate(2deg); } }
 @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .town .fall { stroke-dasharray: 8 10; animation: fall .6s linear infinite; }
 @keyframes fall { to { stroke-dashoffset: -18; } }
@@ -229,7 +231,7 @@ p.section-sub { color: var(--ink-2); margin-bottom: 38px; max-width: 46rem; font
 
 /* project colours */
 .c-fine { --c: #FF4F8B; } .c-econ { --c: #E63946; } .c-store { --c: #FFB020; } .c-triage { --c: #3E8BFF; }
-.c-fifa { --c: #22C3A6; } .c-agent { --c: #8A4DFF; } .c-wh { --c: #FF6B35; }
+.c-fifa { --c: #22C3A6; } .c-dock { --c: #2E86AB; } .c-agent { --c: #8A4DFF; } .c-wh { --c: #FF6B35; }
 
 /* stats strip */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 44px; }

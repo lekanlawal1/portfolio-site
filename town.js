@@ -100,6 +100,8 @@
   // river to the waterfall and a pond
   el("polygon", { points: pts([[1.6, 8.4, 0.01], [2.8, 8.4, 0.01], [2.8, N, 0.01], [1.6, N, 0.01]]), fill: "#7FD3FF", ...STROKE, "stroke-width": 1.2 }, under);
   el("polygon", { points: pts([[0.8, 6.9, 0.01], [3.6, 6.9, 0.01], [3.6, 8.6, 0.01], [0.8, 8.6, 0.01]]), fill: "#7FD3FF", ...STROKE, "stroke-width": 1.2 }, under);
+  // a small lake in the back corner, for Docket's boathouse
+  el("polygon", { points: pts([[8.9, 2.5, 0.01], [11.5, 2.5, 0.01], [11.5, 4.6, 0.01], [8.9, 4.6, 0.01]]), fill: "#7FD3FF", ...STROKE, "stroke-width": 1.2 }, under);
   // road: front L from the warehouse dock
   const road = [[6.6, 11.1], [11.1, 11.1], [11.1, 6.4]];
   el("polyline", { points: pts(road.map(([x, y]) => [x, y, 0.01])), fill: "none", stroke: "#1D1535", "stroke-width": 15, "stroke-linejoin": "round", "stroke-linecap": "round" }, under);
@@ -199,6 +201,28 @@
       box(g, x + 2.25, y + 2.8, 0.45, 0.45, 0.45, 0.4, "#E0AE72");
       return 3.3;
     },
+    dock(g, x, y) { // Docket: a boathouse on a small lake, a pier from its door and a moored sailboat
+      box(g, x, y, 0, 1, 1, 0.9, "#F4EBDD");
+      const r = 0.1;   // roof overhang; the ridge runs from the lake back
+      el("polygon", { points: pts([[x - r, y - r, 0.9], [x + 0.5, y - r, 1.5], [x + 0.5, y + 1 + r, 1.5], [x - r, y + 1 + r, 0.9]]), fill: "#3E9CC0", ...STROKE }, g);
+      el("polygon", { points: pts([[x, y + 1, 0.9], [x + 1, y + 1, 0.9], [x + 0.5, y + 1, 1.5]]), fill: "#E6D9C3", ...STROKE }, g);
+      el("polygon", { points: pts([[x + 0.5, y - r, 1.5], [x + 1 + r, y - r, 0.9], [x + 1 + r, y + 1 + r, 0.9], [x + 0.5, y + 1 + r, 1.5]]), fill: "#2E86AB", ...STROKE }, g);
+      el("polygon", { points: pts([[x + 0.3, y + 1, 0], [x + 0.7, y + 1, 0], [x + 0.7, y + 1, 0.6], [x + 0.3, y + 1, 0.6]]), fill: "#2A4A5E", ...STROKE, "stroke-width": 1 }, g);
+      windowsRight(g, x, y, 0.3, 1, 1, 0.4, 1, 1);
+      // the sailboat sits to the left of the pier, so it's drawn before it
+      const bx = x - 0.65, by = y + 2.2;
+      const boat = el("g", { class: "boat" }, g);
+      const [h1x, h1y] = P(bx - 0.45, by, 0.04), [h2x, h2y] = P(bx + 0.45, by, 0.04);
+      el("path", { d: `M${h1x - 4},${h1y - 7} L${h2x + 4},${h2y - 7} L${h2x - 3},${h2y + 1} L${h1x + 3},${h1y + 1} Z`, fill: "#FFF7EA", ...STROKE, "stroke-width": 1.3 }, boat);
+      const [mx, my] = P(bx, by, 0.2), [tx, ty] = P(bx, by, 1.5);
+      el("line", { x1: mx, y1: my, x2: tx, y2: ty, stroke: "#1D1535", "stroke-width": 1.6 }, boat);
+      el("path", { d: `M${tx + 1},${ty + 2} L${tx + 1},${my - 6} L${tx + 19},${my - 8} Z`, fill: "#2E86AB", ...STROKE, "stroke-width": 1.3 }, boat);
+      // the pier runs out of the door into the lake
+      box(g, x + 0.3, y + 1, 0, 0.4, 1.4, 0.08, "#B98A5E");
+      for (let i = 1; i < 5; i++) el("polyline", { points: pts([[x + 0.3, y + 1 + i * 0.28, 0.08], [x + 0.7, y + 1 + i * 0.28, 0.08]]), stroke: "#1D1535", "stroke-width": 0.8, fill: "none", opacity: 0.5 }, g);
+      for (const k of [0, 0.32]) box(g, x + 0.3 + k, y + 2.32, 0, 0.08, 0.08, 0.28, "#8A5A3B");
+      return 2.1;
+    },
   };
 
   const PROJECTS = [
@@ -208,6 +232,7 @@
     { id: "fifa", color: "#22C3A6", x: 4.8, y: 4.6, w: 3, d: 3, name: "Football Stats Agent", sub: "Ask football in English", href: "projects/football-agent.html" },
     { id: "fine", color: "#FF4F8B", x: 4.2, y: 9.2, w: 0.5, d: 1.7, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
     { id: "wh", color: "#FF6B35", x: 8.4, y: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
+    { id: "dock", color: "#2E86AB", x: 10.2, y: 1.4, w: 1, d: 1, name: "Docket", sub: "Every PDF tool, private", href: "projects/docket.html" },
   ];
 
   // keep only buildings that still exist (the old robot, "agent", merged into the stadium)
@@ -254,8 +279,8 @@
   }
 
   // scenery trees
-  const TREES = [[0.6, 0.5, 0.8], [4.0, 0.6, 0.9], [8.6, 0.5, 0.7], [11.3, 0.7, 0.8], [10.2, 1.6, 0.85], [0.5, 3.2, 0.7], [3.9, 3.2, 0.8], [8.6, 3.7, 0.9],
-    [11.2, 3.6, 0.7], [4.0, 6.3, 0.7], [0.6, 10.2, 0.8], [6.0, 9.2, 0.7], [7.3, 10.0, 0.9], [11.4, 11.4, 0.6], [3.4, 11.2, 0.6], [9.6, 5.0, 0.6]];
+  const TREES = [[0.6, 0.5, 0.8], [4.0, 0.6, 0.9], [8.6, 0.5, 0.7], [11.5, 0.6, 0.8], [9.2, 1.6, 0.85], [0.5, 3.2, 0.7], [3.9, 3.2, 0.8], [8.4, 3.9, 0.9],
+    [11.3, 5.4, 0.7], [4.0, 6.3, 0.7], [0.6, 10.2, 0.8], [6.0, 9.2, 0.7], [7.3, 10.0, 0.9], [11.4, 11.4, 0.6], [3.4, 11.2, 0.6], [9.6, 5.0, 0.6]];
   const COLORS = ["#2FBF71", "#22A863", "#5AD17F", "#FFB020", "#FF7AA8"];
   TREES.forEach(([x, y, s], i) => { const g = el("g"); tree(g, x, y, s, COLORS[i % 3]); place(g, x - 0.3, y - 0.3, 0.6, 0.6); });
 
@@ -298,7 +323,7 @@
     const gx = (a + b) / 2, gy = (b - a) / 2;
     if (gx < 0.3 || gy < 0.3 || gx > N - 0.3 || gy > N - 0.3) return;
     const blocked = PROJECTS.some((p) => gx > p.x - 0.4 && gx < p.x + p.w + 0.4 && gy > p.y - 0.4 && gy < p.y + p.d + 0.4)
-      || (gx > 0.6 && gx < 3.8 && gy > 6.7 && gy < N) || (gy > 10.5 && gx > 6.2) || (gx > 10.5 && gy > 6);
+      || (gx > 0.6 && gx < 3.8 && gy > 6.7 && gy < N) || (gx > 8.7 && gx < 11.7 && gy > 2.3 && gy < 4.8) || (gy > 10.5 && gx > 6.2) || (gx > 10.5 && gy > 6);
     if (blocked || planted >= 40) return;
     const g = el("g", { class: "pop" });
     tree(g, gx, gy, 0.55 + Math.random() * 0.35, COLORS[Math.floor(Math.random() * COLORS.length)]);
