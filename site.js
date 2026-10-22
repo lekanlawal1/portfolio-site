@@ -225,7 +225,7 @@
           <button type="button" class="x" aria-label="Close">&times;</button>
           <p class="unlocked"><span class="stars">${"<i class=\"on\"></i>".repeat(window.Town ? window.Town.total : 6)}</span>Whole town explored</p>
           <div class="who"><span class="dot big" aria-hidden="true">LL</span>
-            <div><h2 id="reward-title">Lekan Lawal</h2><p>Data, BI and AI analyst · Canada</p></div></div>
+            <div><h2 id="reward-title">Lekan Lawal</h2><p>Data, BI and AI · Canada</p></div></div>
           <p class="msg">You've seen every project. If something caught your eye, I'd love to hear about it.</p>
           <div class="actions">
             <a class="btn primary" href="${DRAFT}">Write to Lekan</a>
