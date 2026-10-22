@@ -7,7 +7,7 @@ import { execFileSync } from "node:child_process";
 
 const base = process.argv[2] || "http://localhost:8800/";
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || "playwright");   // or a global install
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
 const page = await browser.newPage();
 // fetch the web fonts with curl (follows the machine's proxy settings), so the PDF always gets them
 await page.route(/fonts\.(googleapis|gstatic)\.com/, (route) => {
