@@ -368,6 +368,25 @@ function start() {
     island.add(g);
     buildings.push(g);
   }
+  // ------------------------------------------------------------------ a billboard: hover (or tap) it and my photo pops up
+  const BB = { x: 8.8, z: 10.15 };
+  const billboard = new THREE.Group();
+  for (const dx of [-0.42, 0.42]) { const post = box(billboard, 0, 0, 0.09, 0.09, 1.05, 0x8a5a3b); post.position.set(dx, 0.52, 0); }
+  const boardTex = textTexture((c, w, h) => {
+    c.fillStyle = "#FFF7EA"; c.fillRect(0, 0, w, h);
+    c.fillStyle = "#FFC23C"; c.fillRect(0, h - 22, w, 22);
+    c.fillStyle = "#1D1535"; c.textAlign = "center"; c.textBaseline = "middle";
+    c.font = `800 ${h * 0.3}px ${FONT}`; c.fillText("Hi, I'm Lekan", w / 2, h * 0.36);
+    c.font = `600 ${h * 0.17}px ${FONT}`; c.fillText("👋 say hi", w / 2, h * 0.62);
+  }, 256, 150);
+  const plain = mat(0xfff7ea);
+  const board = mesh(new THREE.BoxGeometry(1.3, 0.76, 0.08), [plain, plain, plain, plain, new THREE.MeshStandardMaterial({ map: boardTex, roughness: 0.85 }), mat(0x2e86ab)], billboard, { edges: true });
+  board.position.set(0, 1.35, 0);
+  billboard.position.set(gx(BB.x), 0, gz(BB.z));
+  billboard.rotation.y = Math.PI / 4;   // faces the camera's starting corner
+  billboard.traverse((o) => { if (o.isMesh) o.userData.billboard = true; });
+  island.add(billboard);
+
   // windows as one instanced mesh
   const winGeo = new THREE.PlaneGeometry(1, 1);
   const wins = new THREE.InstancedMesh(winGeo, winMat, winSpots.length);
@@ -429,6 +448,18 @@ function start() {
   label.className = "t3-label"; label.setAttribute("aria-hidden", "true");
   label.innerHTML = "<b></b><span></span>";
   wrap.appendChild(label);
+  const photo = document.createElement("div");
+  photo.className = "t3-photo"; photo.setAttribute("aria-hidden", "true");
+  photo.innerHTML = '<img src="assets/lekan-sm.webp" width="240" height="240" alt=""><b>Lekan Lawal</b><span>Hi! Thanks for visiting.</span>';
+  wrap.appendChild(photo);
+  let photoOn = false, bbPop = 0;
+  function showPhoto(on) {
+    if (photoOn === on) return;
+    photoOn = on; photo.classList.toggle("on", on);
+    if (on) setHover(null);
+    canvas.style.cursor = on ? "pointer" : "grab";
+    wake();
+  }
   const hintEl = document.createElement("div");
   hintEl.className = "t3-hint"; hintEl.textContent = coarse ? "Swipe sideways to spin" : "Drag to spin";
   wrap.appendChild(hintEl);
@@ -443,7 +474,7 @@ function start() {
     const r = canvas.getBoundingClientRect();
     ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
-    return ray.intersectObjects([...buildings, grass], true).find((h) => h.object.isMesh);
+    return ray.intersectObjects([...buildings, billboard, grass], true).find((h) => h.object.isMesh);
   }
   function setHover(b) {
     if (hovered === b) return;
@@ -494,7 +525,12 @@ function start() {
       drag.lastX = e.clientX; lastInteract = performance.now(); wake();
       return;
     }
-    if (e.pointerType === "mouse") { const h = pick(e); setHover(h && h.object.userData.building ? h.object.userData.building : null); }
+    if (e.pointerType === "mouse") {
+      const h = pick(e);
+      const onBoard = !!(h && h.object.userData.billboard);
+      showPhoto(onBoard);
+      if (!onBoard) setHover(h && h.object.userData.building ? h.object.userData.building : null);
+    }
   });
   const end = (e) => {
     if (!drag || drag.id !== e.pointerId) return;
@@ -502,7 +538,10 @@ function start() {
     canvas.style.cursor = hovered ? "pointer" : "grab";
     if (wasDrag) return;
     const h = pick(e);
-    if (!h) return;
+    if (!h) { showPhoto(false); return; }
+    // tapping the billboard shows the photo; tapping it again, or anywhere else, hides it
+    if (h.object.userData.billboard) { if (e.pointerType !== "mouse") showPhoto(!photoOn); return; }
+    if (e.pointerType !== "mouse") showPhoto(false);
     const b = h.object.userData.building;
     if (b) {
       const p = b.userData.p;
@@ -518,7 +557,7 @@ function start() {
   canvas.addEventListener("pointerup", end);
   canvas.addEventListener("pointercancel", (e) => { if (drag && drag.id === e.pointerId) drag = null; });
   // Touch screens fire pointerleave after every tap; only a mouse can actually leave.
-  canvas.addEventListener("pointerleave", (e) => { if (!drag && e.pointerType === "mouse") setHover(null); });
+  canvas.addEventListener("pointerleave", (e) => { if (!drag && e.pointerType === "mouse") { setHover(null); showPhoto(false); } });
 
   // planting trees
   let planted = 0;
@@ -529,6 +568,7 @@ function start() {
     if (x < 1.0 || z < 1.0 || x > N - 1.0 || z > N - 1.0) return;                         // road ring
     if (PROJECTS.some((p) => x > p.x - 0.35 && x < p.x + p.w + 0.35 && z > p.z - 0.35 && z < p.z + p.d + 0.35)) return;
     if ((x > 0.6 && x < 3.8 && z > 6.7 && z < 8.8) || (x > 1.4 && x < 3.0 && z > 8.2) || (x > 8.5 && x < 11.3 && z > 2.2 && z < 4.7)) return;  // water
+    if (Math.hypot(x - BB.x, z - BB.z) < 0.9) return;   // the billboard
     if (treeSpots.some(([a, b]) => Math.hypot(a - x, b - z) < 0.55) || planted >= 40) return;
     const t = makeTree(x, z, 0.6 + Math.random() * 0.35, TREE_COLORS[Math.floor(Math.random() * TREE_COLORS.length)], Math.random() < 0.35);
     t.userData.s = t.scale.x; t.scale.setScalar(0.001); t.userData.t0 = performance.now();
@@ -584,7 +624,7 @@ function start() {
     const ease = 1 - Math.pow(1 - intro.t, 3);
 
     // idle spin, drag momentum
-    const idle = now - lastInteract > 2500 && !hovered && !drag;
+    const idle = now - lastInteract > 2500 && !hovered && !drag && !photoOn;
     if (!drag && !fly) { rot.target += spinV; spinV *= 0.92; if (idle) rot.target += dt * 0.12; }
     rot.y += (rot.target - rot.y) * Math.min(1, dt * 8);
     world.rotation.y = rot.y + (1 - ease) * -1.2;
@@ -661,6 +701,16 @@ function start() {
     }
 
     positionLabel();
+    // the billboard bounces a little while the photo is up
+    bbPop += ((photoOn ? 1 : 0) - bbPop) * Math.min(1, dt * 10);
+    billboard.scale.setScalar(1 + bbPop * 0.12);
+    if (photoOn) {
+      tmp.set(gx(BB.x), 1.9 * (1 + bbPop * 0.12), gz(BB.z));
+      island.localToWorld(tmp); tmp.project(camera);
+      const r = canvas.getBoundingClientRect();
+      photo.style.left = ((tmp.x + 1) / 2) * r.width + "px";
+      photo.style.top = ((1 - tmp.y) / 2) * r.height + "px";
+    }
     renderer.render(scene, camera);
     requestAnimationFrame(loop);
   }

@@ -127,6 +127,16 @@ nav.top a:hover { color: var(--ink); background: var(--bg-soft); text-decoration
 .t3-label { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; background: var(--card); color: var(--ink); border: 2.5px solid var(--line);
   border-radius: 12px; padding: 6px 12px; box-shadow: 3px 3px 0 var(--line); text-align: center; white-space: nowrap; opacity: 0; transition: opacity .15s; }
 .t3-label.on { opacity: 1; }
+/* the billboard's photo: pops up above it */
+.t3-photo { position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; width: 150px; padding: 8px 8px 10px; text-align: center;
+  background: var(--card); color: var(--ink); border: 2.5px solid var(--line); border-radius: 14px; box-shadow: var(--shadow);
+  transform: translate(-50%, -100%) translateY(16px) scale(.4) rotate(-6deg); transform-origin: 50% 100%; opacity: 0;
+  transition: opacity .18s, transform .45s cubic-bezier(.34,1.7,.5,1); }
+.t3-photo.on { opacity: 1; transform: translate(-50%, -100%) translateY(-8px) scale(1) rotate(-2deg); }
+.t3-photo img { display: block; width: 100%; height: auto; border-radius: 9px; border: 2px solid var(--line); }
+.t3-photo b { display: block; margin-top: 7px; font: 800 .9rem "Bricolage Grotesque", Inter, sans-serif; }
+.t3-photo span { display: block; font-size: .72rem; color: var(--muted); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .t3-photo, .t3-photo.on { transition: opacity .2s; transform: translate(-50%, -100%) translateY(-8px); } }
 .t3-label b { display: block; font: 800 .92rem "Bricolage Grotesque", Inter, sans-serif; }
 .t3-label span { display: block; font-size: .74rem; color: var(--muted); font-weight: 600; }
 .t3-hint { position: absolute; right: 8px; bottom: 6px; z-index: 3; font-size: .78rem; font-weight: 700; color: var(--ink-2); background: color-mix(in srgb, var(--card) 80%, transparent);
@@ -150,7 +160,7 @@ nav.top a:hover { color: var(--ink); background: var(--bg-soft); text-decoration
 .town .bld { cursor: pointer; outline: none; }
 .town .bld .lift { transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
 .town .bld:hover .lift, .town .bld:focus-visible .lift { transform: translateY(-10px); }
-.town .bld .tip { opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .25s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+.town .tip { opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .25s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
 .town .tip.on { opacity: 1; transform: translateY(-10px); }
 .town .tip rect { fill: var(--card); stroke: var(--line); stroke-width: 2.5; }
 .town .tip text { fill: var(--ink); font: 800 13px "Bricolage Grotesque", Inter, sans-serif; }
@@ -172,6 +182,14 @@ nav.top a:hover { color: var(--ink); background: var(--bg-soft); text-decoration
 .town .pop { animation: pop .5s cubic-bezier(.34,1.56,.64,1) both; transform-box: fill-box; transform-origin: 50% 100%; }
 @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
 .town .ground { cursor: crosshair; }
+.town .bill { cursor: pointer; outline: none; }
+.town .bill .lift { transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+.town .bill:hover .lift, .town .bill:focus-visible .lift, .town .bill[aria-pressed="true"] .lift { transform: translateY(-6px); }
+.town .bill:focus-visible rect, .town .bill:focus-visible polygon { stroke: var(--sun); }
+.town .bill-text { fill: #1D1535; font: 800 11px "Bricolage Grotesque", Inter, sans-serif; }
+.town .photo-tip { transform-box: fill-box; transform-origin: 50% 100%; opacity: 0; pointer-events: none; transition: opacity .18s, transform .45s cubic-bezier(.34,1.7,.5,1); }
+.town .photo-tip:not(.on) { transform: translateY(10px) scale(.5); }
+.town .photo-tip.on { opacity: 1; transform: translateY(-6px) scale(1); }
 
 /* marquee */
 .marquee { border-bottom: 2.5px solid var(--line); background: var(--ink); color: var(--bg); overflow: hidden; white-space: nowrap; }
@@ -446,3 +464,10 @@ dialog.reward.closing::backdrop { animation: fade .18s ease reverse forwards; }
 
 /* the nav keeps its theme toggle on small phones: the résumé link moves to the hero and contact list */
 @media (max-width: 440px) { .hide-xs { display: none; } }
+
+/* About: a photo with a name beside it */
+.me { display: flex; align-items: center; gap: 18px; margin: 0 0 20px; }
+.me img { width: 112px; height: 112px; flex: none; border-radius: 50%; object-fit: cover; border: 3px solid var(--line); box-shadow: 4px 4px 0 var(--line); background: var(--card); }
+.me figcaption { display: grid; gap: 2px; }
+.me b { font-size: 1.15rem; letter-spacing: -0.01em; }
+.me span { color: var(--muted); font-size: .95rem; }

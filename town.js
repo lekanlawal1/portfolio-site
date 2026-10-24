@@ -278,6 +278,31 @@
     return d + "Z";
   }
 
+  // ------------------------------------------------------------------ a billboard: hover, focus or tap it for my photo
+  const BB = { x: 8.1, y: 9.75 };
+  const bill = el("g", { class: "bill", tabindex: 0, role: "button", "aria-label": "Billboard: show a photo of Lekan", "aria-pressed": "false" });
+  const billLift = el("g", { class: "lift" }, bill);
+  for (const dx of [0.2, 0.95]) box(billLift, BB.x + dx, BB.y, 0, 0.08, 0.08, 0.95, "#8A5A3B");
+  box(billLift, BB.x, BB.y, 0.9, 1.25, 0.06, 0.72, "#FFF7EA", { left: "#FFF7EA", right: "#2E86AB", top: "#E6D9C3" });
+  // the words sit on the board's front face, slanted along it
+  const [fx, fy] = P(BB.x + 0.625, BB.y + 0.06, 1.18);
+  el("text", { class: "bill-text", transform: `matrix(${C30} 0.5 0 1 ${fx.toFixed(1)} ${fy.toFixed(1)})`, "text-anchor": "middle" }, billLift).textContent = "Hi! 👋";
+  place(bill, BB.x, BB.y, 1.25, 0.1);
+  // the photo card, above everything else
+  const [px, py] = P(BB.x + 0.6, BB.y, 1.9);
+  const photoTip = el("g", { class: "tip photo-tip" }, tipLayer);
+  el("rect", { x: px - 62, y: py - 168, width: 124, height: 158, rx: 12 }, photoTip);
+  el("image", { href: "assets/lekan-sm.webp", x: px - 54, y: py - 160, width: 108, height: 108 }, photoTip);
+  el("text", { x: px, y: py - 34, "text-anchor": "middle" }, photoTip).textContent = "Lekan Lawal";
+  el("text", { x: px, y: py - 19, "text-anchor": "middle", class: "sub" }, photoTip).textContent = "Thanks for visiting!";
+  let billOn = false;
+  const showBill = (on) => { billOn = on; photoTip.classList.toggle("on", on); bill.setAttribute("aria-pressed", String(on)); };
+  bill.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") showBill(true); });
+  bill.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") showBill(false); });
+  bill.addEventListener("focus", () => showBill(true)); bill.addEventListener("blur", () => showBill(false));
+  bill.addEventListener("click", (e) => { if (e.pointerType !== "mouse") showBill(!billOn); });
+  bill.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showBill(!billOn); } });
+
   // scenery trees
   const TREES = [[0.6, 0.5, 0.8], [4.0, 0.6, 0.9], [8.6, 0.5, 0.7], [11.5, 0.6, 0.8], [9.2, 1.6, 0.85], [0.5, 3.2, 0.7], [3.9, 3.2, 0.8], [8.4, 3.9, 0.9],
     [11.3, 5.4, 0.7], [4.0, 6.3, 0.7], [0.6, 10.2, 0.8], [6.0, 9.2, 0.7], [7.3, 10.0, 0.9], [11.4, 11.4, 0.6], [3.4, 11.2, 0.6], [9.6, 5.0, 0.6]];
@@ -314,7 +339,7 @@
   // ------------------------------------------------------------------ plant trees by clicking the grass
   let planted = 0;
   svg.addEventListener("click", (e) => {
-    if (e.target.closest(".bld")) return;
+    if (e.target.closest(".bld, .bill")) return;
     const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
     const m = root.getScreenCTM(); if (!m) return;
     const { x: X, y: Y } = pt.matrixTransform(m.inverse());
@@ -323,7 +348,8 @@
     const gx = (a + b) / 2, gy = (b - a) / 2;
     if (gx < 0.3 || gy < 0.3 || gx > N - 0.3 || gy > N - 0.3) return;
     const blocked = PROJECTS.some((p) => gx > p.x - 0.4 && gx < p.x + p.w + 0.4 && gy > p.y - 0.4 && gy < p.y + p.d + 0.4)
-      || (gx > 0.6 && gx < 3.8 && gy > 6.7 && gy < N) || (gx > 8.7 && gx < 11.7 && gy > 2.3 && gy < 4.8) || (gy > 10.5 && gx > 6.2) || (gx > 10.5 && gy > 6);
+      || (gx > 0.6 && gx < 3.8 && gy > 6.7 && gy < N) || (gx > 8.7 && gx < 11.7 && gy > 2.3 && gy < 4.8) || (gy > 10.5 && gx > 6.2) || (gx > 10.5 && gy > 6)
+      || (gx > BB.x - 0.4 && gx < BB.x + 1.6 && gy > BB.y - 0.5 && gy < BB.y + 0.6);
     if (blocked || planted >= 40) return;
     const g = el("g", { class: "pop" });
     tree(g, gx, gy, 0.55 + Math.random() * 0.35, COLORS[Math.floor(Math.random() * COLORS.length)]);
