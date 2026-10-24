@@ -186,7 +186,7 @@ nav.top a:hover { color: var(--ink); background: var(--bg-soft); text-decoration
 .town .bill .lift { transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
 .town .bill:hover .lift, .town .bill:focus-visible .lift, .town .bill[aria-pressed="true"] .lift { transform: translateY(-6px); }
 .town .bill:focus-visible rect, .town .bill:focus-visible polygon { stroke: var(--sun); }
-.town .bill-text { fill: #1D1535; font: 800 11px "Bricolage Grotesque", Inter, sans-serif; }
+.town .bill-text { fill: #1D1535; font: 800 14px "Bricolage Grotesque", Inter, sans-serif; }
 .town .photo-tip { transform-box: fill-box; transform-origin: 50% 100%; opacity: 0; pointer-events: none; transition: opacity .18s, transform .45s cubic-bezier(.34,1.7,.5,1); }
 .town .photo-tip:not(.on) { transform: translateY(10px) scale(.5); }
 .town .photo-tip.on { opacity: 1; transform: translateY(-6px) scale(1); }

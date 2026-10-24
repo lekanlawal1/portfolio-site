@@ -279,17 +279,17 @@
   }
 
   // ------------------------------------------------------------------ a billboard: hover, focus or tap it for my photo
-  const BB = { x: 8.1, y: 9.75 };
+  const BB = { x: 7.9, y: 9.75 };
   const bill = el("g", { class: "bill", tabindex: 0, role: "button", "aria-label": "Billboard: show a photo of Lekan", "aria-pressed": "false" });
   const billLift = el("g", { class: "lift" }, bill);
-  for (const dx of [0.2, 0.95]) box(billLift, BB.x + dx, BB.y, 0, 0.08, 0.08, 0.95, "#8A5A3B");
-  box(billLift, BB.x, BB.y, 0.9, 1.25, 0.06, 0.72, "#FFF7EA", { left: "#FFF7EA", right: "#2E86AB", top: "#E6D9C3" });
+  for (const dx of [0.3, 1.25]) box(billLift, BB.x + dx, BB.y, 0, 0.09, 0.09, 1.2, "#8A5A3B");
+  box(billLift, BB.x, BB.y, 1.15, 1.65, 0.06, 0.95, "#FFF7EA", { left: "#FFF7EA", right: "#2E86AB", top: "#E6D9C3" });
   // the words sit on the board's front face, slanted along it
-  const [fx, fy] = P(BB.x + 0.625, BB.y + 0.06, 1.18);
+  const [fx, fy] = P(BB.x + 0.825, BB.y + 0.06, 1.5);
   el("text", { class: "bill-text", transform: `matrix(${C30} 0.5 0 1 ${fx.toFixed(1)} ${fy.toFixed(1)})`, "text-anchor": "middle" }, billLift).textContent = "Hi! 👋";
-  place(bill, BB.x, BB.y, 1.25, 0.1);
+  place(bill, BB.x, BB.y, 1.65, 0.1);
   // the photo card, above everything else
-  const [px, py] = P(BB.x + 0.6, BB.y, 1.9);
+  const [px, py] = P(BB.x + 0.8, BB.y, 2.3);
   const photoTip = el("g", { class: "tip photo-tip" }, tipLayer);
   el("rect", { x: px - 62, y: py - 168, width: 124, height: 158, rx: 12 }, photoTip);
   el("image", { href: "assets/lekan-sm.webp", x: px - 54, y: py - 160, width: 108, height: 108 }, photoTip);
@@ -349,7 +349,7 @@
     if (gx < 0.3 || gy < 0.3 || gx > N - 0.3 || gy > N - 0.3) return;
     const blocked = PROJECTS.some((p) => gx > p.x - 0.4 && gx < p.x + p.w + 0.4 && gy > p.y - 0.4 && gy < p.y + p.d + 0.4)
       || (gx > 0.6 && gx < 3.8 && gy > 6.7 && gy < N) || (gx > 8.7 && gx < 11.7 && gy > 2.3 && gy < 4.8) || (gy > 10.5 && gx > 6.2) || (gx > 10.5 && gy > 6)
-      || (gx > BB.x - 0.4 && gx < BB.x + 1.6 && gy > BB.y - 0.5 && gy < BB.y + 0.6);
+      || (gx > BB.x - 0.4 && gx < BB.x + 2.0 && gy > BB.y - 0.5 && gy < BB.y + 0.6);
     if (blocked || planted >= 40) return;
     const g = el("g", { class: "pop" });
     tree(g, gx, gy, 0.55 + Math.random() * 0.35, COLORS[Math.floor(Math.random() * COLORS.length)]);

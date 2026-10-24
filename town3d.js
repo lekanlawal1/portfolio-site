@@ -369,14 +369,14 @@ function start() {
     buildings.push(g);
   }
   // ------------------------------------------------------------------ a billboard: hover (or tap) it and my photo pops up
-  const BB = { x: 8.8, z: 10.15 };
+  const BB = { x: 8.8, z: 10.15, size: 1.4 };   // size: the billboard is drawn at 1.4× its model
   const billboard = new THREE.Group();
   for (const dx of [-0.42, 0.42]) { const post = box(billboard, 0, 0, 0.09, 0.09, 1.05, 0x8a5a3b); post.position.set(dx, 0.52, 0); }
   const boardTex = textTexture((c, w, h) => {
     c.fillStyle = "#FFF7EA"; c.fillRect(0, 0, w, h);
     c.fillStyle = "#FFC23C"; c.fillRect(0, h - 22, w, 22);
     c.fillStyle = "#1D1535"; c.textAlign = "center"; c.textBaseline = "middle";
-    c.font = `800 ${h * 0.3}px ${FONT}`; c.fillText("Hi, I'm Lekan", w / 2, h * 0.36);
+    c.font = `800 ${h * 0.2}px ${FONT}`; c.fillText("Hi, I'm Lekan", w / 2, h * 0.38);
     c.font = `600 ${h * 0.17}px ${FONT}`; c.fillText("👋 say hi", w / 2, h * 0.62);
   }, 256, 150);
   const plain = mat(0xfff7ea);
@@ -385,6 +385,7 @@ function start() {
   billboard.position.set(gx(BB.x), 0, gz(BB.z));
   billboard.rotation.y = Math.PI / 4;   // faces the camera's starting corner
   billboard.traverse((o) => { if (o.isMesh) o.userData.billboard = true; });
+  billboard.scale.setScalar(BB.size);
   island.add(billboard);
 
   // windows as one instanced mesh
@@ -568,7 +569,7 @@ function start() {
     if (x < 1.0 || z < 1.0 || x > N - 1.0 || z > N - 1.0) return;                         // road ring
     if (PROJECTS.some((p) => x > p.x - 0.35 && x < p.x + p.w + 0.35 && z > p.z - 0.35 && z < p.z + p.d + 0.35)) return;
     if ((x > 0.6 && x < 3.8 && z > 6.7 && z < 8.8) || (x > 1.4 && x < 3.0 && z > 8.2) || (x > 8.5 && x < 11.3 && z > 2.2 && z < 4.7)) return;  // water
-    if (Math.hypot(x - BB.x, z - BB.z) < 0.9) return;   // the billboard
+    if (Math.hypot(x - BB.x, z - BB.z) < 1.2) return;   // the billboard
     if (treeSpots.some(([a, b]) => Math.hypot(a - x, b - z) < 0.55) || planted >= 40) return;
     const t = makeTree(x, z, 0.6 + Math.random() * 0.35, TREE_COLORS[Math.floor(Math.random() * TREE_COLORS.length)], Math.random() < 0.35);
     t.userData.s = t.scale.x; t.scale.setScalar(0.001); t.userData.t0 = performance.now();
@@ -703,9 +704,9 @@ function start() {
     positionLabel();
     // the billboard bounces a little while the photo is up
     bbPop += ((photoOn ? 1 : 0) - bbPop) * Math.min(1, dt * 10);
-    billboard.scale.setScalar(1 + bbPop * 0.12);
+    billboard.scale.setScalar(BB.size * (1 + bbPop * 0.12));
     if (photoOn) {
-      tmp.set(gx(BB.x), 1.9 * (1 + bbPop * 0.12), gz(BB.z));
+      tmp.set(gx(BB.x), 1.9 * BB.size * (1 + bbPop * 0.12), gz(BB.z));
       island.localToWorld(tmp); tmp.project(camera);
       const r = canvas.getBoundingClientRect();
       photo.style.left = ((tmp.x + 1) / 2) * r.width + "px";
