@@ -113,6 +113,15 @@
     would still sit inside the file. The cleaner now keeps only what the document can actually reach. The test
     searches every object in the result, decompressed, for each secret in a deliberately messy offer letter.</p>
 
+    <h2>Filling a form that has nothing to fill</h2>
+    <p>A form downloaded as a picture, scanned, or turned into a PDF from a photo has no form fields, so most
+    PDF apps can't type into it. Docket draws the page and looks for where a person would write: a thin line
+    with nothing written just above it is a blank, and a small, square, empty outline is a tick box. Label text
+    above part of a line splits it into separate blanks; page-wide rules, heavy bars and table rows are skipped.
+    On a real one-page inspection form it found all 37 blanks and 28 of 29 tick boxes, with no false ones, in
+    under a fifth of a second. Anything it misses can be added by hand, and the result saves either with the
+    answers written on the page or as a fillable PDF with real form fields.</p>
+
     <h2>Offline, and as an app</h2>
     <p>After the first visit, Docket is kept on the device and installs like an app. App code is fetched fresh
     when there's a connection, so updates arrive at once, and comes from the device when there isn't. In the
@@ -130,7 +139,7 @@
     <div class="numbers">
       <div class="num"><div class="v">33</div><div class="l">working tools, from merging pages to reading scans</div></div>
       <div class="num"><div class="v">0</div><div class="l">files uploaded. There's no server; it's a static site</div></div>
-      <div class="num"><div class="v">125</div><div class="l">automated checks on every change, 71 of them driving the tools in a real browser</div></div>
+      <div class="num"><div class="v">130</div><div class="l">automated checks on every change, 72 of them driving the tools in a real browser</div></div>
     </div>
     <p>The browser tests build their own PDFs, push them through every tool and check the output: page counts,
     text, form values, file sizes, that a locked file really needs its password, and that redacted words are really
