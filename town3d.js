@@ -25,6 +25,9 @@ if (wrap && svgTown && !reduced && !params.has("flat") && webglOK()) {
   if (document.readyState === "complete") go(); else addEventListener("load", go, { once: true });
 }
 
+// tells sound.js (if it's on) that something happened
+const sfx = (name) => document.dispatchEvent(new CustomEvent("island-sound", { detail: name }));
+
 function start() {
   const INK = 0x1d1535;
   const coarse = matchMedia("(pointer: coarse)").matches;
@@ -457,6 +460,7 @@ function start() {
   function showPhoto(on) {
     if (photoOn === on) return;
     photoOn = on; photo.classList.toggle("on", on);
+    if (on) sfx("photo");
     if (on) setHover(null);
     canvas.style.cursor = on ? "pointer" : "grab";
     wake();
@@ -483,6 +487,7 @@ function start() {
     hovered = b;
     canvas.style.cursor = b ? "pointer" : (drag ? "grabbing" : "grab");
     if (b) {
+      sfx("hover");
       b.userData.targetLift = 0.45;
       label.querySelector("b").textContent = b.userData.p.name;
       label.querySelector("span").textContent = b.userData.p.sub;
@@ -495,6 +500,7 @@ function start() {
   const flyTarget = new THREE.Vector3(), flyPoint = new THREE.Vector3();
   function startFly(b) {
     fly = { b, t0: performance.now(), wiped: false };
+    sfx("fly");
     spinV = 0; canvas.style.cursor = "default";
     // keep the name on screen during the zoom, so a single tap still tells you where you're going
     hovered = b;
@@ -546,6 +552,7 @@ function start() {
     const b = h.object.userData.building;
     if (b) {
       const p = b.userData.p;
+      if (!visited.has(p.id)) sfx("star");
       visited.add(p.id);
       try { localStorage.setItem("town-visited", JSON.stringify([...visited])); } catch {}
       if (e.metaKey || e.ctrlKey || e.shiftKey) { open(p.href, "_blank"); return; }

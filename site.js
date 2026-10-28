@@ -217,6 +217,7 @@
     let reward = null;
     function openReward() {
       try { localStorage.setItem("reward-seen", "1"); } catch {}
+      document.dispatchEvent(new CustomEvent("island-sound", { detail: "reward" }));
       if (!reward) {
         reward = document.createElement("dialog");
         reward.className = "reward";

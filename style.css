@@ -142,6 +142,14 @@ nav.top a:hover { color: var(--ink); background: var(--bg-soft); text-decoration
 .t3-hint { position: absolute; right: 8px; bottom: 6px; z-index: 3; font-size: .78rem; font-weight: 700; color: var(--ink-2); background: color-mix(in srgb, var(--card) 80%, transparent);
   border: 2px solid var(--line); border-radius: 999px; padding: 3px 10px; pointer-events: none; animation: hintfade 6s 3s forwards; }
 @keyframes hintfade { to { opacity: 0; } }
+/* the island's sound switch: always visible, bottom left of the island */
+.sound-toggle { position: absolute; left: 8px; bottom: 6px; z-index: 4; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  font: 700 .78rem Inter, sans-serif; color: var(--ink-2); background: color-mix(in srgb, var(--card) 85%, transparent);
+  border: 2px solid var(--line); border-radius: 999px; padding: 4px 11px 4px 9px; transition: transform .15s, background .15s; }
+.sound-toggle:hover { transform: translateY(-1px); background: var(--card); }
+.sound-toggle:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.sound-toggle[aria-pressed="true"] { color: var(--ink); background: var(--sun); }
+:root[data-theme="dark"] .sound-toggle[aria-pressed="true"] { color: #1D1535; }
 .town { width: 100%; height: auto; display: block; overflow: visible; touch-action: manipulation; }
 .cloud { position: absolute; z-index: 1; width: 120px; height: 40px; background: #fff; border-radius: 40px; opacity: .9; animation: drift linear infinite; pointer-events: none; }
 .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }

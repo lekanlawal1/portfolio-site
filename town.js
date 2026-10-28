@@ -9,6 +9,8 @@
   const P = (x, y, z = 0) => [(x - y) * C30 * S, (x + y) * 0.5 * S - z * S];
   const pts = (arr) => arr.map((p) => P(...p).map((n) => n.toFixed(1)).join(",")).join(" ");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // tells sound.js (if it's on) that something happened
+  const sfx = (name) => document.dispatchEvent(new CustomEvent("island-sound", { detail: name }));
 
   function el(tag, attrs = {}, parent) {
     const e = document.createElementNS(NS, tag);
@@ -254,7 +256,7 @@
     el("path", { d: starPath(lx + 2, ly - 4, 8, 3.6), fill: "#FFC23C", ...STROKE, "stroke-width": 1.4 }, flag);
     const tipG = el("g", { class: "tip" }, tipLayer);
     const show = (on) => tipG.classList.toggle("on", on);
-    a.addEventListener("pointerenter", () => show(true)); a.addEventListener("pointerleave", () => show(false));
+    a.addEventListener("pointerenter", (e) => { show(true); if (e.pointerType === "mouse") sfx("hover"); }); a.addEventListener("pointerleave", () => show(false));
     a.addEventListener("focus", () => show(true)); a.addEventListener("blur", () => show(false));
     a._tip = tipG;
     const w = Math.max(p.name.length * 7.3, p.sub.length * 6) + 22;
@@ -262,9 +264,11 @@
     el("text", { x: lx, y: ly - 29, "text-anchor": "middle" }, tipG).textContent = p.name;
     el("text", { x: lx, y: ly - 15, "text-anchor": "middle", class: "sub" }, tipG).textContent = p.sub;
     a.addEventListener("click", (e) => {
+      if (!visited.has(p.id)) sfx("star");
       visited.add(p.id); saveVisited();
       if (e.metaKey || e.ctrlKey || e.shiftKey || !window.Fun) return;   // new tab: leave the link alone
       e.preventDefault();
+      sfx("fly");
       Fun.wipeTo(p.href, { x: e.clientX || innerWidth / 2, y: e.clientY || innerHeight / 2, color: p.color, name: p.name });
     });
     place(a, p.x, p.y, p.w, p.d);
@@ -296,7 +300,7 @@
   el("text", { x: px, y: py - 34, "text-anchor": "middle" }, photoTip).textContent = "Lekan Lawal";
   el("text", { x: px, y: py - 19, "text-anchor": "middle", class: "sub" }, photoTip).textContent = "Thanks for visiting!";
   let billOn = false;
-  const showBill = (on) => { billOn = on; photoTip.classList.toggle("on", on); bill.setAttribute("aria-pressed", String(on)); };
+  const showBill = (on) => { if (on && !billOn) sfx("photo"); billOn = on; photoTip.classList.toggle("on", on); bill.setAttribute("aria-pressed", String(on)); };
   bill.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") showBill(true); });
   bill.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") showBill(false); });
   bill.addEventListener("focus", () => showBill(true)); bill.addEventListener("blur", () => showBill(false));
