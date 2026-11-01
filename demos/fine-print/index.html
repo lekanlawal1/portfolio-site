@@ -73,6 +73,14 @@ h1 { font-family: "Source Serif 4", Georgia, serif; font-size: clamp(2rem, 5vw, 
 .own .privacy { font-size: 13px; margin: 12px 0 0; padding: 10px 12px; background: var(--field); border-radius: 12px; }
 .own .status { font-weight: 600; color: var(--ink); margin: 10px 0 0; min-height: 1.4em; }
 .own .status.bad { color: var(--violation); }
+.own .status.working { display: flex; align-items: center; gap: 10px; }
+/* A striped bar that slides while something is in progress (no fixed length, so no fake percentage).
+   Adapted from a loader on Uiverse.io by bernethe (MIT). */
+.loading-stripes { display: inline-block; flex: none; width: 46px; height: 14px; border: 2px solid var(--ink); border-radius: 5px;
+  background: linear-gradient(-60deg, transparent 0 50%, var(--accent) 50% 75%, transparent 75%) 0 0 / 16px 24px;
+  animation: loading-stripes .8s linear infinite; }
+@keyframes loading-stripes { to { background-position: -16px 0; } }
+@media (prefers-reduced-motion: reduce) { .loading-stripes { animation-duration: 2.4s; } }
 .own-file { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; margin: 0 0 10px; border: 2px dashed var(--accent); border-radius: 14px; cursor: pointer; background: var(--field); }
 .own-file:hover, .own-file.over { background: color-mix(in srgb, var(--accent) 10%, var(--card)); }
 .own-file:focus-within { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); }
@@ -392,7 +400,14 @@ function ownRejected(doc) {
 }
 
 const ownText = document.getElementById("own-text");
-const ownStatus = (msg, bad = false) => { const el = document.getElementById("own-status"); el.textContent = msg; el.classList.toggle("bad", bad); };
+// A message still in progress (ending "...") gets the sliding stripes in front of it.
+const ownStatus = (msg, bad = false) => {
+  const el = document.getElementById("own-status"), working = !bad && /\.\.\.$/.test(msg);
+  const bar = document.createElement("span");
+  bar.className = "loading-stripes"; bar.setAttribute("aria-hidden", "true");
+  el.replaceChildren(...(working ? [bar] : []), document.createTextNode(msg));
+  el.classList.toggle("bad", bad); el.classList.toggle("working", working);
+};
 ownText.addEventListener("input", () => {
   document.getElementById("own-count").textContent = `${ownText.value.length.toLocaleString("en-CA")} of 40,000 characters`;
 });

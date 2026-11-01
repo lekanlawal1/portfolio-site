@@ -41,6 +41,14 @@
 .seg button[aria-pressed="true"] { background: var(--c); color: #fff; }
 .status { font-size: .9rem; color: var(--ink-2); }
 .status b { color: var(--ink); }
+.status:has(.loading-stripes) { display: inline-flex; align-items: center; gap: 10px; }
+/* A striped bar that slides while something is in progress (no fixed length, so no fake percentage).
+   Adapted from a loader on Uiverse.io by bernethe (MIT). */
+.loading-stripes { display: inline-block; flex: none; width: 46px; height: 14px; border: 2px solid var(--ink); border-radius: 5px;
+  background: linear-gradient(-60deg, transparent 0 50%, var(--input) 50% 75%, transparent 75%) 0 0 / 16px 24px;
+  animation: loading-stripes .8s linear infinite; }
+@keyframes loading-stripes { to { background-position: -16px 0; } }
+@media (prefers-reduced-motion: reduce) { .loading-stripes { animation-duration: 2.4s; } }
 
 .drop { display: none; border: 2.5px dashed var(--line); border-radius: 16px; padding: 22px; text-align: center; background: var(--card); margin-bottom: 16px; }
 .drop.show { display: block; }
@@ -183,7 +191,7 @@ details.formulas-box[open] > summary::after { transform: rotate(45deg); }
       <button type="button" data-src="sample" aria-pressed="true">Sample workbook</button>
       <button type="button" data-src="own" aria-pressed="false">Check your own file</button>
     </div>
-    <div class="status" id="status">Loading the workbook&hellip;</div>
+    <div class="status" id="status"><span class="loading-stripes" aria-hidden="true"></span>Loading the workbook&hellip;</div>
   </div>
 
   <div class="drop" id="drop">
