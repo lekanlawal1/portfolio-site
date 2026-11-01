@@ -291,3 +291,32 @@
     }
   });
 })();
+
+/* Project cards: a short silent clip of each demo in use, played only while the card is on
+   screen. The still image stays until the clip can actually play, so a slow or failed load
+   just leaves the picture. Visitors who ask for less motion or less data keep the still. */
+(() => {
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.connection?.saveData;
+  if (still || !("IntersectionObserver" in window)) return;
+  document.addEventListener("DOMContentLoaded", () => {
+    const shots = document.querySelectorAll(".card .shot[data-clip]");
+    if (!shots.length) return;
+    const seen = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        const frame = e.target.querySelector(".frame");
+        let v = frame.querySelector("video");
+        if (!e.isIntersecting) { if (v) v.pause(); continue; }
+        if (!v) {
+          v = document.createElement("video");
+          Object.assign(v, { muted: true, loop: true, playsInline: true, preload: "auto" });
+          v.setAttribute("aria-hidden", "true");
+          v.addEventListener("playing", () => frame.classList.add("playing"), { once: true });
+          v.src = e.target.dataset.clip;
+          frame.appendChild(v);
+        }
+        v.play().catch(() => {});
+      }
+    }, { threshold: 0.35 });
+    shots.forEach((s) => seen.observe(s));
+  });
+})();

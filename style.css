@@ -235,6 +235,8 @@ p.section-sub { color: var(--ink-2); margin-bottom: 38px; max-width: 46rem; font
   background-image: radial-gradient(circle at 12px 50%, #FF5F57 4px, transparent 4.5px), radial-gradient(circle at 26px 50%, #FFBD2E 4px, transparent 4.5px), radial-gradient(circle at 40px 50%, #28C840 4px, transparent 4.5px); }
 .card:hover .shot .frame { transform: translateY(-6px) scale(1.02); }
 .card .shot img { width: 100%; height: calc(100% - 22px); object-fit: cover; object-position: top; display: block; }
+.card .shot video { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: calc(100% - 22px); object-fit: cover; object-position: top; opacity: 0; transition: opacity .5s; background: #fff; }
+.card .shot .frame.playing video { opacity: 1; }
 .card .badge { position: absolute; top: 12px; right: 12px; z-index: 2; background: var(--sun); color: #1D1535; border: 2px solid var(--line);
   font: 800 .78rem "Bricolage Grotesque", Inter, sans-serif; padding: 4px 10px; border-radius: 999px; transform: rotate(4deg); box-shadow: 2px 2px 0 var(--line); }
 .card .body { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
