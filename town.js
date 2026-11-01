@@ -324,6 +324,7 @@
   const total = legs.reduce((s, l) => s + l.len, 0);
   let t0 = null;
   function drive(ts) {
+    if (svg.closest(".is3d")) return;   // the 3D island replaced this one: nothing to animate
     if (t0 == null) t0 = ts;
     const cycle = 14000, u = ((ts - t0) % cycle) / cycle;
     const dist = (u < 0.5 ? u * 2 : 2 - u * 2) * total;   // out and back

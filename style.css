@@ -65,7 +65,7 @@ header.site .wrap { display: flex; align-items: center; justify-content: space-b
 .brand { font-weight: 800; font-size: 1.2rem; color: var(--ink); letter-spacing: -0.02em; display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; }
 .brand:hover { text-decoration: none; }
 .brand .dot { width: 26px; height: 26px; border-radius: 8px; background: var(--accent); border: 2.5px solid var(--line);
-  box-shadow: 2px 2px 0 var(--line); display: inline-grid; place-items: center; color: #fff; font-size: .8rem; transform: rotate(-8deg);
+  box-shadow: 2px 2px 0 var(--line); display: inline-grid; place-items: center; color: #1D1535; font-size: .8rem; transform: rotate(-8deg);
   transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
 .brand:hover .dot { transform: rotate(8deg) scale(1.1); }
 nav.top { display: flex; align-items: center; gap: 6px; }
@@ -92,7 +92,7 @@ nav.top a:hover { color: var(--ink); background: var(--bg-soft); text-decoration
 }
 .btn:hover { text-decoration: none; transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--line); }
 .btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--line); }
-.btn.primary { background: var(--accent); color: #fff; }
+.btn.primary { background: var(--accent); color: var(--ink); }
 :root[data-theme="dark"] .btn.primary { color: #15112B; }
 .btn .arrow { transition: transform .2s; }
 .btn:hover .arrow { transform: translateX(4px); }
@@ -276,7 +276,7 @@ p.section-sub { color: var(--ink-2); margin-bottom: 38px; max-width: 46rem; font
 .skill-groups > div { background: var(--card); border: 2.5px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 3px 3px 0 var(--line);
   transition: transform .25s cubic-bezier(.34,1.56,.64,1); }
 .skill-groups > div:hover { transform: translateX(6px) rotate(.5deg); }
-.skill-groups h4 { font-size: .95rem; margin-bottom: 4px; font-weight: 800; }
+.skill-groups h3 { font-size: .95rem; margin-bottom: 4px; font-weight: 800; }
 .skill-groups p { font-size: .92rem; color: var(--ink-2); }
 
 /* contact */
