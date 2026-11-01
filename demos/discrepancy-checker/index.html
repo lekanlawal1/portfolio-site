@@ -41,7 +41,9 @@
 .seg button[aria-pressed="true"] { background: var(--c); color: #fff; }
 .status { font-size: .9rem; color: var(--ink-2); }
 .status b { color: var(--ink); }
-.status:has(.loading-stripes) { display: inline-flex; align-items: center; gap: 10px; }
+.status:has(.loading-stripes), .status:has(.done-tick) { display: inline-flex; align-items: center; gap: 8px; }
+.done-tick { display: inline-grid; place-items: center; width: 18px; height: 18px; flex: none; border-radius: 50%; background: var(--ok); color: #fff; font-size: 11px; font-weight: 800; }
+:root[data-theme="dark"] .done-tick { color: #10241a; }
 /* A striped bar that slides while something is in progress (no fixed length, so no fake percentage).
    Adapted from a loader on Uiverse.io by bernethe (MIT). */
 .loading-stripes { display: inline-block; flex: none; width: 46px; height: 14px; border: 2px solid var(--ink); border-radius: 5px;
@@ -244,6 +246,6 @@ details.formulas-box[open] > summary::after { transform: rotate(45deg); }
 </main>
 <footer class="site"><div class="wrap">© 2026 Lekan Lawal · The workbook uses plain Excel formulas, no macros: it opens in Excel 2010 and later, Excel for Mac and Google Sheets.</div></footer>
 <script src="xlsx.mini.min.js"></script>
-<script src="checker.js"></script>
+<script src="checker.js?v=20261102"></script>
 </body>
 </html>

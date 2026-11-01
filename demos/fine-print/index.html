@@ -74,6 +74,22 @@ h1 { font-family: "Source Serif 4", Georgia, serif; font-size: clamp(2rem, 5vw, 
 .own .status { font-weight: 600; color: var(--ink); margin: 10px 0 0; min-height: 1.4em; }
 .own .status.bad { color: var(--violation); }
 .own .status.working { display: flex; align-items: center; gap: 10px; }
+/* while the checklist shows the progress, the working status line is only read out, not shown twice */
+.own .status.working:has(+ .check-steps:not([hidden])) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+/* the check, step by step: what's done, what's happening now, what's next, and the time so far */
+.check-steps { list-style: none; margin: 10px 0 0; padding: 12px 14px; background: var(--field); border-radius: 12px; display: grid; gap: 8px; font-size: 14px; }
+.check-steps li { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 8px; color: var(--ink-2); }
+.check-steps li::before { content: ""; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); box-sizing: border-box; }
+.check-steps li.done { color: var(--ink); }
+.check-steps li.done::before { content: "✓"; display: grid; place-items: center; border: 0; background: var(--ok); color: #fff; font-size: 11px; font-weight: 800; }
+.check-steps li.now { color: var(--ink); font-weight: 600; }
+.check-steps li.now::before { border-color: var(--accent); border-top-color: transparent; animation: step-spin .9s linear infinite; }
+.check-steps li.failed { color: var(--violation); }
+.check-steps li.failed::before { content: "!"; display: grid; place-items: center; border: 0; background: var(--violation); color: #fff; font-size: 11px; font-weight: 800; }
+.check-steps .detail { font-weight: 400; color: var(--ink-2); font-size: 13px; }
+.check-steps .time { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+@keyframes step-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .check-steps li.now::before { animation: none; border-top-color: var(--accent); } }
 /* A striped bar that slides while something is in progress (no fixed length, so no fake percentage).
    Adapted from a loader on Uiverse.io by bernethe (MIT). */
 .loading-stripes { display: inline-block; flex: none; width: 46px; height: 14px; border: 2px solid var(--ink); border-radius: 5px;
@@ -200,6 +216,7 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
       </span>
     </div>
     <p class="status" id="own-status" role="status"></p>
+    <ol class="check-steps" id="own-steps" hidden aria-label="Progress"></ol>
     <p class="privacy"><b>Before you paste or open a file:</b> email addresses, phone numbers, postal codes and SIN-shaped numbers are removed
       in your browser before anything is sent. The text then goes to Google's Gemini through a small server of mine that
       stores nothing. Google may use text sent to its free API to improve its products, so take out names and addresses
@@ -453,6 +470,39 @@ for (const el of [document.getElementById("own-drop"), ownText]) {
   el.addEventListener("drop", (e) => { const f = e.dataTransfer?.files?.[0]; if (f) { e.preventDefault(); openFile(f); } });
 }
 
+// The check, step by step. The pipeline reports progress as messages; each one moves the list on.
+const STEPS = [
+  ["contact", "Contact details taken out"],
+  ["kind", "Working out what kind of document this is"],
+  ["read", "The AI reads and quotes the clauses"],
+  ["verify", "Checking every quote against your document"],
+];
+function showSteps() {
+  const ol = document.getElementById("own-steps");
+  ol.innerHTML = STEPS.map(([key, label]) => `<li data-step="${key}"><span>${label} <span class="detail"></span></span><span class="time"></span></li>`).join("");
+  ol.hidden = false;
+  const t0 = performance.now();
+  let current = null;
+  const li = (key) => ol.querySelector(`[data-step="${key}"]`);
+  const tick = setInterval(() => { if (current) li(current).querySelector(".time").textContent = `${Math.round((performance.now() - t0) / 1000)} s`; }, 250);
+  const goTo = (key, detail = "") => {
+    const keys = STEPS.map(([k]) => k), at = keys.indexOf(key);
+    keys.forEach((k, i) => { const el = li(k); el.classList.toggle("done", i < at); el.classList.toggle("now", i === at); if (i !== at) el.querySelector(".time").textContent = ""; });
+    li(key).querySelector(".detail").textContent = detail;
+    current = key;
+  };
+  return {
+    contact(count) { li("contact").classList.add("done"); li("contact").querySelector(".detail").textContent = count ? `(${count} removed)` : "(none found)"; },
+    progress(msg) {
+      if (/kind of document/.test(msg)) goTo("kind");
+      else if (/AI is reading/.test(msg)) { const m = msg.match(/section (\d+) of (\d+)/); goTo("read", m ? `(section ${m[1]} of ${m[2]})` : ""); }
+      else if (/Checking every quote/.test(msg)) goTo("verify");
+    },
+    finish() { clearInterval(tick); ol.querySelectorAll("li").forEach((el) => { el.classList.remove("now"); el.classList.add("done"); el.querySelector(".time").textContent = ""; }); current = null; },
+    fail() { clearInterval(tick); if (current) { li(current).classList.replace("now", "failed"); li(current).querySelector(".time").textContent = ""; } current = null; },
+  };
+}
+
 document.getElementById("own-go").addEventListener("click", async () => {
   const go = document.getElementById("own-go");
   const raw = ownText.value.trim();
@@ -461,14 +511,19 @@ document.getElementById("own-go").addEventListener("click", async () => {
   const { text, count } = FinePrintPipeline.redact(raw);
   if (count) { ownText.value = text; ownText.dispatchEvent(new Event("input")); }
   go.disabled = true;
+  const steps = showSteps();
+  steps.contact(count);
   try {
-    const r = await FinePrintPipeline.analyze(text, window.FINE_PRINT_API, (m) => ownStatus(m));
+    const r = await FinePrintPipeline.analyze(text, window.FINE_PRINT_API, (m) => { ownStatus(m); steps.progress(m); });
+    steps.finish();
     own = { title: "Your document", text, ...r, labelRejected: r.rejected.filter((x) => x.label) };
     ownStatus(`Done in ${r.seconds.toFixed(1)} s.${count ? ` ${count} contact detail(s) were removed before sending.` : ""}`);
     render();
     document.querySelector(".grid").scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (err) {
-    const offline = err instanceof TypeError;   // the request never reached the service
+    steps.fail();
+    // the request never reached the service (the pipeline passes the browser's network error on as its message)
+    const offline = err instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(err.message);
     ownStatus(offline ? "The live checker isn't reachable right now. The sample documents above still work." : `Couldn't check it: ${err.message}`, true);
   } finally {
     go.disabled = false;

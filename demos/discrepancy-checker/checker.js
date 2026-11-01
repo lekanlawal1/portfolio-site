@@ -302,7 +302,7 @@
     render();
     const parts = [["inventory", "count rows"], ["receiving", "receipts"], ["billing", "invoices"]]
       .filter(([k]) => data[k]).map(([k, w]) => `${data[k].length} ${w}`);
-    $("status").innerHTML = `<b>${esc(name)}</b>: ${parts.join(", ")}`;
+    $("status").innerHTML = `<span class="done-tick" aria-hidden="true">✓</span>Read <b>${esc(name)}</b>: ${parts.join(", ")}`;
     $("drop-err").textContent = errors.length ? `Skipped: ${errors.join(". ")}.` : "";
   }
 
