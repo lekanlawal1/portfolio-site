@@ -558,5 +558,6 @@ function tabs() {
 fetch("data.json").then((r) => r.json()).then((d) => { data = d; tabs(); })
   .catch((err) => { document.getElementById("findings").innerHTML = `<p class="empty">Could not load the demo data (${esc(err.message)}).</p>`; });
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "50d455a6ac424591b8acaa97dc3975a9"}'></script>
 </body>
 </html>
