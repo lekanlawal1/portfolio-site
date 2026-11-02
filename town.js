@@ -320,6 +320,10 @@
   box(tX, -0.55, -0.25, 0.08, 0.8, 0.5, 0.6, "#FFFFFF"); box(tX, 0.27, -0.25, 0.08, 0.35, 0.5, 0.45, "#FF6B35");
   box(tY, -0.25, -0.62, 0.08, 0.5, 0.35, 0.45, "#FF6B35"); box(tY, -0.25, -0.25, 0.08, 0.5, 0.8, 0.6, "#FFFFFF");
   world.appendChild(truck);
+  // the truck is Derby, the game I'm building
+  const tTitle = el("title", {}, truck); tTitle.textContent = "Derby: a daily football quiz. Click to try it";
+  truck.style.cursor = "pointer";
+  truck.addEventListener("click", (e) => { e.stopPropagation(); open("https://dailyderby.app/", "_blank", "noopener"); });
   const legs = road.slice(1).map((p, i) => ({ a: road[i], b: p, len: Math.hypot(p[0] - road[i][0], p[1] - road[i][1]) }));
   const total = legs.reduce((s, l) => s + l.len, 0);
   let t0 = null;

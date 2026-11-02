@@ -408,6 +408,10 @@ function start() {
   const wheelGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 10); wheelGeo.rotateX(Math.PI / 2);
   for (const x of [-0.35, 0.05, 0.45]) { const w = mesh(wheelGeo, mat(INK), truck); w.position.set(x, 0.12, 0); }
   island.add(truck);
+  // the truck is Derby, the game I'm building: hover to stop it and see its name, click to play
+  truck.userData.p = { id: "derby", name: "Derby", sub: "A daily football quiz. Click to try it", href: "https://dailyderby.app/" };
+  truck.traverse((o) => { if (o.isMesh) o.userData.building = truck; });
+  let truckU = 0;
   const pathShape = new THREE.Shape(); roundRect(pathShape, 0.6, 0.65);
   const pathPts = pathShape.getSpacedPoints(240).map((v) => new THREE.Vector3(v.x, 0.03, v.y));
   const path = new THREE.CatmullRomCurve3(pathPts.slice(0, -1), true);
@@ -479,7 +483,7 @@ function start() {
     const r = canvas.getBoundingClientRect();
     ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
-    return ray.intersectObjects([...buildings, billboard, grass], true).find((h) => h.object.isMesh);
+    return ray.intersectObjects([...buildings, truck, billboard, grass], true).find((h) => h.object.isMesh);
   }
   function setHover(b) {
     if (hovered === b) return;
@@ -550,6 +554,7 @@ function start() {
     if (h.object.userData.billboard) { if (e.pointerType !== "mouse") showPhoto(!photoOn); return; }
     if (e.pointerType !== "mouse") showPhoto(false);
     const b = h.object.userData.building;
+    if (b === truck) { open(b.userData.p.href, "_blank", "noopener"); setHover(null); return; }
     if (b) {
       const p = b.userData.p;
       if (!visited.has(p.id)) sfx("star");
@@ -685,7 +690,8 @@ function start() {
     }
 
     // truck
-    const u = (t * 0.022) % 1;
+    if (hovered !== truck && dt > 0) truckU = (truckU + dt * 0.022) % 1;
+    const u = truckU;
     path.getPointAt(u, tmp); truck.position.copy(tmp);
     const tan = path.getTangentAt(u); truck.rotation.y = Math.atan2(-tan.z, tan.x);
 

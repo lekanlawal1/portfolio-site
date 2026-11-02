@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=20261105">
+<link rel="stylesheet" href="style.css?v=20261107">
 <script src="site.js?v=20261105"></script>
 </head>
 <body>
@@ -65,6 +65,24 @@
 
   <section id="projects">
     <div class="wrap">
+      <div class="derby-rail">
+        <a class="derby-side" href="https://dailyderby.app/" target="_blank" rel="noopener">
+          <svg class="dtruck" viewBox="0 0 120 64" aria-hidden="true">
+            <line class="road" x1="0" y1="60" x2="120" y2="60"/>
+            <g class="body">
+              <rect x="8" y="8" width="66" height="38" rx="4" fill="#fff" stroke="currentColor" stroke-width="3"/>
+              <text x="41" y="32" text-anchor="middle">DERBY</text>
+              <path d="M74 18h18l12 14v14H74z" fill="#FF6B35" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+              <path d="M80 23h10l7 8H80z" fill="#CDEBFF" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+            </g>
+            <g class="wheels" fill="#1D1535"><circle cx="24" cy="50" r="7"/><circle cx="56" cy="50" r="7"/><circle cx="90" cy="50" r="7"/></g>
+          </svg>
+          <span class="kicker">Now building</span>
+          <b>Derby</b>
+          <span class="what">A daily football quiz. Ten questions a day, and you play for your club.</span>
+          <span class="go">Try it &rarr;</span>
+        </a>
+      </div>
       <h2 class="section">Seven builds. Click into any of them.</h2>
       <p class="section-sub">An iOS app that checks contracts against Ontario law, a private all-in-one PDF toolkit, a self-refreshing economic data platform,
         an Excel tool for warehouse audits, a sales dashboard for your own data, an App Store review analyzer, and a football stats agent
@@ -221,20 +239,28 @@
         </div>
         <div class="skill-groups">
           <div>
-            <h3>Languages and data</h3>
-            <p>Python · SQL · JavaScript · pandas · DuckDB · scikit-learn · statsmodels</p>
+            <h3>Languages</h3>
+            <p>Python · SQL · JavaScript · TypeScript · Swift · HTML and CSS</p>
+          </div>
+          <div>
+            <h3>Data and machine learning</h3>
+            <p>pandas · DuckDB · scikit-learn · statsmodels · forecasting · data quality checks</p>
           </div>
           <div>
             <h3>BI and visualization</h3>
             <p>Excel (INDEX/MATCH, SUMIFS, conditional formatting, data validation) · Power BI · Tableau · Plotly · dashboard design</p>
           </div>
           <div>
-            <h3>Web and cloud</h3>
-            <p>React · Firebase · Streamlit · GitHub Pages · GitHub Actions (CI and scheduled pipelines)</p>
+            <h3>AI</h3>
+            <p>Gemini API (structured output, guardrails) · on-device AI · OCR · prompt engineering and evaluation · Claude · ChatGPT</p>
           </div>
           <div>
-            <h3>AI tooling</h3>
-            <p>Gemini API (structured output, guardrails) · Claude · ChatGPT · prompt engineering and evaluation</p>
+            <h3>Apps and web</h3>
+            <p>React · Preact · SwiftUI · Streamlit · Firebase · REST APIs</p>
+          </div>
+          <div>
+            <h3>Cloud and automation</h3>
+            <p>Cloudflare Workers · GitHub Actions (CI and scheduled pipelines) · GitHub Pages · Git</p>
           </div>
         </div>
       </div>
@@ -265,8 +291,8 @@
   <div class="wrap">© 2026 Lekan Lawal · Built by hand, no frameworks. The town is drawn in code: Three.js, with a plain SVG version for slower devices.</div>
 </footer>
 
-<script src="town.js?v=20261104"></script>
-<script type="module" src="town3d.js?v=20261028"></script>
+<script src="town.js?v=20261107"></script>
+<script type="module" src="town3d.js?v=20261107"></script>
 <script src="sound.js?v=20261028b"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "50d455a6ac424591b8acaa97dc3975a9"}'></script>
 </body>

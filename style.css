@@ -481,3 +481,34 @@ dialog.reward.closing::backdrop { animation: fade .18s ease reverse forwards; }
 .me figcaption { display: grid; gap: 2px; }
 .me b { font-size: 1.15rem; letter-spacing: -0.01em; }
 .me span { color: var(--muted); font-size: .95rem; }
+
+/* Derby: a small "try it" beside the project cards, drawn as the island's truck. It sits in the
+   right-hand margin on wide screens and follows you down the projects; narrower, it's a pill under them. */
+#projects > .wrap { position: relative; }
+.derby-rail { position: absolute; top: 120px; bottom: 0; left: 100%; width: 168px; margin-left: 4px; }
+.derby-side { position: sticky; top: 110px; display: flex; flex-direction: column; gap: 4px; padding: 14px 14px 16px;
+  background: var(--card); border: 2.5px solid var(--line); border-radius: 16px; box-shadow: 4px 4px 0 var(--line);
+  color: var(--ink); text-decoration: none; transform: rotate(1.5deg); transition: transform .25s cubic-bezier(.34,1.56,.64,1); }
+.derby-side:hover { transform: rotate(0) translateY(-4px); }
+.derby-side .kicker { font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.derby-side b { font-size: 1.15rem; line-height: 1.1; }
+.derby-side .what { font-size: .8rem; color: var(--ink-2); line-height: 1.35; }
+.derby-side .go { margin-top: 8px; align-self: flex-start; background: #FF6B35; color: #1D1535; font-weight: 800; font-size: .85rem;
+  padding: 6px 12px; border: 2.5px solid var(--line); border-radius: 999px; box-shadow: 2px 2px 0 var(--line); }
+.dtruck { width: 100%; height: auto; color: var(--line); overflow: visible; }
+.dtruck text { font: 800 11px/1 inherit; font-family: inherit; fill: #1D1535; letter-spacing: .06em; }
+.dtruck .road { stroke: var(--muted); stroke-width: 2; stroke-dasharray: 8 7; animation: road .6s linear infinite; }
+.dtruck .body { animation: bump .5s ease-in-out infinite alternate; }
+.derby-side:hover .dtruck .body { animation-duration: .25s; }
+@keyframes road { to { stroke-dashoffset: -15; } }
+@keyframes bump { to { transform: translateY(-1.5px); } }
+@media (prefers-reduced-motion: reduce) { .dtruck .road, .dtruck .body { animation: none; } }
+/* not enough margin: a small pill under the cards instead */
+@media (max-width: 1520px) {
+  .derby-rail { position: static; width: auto; margin: 26px 0 0; display: flex; justify-content: center; }
+  .derby-side { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 10px 16px; transform: none; max-width: 560px; }
+  .derby-side .dtruck { width: 74px; }
+  .derby-side .kicker { display: none; }
+  .derby-side .what { flex: 1 1 200px; }
+  .derby-side .go { margin-top: 0; }
+}
