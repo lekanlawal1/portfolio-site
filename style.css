@@ -497,13 +497,19 @@ dialog.reward.closing::backdrop { animation: fade .18s ease reverse forwards; }
 .derby-side .cap b { font-size: .9rem; }
 .derby-side .cap span { font-size: .7rem; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .derby-side, .derby-side:hover { transform: none; } }
-/* no room in the margin: a slim pill under the cards */
+.derby-side .pre { display: none; }
+/* no room in the margin: one small line at the bottom of the projects section */
 @media (max-width: 1399px) {
-  .derby-rail { position: static; width: auto; margin-top: 26px; display: flex; justify-content: center; }
-  .derby-side { position: static; width: auto; display: flex; align-items: center; gap: 12px; padding: 8px 14px 8px 8px;
-    background: var(--card); border: 2.5px solid var(--line); border-radius: 999px; box-shadow: 3px 3px 0 var(--line); transform: none; }
-  .derby-side:hover { transform: translateY(-3px); }
-  .derby-side img { width: 34px; border-radius: 8px; border-width: 2px; box-shadow: none; }
-  .derby-side .cap { order: 1; align-items: flex-start; margin: 0; text-align: left; }
-  .derby-side .tab { order: 2; margin: 0; }
+  .derby-rail { position: static; width: auto; margin-top: 22px; display: flex; justify-content: center; }
+  .derby-side { position: static; width: auto; display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 4px;
+    background: var(--card); border: 2px solid var(--line); border-radius: 999px; box-shadow: 2px 2px 0 var(--line); transform: none; font-size: .8rem; }
+  .derby-side:hover { transform: translateY(-2px); }
+  .derby-side img { width: 18px; border-radius: 4px; border-width: 1.5px; box-shadow: none; }
+  .derby-side .cap { order: 1; flex-direction: row; align-items: baseline; gap: 5px; margin: 0; text-align: left; }
+  .derby-side .pre { display: inline; color: var(--muted); font-size: .8rem; }
+  .derby-side .cap b { font-size: .8rem; }
+  .derby-side .cap span:last-child { font-size: .8rem; }
+  .derby-side .cap span:last-child::before { content: "· "; }
+  .derby-side .tab { order: 2; margin: 0; padding: 1px 8px; font-size: .72rem; border-width: 2px; box-shadow: none; }
 }
+@media (max-width: 420px) { .derby-side .cap span:last-child { display: none; } }
