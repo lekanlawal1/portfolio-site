@@ -320,3 +320,35 @@
     shots.forEach((s) => seen.observe(s));
   });
 })();
+
+/* Skills band: pressing a skill dims the project cards that don't use it. Press it again, press
+   "show all", or press Escape to clear. */
+document.addEventListener("DOMContentLoaded", () => {
+  const band = document.querySelector(".skills-band"), cards = document.querySelector(".cards");
+  if (!band || !cards) return;
+  const status = band.querySelector(".sk-status");
+  const names = { "fine-print": "Fine Print", docket: "Docket", economy: "Canada Economy", discrepancy: "Discrepancy Checker", superstore: "Money Snitch", triage: "App Review Insights", football: "Football Stats Agent" };
+  let on = null;
+  function clear() {
+    if (on) on.setAttribute("aria-pressed", "false");
+    on = null;
+    cards.classList.remove("filtering");
+    cards.querySelectorAll(".card.match").forEach((c) => c.classList.remove("match"));
+    status.textContent = "";
+  }
+  band.addEventListener("click", (e) => {
+    if (e.target.closest(".sk-status button")) { clear(); return; }
+    const chip = e.target.closest("button.sk-chip");
+    if (!chip) return;
+    if (chip === on) { clear(); return; }
+    clear();
+    on = chip; chip.setAttribute("aria-pressed", "true");
+    const ids = chip.dataset.p.split(" ");
+    cards.classList.add("filtering");
+    ids.forEach((id) => document.getElementById(id)?.classList.add("match"));
+    const skill = chip.firstChild.textContent.trim();
+    status.innerHTML = `<b></b>, used in ${ids.map((id) => `<a href="#${id}">${names[id] || id}</a>`).join(", ")}.<button type="button">Show all</button>`;
+    status.querySelector("b").textContent = skill;
+  });
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && on) clear(); });
+});
