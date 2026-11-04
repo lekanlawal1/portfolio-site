@@ -265,15 +265,9 @@ p.section-sub { color: var(--ink-2); margin-bottom: 38px; max-width: 46rem; font
 .stat:nth-child(1) .v { color: var(--accent); } .stat:nth-child(2) .v { color: var(--mint); } .stat:nth-child(3) .v { color: var(--grape); } .stat:nth-child(4) .v { color: var(--sky); }
 
 /* about / skills */
-.about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 44px; }
-@media (max-width: 800px) { .about-grid { grid-template-columns: 1fr; } }
+.about-grid { display: grid; grid-template-columns: 240px minmax(0, 62ch); gap: 48px; align-items: start; }
+@media (max-width: 800px) { .about-grid { grid-template-columns: 1fr; gap: 18px; } }
 .about-grid p { font-size: 1.05rem; color: var(--ink-2); }
-.skill-groups { display: grid; gap: 14px; }
-.skill-groups > div { background: var(--card); border: 2.5px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: 3px 3px 0 var(--line);
-  transition: transform .25s cubic-bezier(.34,1.56,.64,1); }
-.skill-groups > div:hover { transform: translateX(6px) rotate(.5deg); }
-.skill-groups h3 { font-size: .95rem; margin-bottom: 4px; font-weight: 800; }
-.skill-groups p { font-size: .92rem; color: var(--ink-2); }
 
 /* contact */
 .contact-card { background: var(--accent); color: #fff; border: 2.5px solid var(--line); border-radius: 26px; box-shadow: var(--shadow-lg);
@@ -470,8 +464,8 @@ dialog.reward.closing::backdrop { animation: fade .18s ease reverse forwards; }
 @media (max-width: 440px) { .hide-xs { display: none; } }
 
 /* About: a photo with a name beside it */
-.me { display: flex; align-items: center; gap: 18px; margin: 0 0 20px; }
-.me img { width: 112px; height: 112px; flex: none; border-radius: 50%; object-fit: cover; border: 3px solid var(--line); box-shadow: 4px 4px 0 var(--line); background: var(--card); }
+.me { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin: 0; }
+.me img { width: 220px; height: 220px; flex: none; border-radius: 50%; object-fit: cover; border: 3px solid var(--line); box-shadow: 4px 4px 0 var(--line); background: var(--card); }
 .me figcaption { display: grid; gap: 2px; }
 .me b { font-size: 1.15rem; letter-spacing: -0.01em; }
 .me span { color: var(--muted); font-size: .95rem; }
@@ -543,3 +537,7 @@ button.sk-chip:focus-visible { outline: 3px solid var(--sky); outline-offset: 2p
   .sk-chip { flex: none; scroll-snap-align: start; }
 }
 @media (prefers-reduced-motion: reduce) { .sk-chip, .cards .card { transition: none; } }
+@media (max-width: 800px) {
+  .me { flex-direction: row; align-items: center; gap: 18px; }
+  .me img { width: 112px; height: 112px; }
+}
