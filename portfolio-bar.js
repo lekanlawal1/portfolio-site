@@ -5,7 +5,8 @@
      <script src="https://lekanlawal1.github.io/portfolio-site/portfolio-bar.js" data-project="econ" defer></script>
    data-project is the island building's id (econ, store, triage, fifa, fine, wh, dock). Opening the page
    counts as visiting that project. Pages on this origin share localStorage with the portfolio, so the
-   tour sees visits however people arrive. Leave data-project off for archived projects. */
+   tour sees visits however people arrive. Leave data-project off for archived projects.
+   The tour counter only shows to visitors who've started the tour; everyone else gets just the way back. */
 (() => {
   const PORTFOLIO = "https://lekanlawal1.github.io/portfolio-site/";
   const TOUR = ["fine", "dock", "econ", "wh", "store", "triage", "fifa"];
@@ -16,6 +17,10 @@
 
   let visited = [];
   try { visited = JSON.parse(localStorage.getItem("town-visited") || "[]"); } catch { /* private mode */ }
+  // The tour only means something to people who've seen the island: they came here from the portfolio,
+  // or they've opened a project before. Someone arriving from a résumé or LinkedIn link just gets the way back.
+  const fromPortfolio = /^https:\/\/lekanlawal1\.github\.io\/portfolio-site\//.test(document.referrer) || (me && me.dataset.portfolio);
+  const touring = fromPortfolio || visited.some((id) => TOUR.includes(id));
   if (project && TOUR.includes(project) && !visited.includes(project)) {
     visited.push(project);
     try { localStorage.setItem("town-visited", JSON.stringify(visited)); } catch { /* private mode */ }
@@ -47,11 +52,11 @@
   const back = base + "index.html" + (project ? `#${CARD[project]}` : "#projects");
   strip.innerHTML = `
     <a class="pf-back" href="${back}"><span class="pf-arrow" aria-hidden="true">&larr;</span><span class="pf-label">Back to <span class="pf-label-long">all </span>projects</span></a>
-    <a class="pf-tour${done ? " done" : ""}" href="${base}index.html#${done ? "reward" : "tour"}"
+    ${touring ? `<a class="pf-tour${done ? " done" : ""}" href="${base}index.html#${done ? "reward" : "tour"}"
        aria-label="Island tour: ${n} of ${TOUR.length} projects explored${done ? ", reward unlocked" : ""}">
       <span class="pf-dots" aria-hidden="true">${TOUR.map((_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>
       ${done ? "Reward unlocked" : `Tour ${n}/${TOUR.length}`}
-    </a>`;
+    </a>` : ""}`;
 
   const mount = () => { document.head.appendChild(style); document.body.prepend(strip); };
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
