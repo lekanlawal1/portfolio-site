@@ -501,10 +501,10 @@ dialog.reward.closing::backdrop { animation: fade .18s ease reverse forwards; }
 /* no room in the margin: one small line at the bottom of the projects section */
 @media (max-width: 1399px) {
   .derby-rail { position: static; width: auto; margin-top: 22px; display: flex; justify-content: center; }
-  .derby-side { position: static; width: auto; display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 4px;
+  .derby-side { position: static; width: auto; display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 12px;
     background: var(--card); border: 2px solid var(--line); border-radius: 999px; box-shadow: 2px 2px 0 var(--line); transform: none; font-size: .8rem; }
   .derby-side:hover { transform: translateY(-2px); }
-  .derby-side img { width: 18px; border-radius: 4px; border-width: 1.5px; box-shadow: none; }
+  .derby-side img { display: none; }
   .derby-side .cap { order: 1; flex-direction: row; align-items: baseline; gap: 5px; margin: 0; text-align: left; }
   .derby-side .pre { display: inline; color: var(--muted); font-size: .8rem; }
   .derby-side .cap b { font-size: .8rem; }
