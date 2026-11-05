@@ -129,7 +129,7 @@ const howiStep = (k) => {
 document.querySelector(".howi-steps").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; howiStep(+b.dataset.s); if (story) story.go(+b.dataset.s); });
 
 import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js").then(async (THREE) => {
-  const [{ makeGlobe }, { makeStory }] = await Promise.all([import("./globe.js?v=20261112"), import("./story.js?v=20261112")]);
+  const [{ makeGlobe }, { makeStory }] = await Promise.all([import("./globe.js?v=20261113"), import("./story.js?v=20261113")]);
   G = makeGlobe(THREE, { hero, stage: $("stage"), projects: P, onPick: gopen,
     keepClear: () => { const r = $("intro").getBoundingClientRect(), t = hero.getBoundingClientRect(); return r.bottom - t.top + 8; } });
   if (gcur >= 0) G.focus(gcur);
@@ -286,6 +286,8 @@ const drawNames = () => { $("names").innerHTML = P.map((p, i) => `<button type="
 drawNames();
 $("names").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(+b.dataset.i, true); });
 $("prev").addEventListener("click", () => go(cur - 1));
+$("sprev").addEventListener("click", () => go(cur - 1));
+$("snext").addEventListener("click", () => go(cur + 1));
 addEventListener("keydown", (e) => {
   if (e.altKey || e.metaKey || e.ctrlKey || /input|textarea|select/i.test(e.target.tagName)) return;
   const r = $("pin").getBoundingClientRect();
@@ -306,7 +308,7 @@ hud.addEventListener("touchend", (e) => {
 let pinST = null;
 function setupPin() {
   if (pinST) { pinST.kill(); pinST = null; }
-  if (!hasGsap || small()) return;
+  return;   // no pinning: the section scrolls like any other, and projects change on a click
   pinST = ScrollTrigger.create({ trigger: "#pin", pin: true, start: "top top", end: () => `+=${(P.length - 1) * innerHeight * 0.45}`,
     snap: reduce ? false : { snapTo: 1 / (P.length - 1), duration: { min: 0.35, max: 0.7 }, delay: 0.12, ease: "power2.inOut" },
     onUpdate: (s) => { if (gliding) return; const k = Math.round(s.progress * (P.length - 1)); if (k !== cur) { hover = null; setCur(k); } } });
@@ -331,7 +333,7 @@ function go(i, jump) {
     // phones and tablets: keep the map and the top of the new panel in view together, so you see
     // the light travel and the panel arrive
     const m = map.getBoundingClientRect();
-    if (m.top < 40 || m.top > innerHeight * 0.3) scrollToY(scrollY + m.top - 64, 0.8);
+    if (small() && (m.top < 40 || m.top > innerHeight * 0.3)) scrollToY(scrollY + m.top - 64, 0.8);
   }
 }
 

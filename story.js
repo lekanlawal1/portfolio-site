@@ -23,8 +23,8 @@ export function makeStory(THREE, { box, onStep }) {
   for (const [n, a] of [["aA", A], ["aB", B], ["aC", C], ["aD", D]]) geo.setAttribute(n, new THREE.BufferAttribute(a, 3));
   geo.setAttribute("aSeed", new THREE.BufferAttribute(seed, 1));
   const mat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uP: { value: 0 }, uT: { value: 0 }, uSize: { value: 3.6 * Math.min(devicePixelRatio, 2) } },
-    vertexShader: `attribute vec3 aA, aB, aC, aD; attribute float aSeed; uniform float uP, uT, uSize; varying float vG;
+    uniforms: { uP: { value: 0 }, uT: { value: 0 }, uM: { value: new THREE.Vector3(0, 0, 0) }, uSize: { value: 3.6 * Math.min(devicePixelRatio, 2) } },
+    vertexShader: `attribute vec3 aA, aB, aC, aD; attribute float aSeed; uniform float uP, uT, uSize; uniform vec3 uM; varying float vG;
       void main() {
         float d = aSeed * .35;
         float s1 = smoothstep(0., 1., clamp((uP - d) * 1.55, 0., 1.));
@@ -32,6 +32,9 @@ export function makeStory(THREE, { box, onStep }) {
         float s3 = smoothstep(0., 1., clamp((uP - 2. - d) * 1.55, 0., 1.));
         vec3 p = mix(aA, aB, s1); p = mix(p, aC, s2); p = mix(p, aD, s3);
         p += vec3(sin(uT * .6 + aSeed * 40.), cos(uT * .5 + aSeed * 31.), sin(uT * .4 + aSeed * 17.)) * .06 * ((1. - s1) + s3 * .5);
+        // the pointer nudges the few points right under it: a small ripple, never a hole
+        vec2 dm = p.xy - uM.xy; float rm = length(dm);
+        p.xy += dm / max(rm, .001) * uM.z * smoothstep(.45, 0., rm) * .14;
         vec4 mv = modelViewMatrix * vec4(p, 1.); gl_Position = projectionMatrix * mv;
         vG = .55 + .45 * sin(uT * 1.4 + aSeed * 60.);
         gl_PointSize = uSize * (.7 + aSeed * .7) * (8. / -mv.z);
@@ -48,6 +51,13 @@ export function makeStory(THREE, { box, onStep }) {
     renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.position.z = cam.aspect < 1.3 ? 11 : 8.6; cam.updateProjectionMatrix(); };
   size(); addEventListener("resize", size);
 
+  // the pointer over the card (or a finger on it)
+  let mx = 0, my = 0, pushAt = 0, push = 0;
+  const at = (x, y) => { const r = box.getBoundingClientRect(); mx = (x - r.left) / r.width - 0.5; my = (y - r.top) / r.height - 0.5; pushAt = performance.now(); };
+  box.addEventListener("pointermove", (e) => at(e.clientX, e.clientY));
+  box.addEventListener("touchmove", (e) => at(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  box.addEventListener("touchstart", (e) => at(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+
   // plays by itself: each shape holds, then the next change starts. Picking a step jumps to it and
   // gives the visitor a moment before it carries on.
   let step = 0, shown = 0, holdUntil = 0, visible = false, next = 0;
@@ -62,6 +72,9 @@ export function makeStory(THREE, { box, onStep }) {
     const want = step;
     shown += (want - shown) * (reduce ? 1 : 0.05);
     mat.uniforms.uP.value = shown; mat.uniforms.uT.value = reduce ? 0 : (now - t0) / 1000;
+    push += ((now - pushAt < 700 && !reduce ? 1 : 0) - push) * 0.1;
+    const half = Math.tan((cam.fov / 2) * Math.PI / 180) * cam.position.z;
+    mat.uniforms.uM.value.set(mx * 2 * half * cam.aspect, -my * 2 * half, push);
     pts.rotation.y = shown < 1 ? (1 - shown) * Math.sin((now - t0) / 4000) * 0.6 : 0;
     pts.rotation.z = Math.max(0, shown - 2) * 0.12;
     renderer.render(scene, cam);

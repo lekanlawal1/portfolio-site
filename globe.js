@@ -56,9 +56,9 @@ export function makeGlobe(THREE, { hero, stage, projects: P, onPick, keepClear }
         vec3 p = mix(aFrom, position, e);
         if (aKind < .5) p *= 1. + .012 * sin(uT * 1.3 + aSeed * 40.);
         vec3 wp = (modelMatrix * vec4(p, 1.)).xyz;
-        // the pointer (or a finger) pushes nearby points aside
+        // the pointer (or a finger) gives nearby points the faintest nudge
         vec2 d = wp.xy - uM.xy; float r = length(d);
-        wp.xy += d / max(r, .001) * uM.z * smoothstep(1.1, 0., r) * .35 * step(wp.z, 9.);
+        wp.xy += d / max(r, .001) * uM.z * smoothstep(.55, 0., r) * .06 * step(wp.z, 9.);
         vec4 mv = viewMatrix * vec4(wp, 1.);
         gl_Position = projectionMatrix * mv;
         vec3 c = (modelMatrix * vec4(0., 0., 0., 1.)).xyz;

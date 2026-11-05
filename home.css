@@ -418,3 +418,7 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   .howi { grid-template-columns: 1fr; }
   .howi-stage { height: 230px; border-right: 0; border-bottom: 1px solid var(--line); }
 }
+
+/* the step bar's arrows (the section no longer pins: projects change on a click) */
+.sarrow { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: none; color: var(--ink); font-size: 15px; cursor: pointer; flex: none; }
+.sarrow:hover { border-color: var(--amber); color: var(--amber); }
