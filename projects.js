@@ -22,7 +22,7 @@ window.PROJECTS = [
     live: ["Check your margins", "https://lekanlawal1.github.io/project1-bi-dashboard/"], study: "projects/project1.html", source: "https://github.com/lekanlawal1/project1-bi-dashboard",
     skills: ["Python", "SQL", "JavaScript", "pandas", "DuckDB", "Data quality checks", "Reconciliation", "PDF parsing and OCR", "Playwright"] },
   { id: "triage", name: "App Review Insights", kind: "AI analysis", line: "Pick any iPhone app and see what its users love, hate and ask for; every AI quote is checked against the real review.",
-    proof: ["30/30", "AI quotes found word for word in Wealthsimple's reviews"], img: "assets/shots/triage.jpg",
+    proof: ["28/28", "AI quotes found word for word in 500 of Wealthsimple's reviews"], img: "assets/shots/triage.jpg",
     live: ["Try it on any app", "https://lekanlawal1.github.io/app-review-insights/"], study: "projects/app-reviews.html", source: "https://github.com/lekanlawal1/app-review-insights",
     skills: ["JavaScript", "Gemini API", "AI output checks", "Cloudflare Workers", "GitHub Actions"] },
   { id: "docket", name: "Docket", kind: "PDF toolkit", line: "38 PDF and document tools that run entirely in your browser: merge, sign, redact, compare, OCR and convert. Nothing is uploaded.",
