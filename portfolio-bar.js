@@ -21,7 +21,7 @@
     ["fifa", "The Gaffer", "https://lekanlawal1.github.io/football-agent/"],
     ["store", "Money Snitch", "https://lekanlawal1.github.io/project1-bi-dashboard/"],
     ["triage", "App Review Insights", "https://lekanlawal1.github.io/app-review-insights/"],
-    ["dock", "Docket", "https://lekanlawal1.github.io/docket/"],
+    ["dock", "Docket", PORTFOLIO + "go/docket.html"],
     ["wh", "Discrepancy Checker", PORTFOLIO + "demos/discrepancy-checker/"],
   ];
   const me = document.currentScript;
