@@ -200,9 +200,11 @@ function layout() {
     b.className = `node ${n.k}${n.k === "p" && seen.has(n.id) ? " seen" : ""}`;
     if (n.k === "p") { b.innerHTML = `<span class="dot"></span><b>${esc(n.label)}</b><small>${pad(n.i)}</small>`; b.setAttribute("aria-label", `${n.label}, project ${n.i + 1} of ${P.length}`); }
     else { b.textContent = n.label; b.setAttribute("aria-label", `${n.label}: show the projects that use it`); }
-    b.addEventListener("pointerenter", () => { hover = n; paint(); });
-    b.addEventListener("focus", () => { hover = n; paint(); });
-    b.addEventListener("click", () => { if (n.k === "p") go(n.i, true); else { hover = n; paint(); } });
+    // previews are for a mouse or the keyboard only: on a phone, Safari treats a tap that changes
+    // the page on "hover" as a hover and never sends the click, so a tap goes straight to the project
+    b.addEventListener("pointerenter", (e) => { if (e.pointerType !== "mouse") return; hover = n; paint(); });
+    b.addEventListener("focus", () => { if (!b.matches(":focus-visible")) return; hover = n; paint(); });
+    b.addEventListener("click", () => { if (n.k === "p") { hover = null; go(n.i, true); } else { hover = n; paint(); } });
     map.appendChild(b);
   });
   nodes.filter((n) => n.k === "p").forEach((p) => {
@@ -210,7 +212,7 @@ function layout() {
     P[p.i].skills.forEach((s) => { const sn = nodes.find((n) => n.k === "s" && n.id === s); if (sn) edges.push({ a: p, b: sn, q: [Math.random(), Math.random(), Math.random()] }); });
   });
 }
-map.addEventListener("pointerleave", () => { hover = null; paint(); });
+map.addEventListener("pointerleave", (e) => { if (e.pointerType !== "mouse") return; hover = null; paint(); });
 
 const shown = () => hover || nodes.find((n) => n.k === "p" && n.i === cur);
 function related(n) {
