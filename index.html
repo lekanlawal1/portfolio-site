@@ -7,7 +7,7 @@
 <meta name="description" content="Lekan Lawal builds data, BI and AI tools that check their own work. Eight live projects: an iOS contract checker, a self-refreshing economic data platform, AI ticket routing, a football stats agent and more.">
 <meta property="og:title" content="Lekan Lawal | AI, Data & BI">
 <meta property="og:description" content="Messy data in, trusted tools out. Eight live projects, each one checks its own numbers.">
-<meta property="og:image" content="https://lekanlawal1.github.io/portfolio-site/assets/og-home.png?v=20261105">
+<meta property="og:image" content="https://lekanlawal1.github.io/portfolio-site/assets/og-home.png?v=20261112">
 <meta name="theme-color" content="#0E0D0C">
 <link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml">
 <link rel="icon" href="assets/favicon-32.png?v=3" type="image/png" sizes="32x32">
@@ -15,13 +15,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="home.css?v=20261108">
+<link rel="stylesheet" href="home.css?v=20261112">
 <script>try { sessionStorage.setItem("pf-from", "1"); } catch {}</script>
 <script src="warp.js?v=20261106"></script>
 </head>
 <body>
-<a class="skip" href="#work">Skip to the work</a>
-<canvas id="gl" aria-hidden="true"></canvas>
+<a class="skip" href="#about">Skip to the text</a>
 
 <header class="nav">
   <a class="name" href="#top">Lekan Lawal</a>
@@ -30,32 +29,28 @@
   </nav>
 </header>
 
-<main id="top">
-  <!-- the story: 2,400 points that start as a messy cloud, sort into rows, become a real store's
-       monthly sales, and close into a ring. The captions are plain text, readable without the canvas. -->
-  <section class="story" id="story" aria-label="Introduction">
-    <div class="beat">
-      <div class="cap c0" id="c0">
-        <span class="mono">Lekan Lawal · Data, BI and AI · Canada</span>
-        <h1>Messy data in.<br><i>Trusted</i> tools out.</h1>
-        <p>I build data, BI and AI tools that check their own work. These points are a real store's sales lines:
-          scroll to see what I do with them.</p>
-        <div class="roles" role="group" aria-labelledby="roles-label">
-          <span class="mono" id="roles-label">Hiring for</span>
-          <button type="button" data-role="analyst" aria-pressed="false">Data analyst</button><button type="button" data-role="bi" aria-pressed="false">BI</button><button type="button" data-role="ai" aria-pressed="false">AI engineer</button><button type="button" data-role="ops" aria-pressed="false">Operations</button>
-        </div>
-        <p class="role-note mono" id="role-note" aria-live="polite">Pick one and the tour starts with the work that fits.</p>
-        <div class="cta"><a class="go-tour" href="demos/fine-print/" data-tour="first"><span id="tour-label">Take the tour</span> <span aria-hidden="true">→</span></a><a class="go-work" href="#work">See all the work</a></div>
+<main>
+  <!-- the centerpiece: a globe of data with the eight projects on it. Drag to turn it; pick a point
+       and it turns that project to face you, zooms in, and opens its file. -->
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <div class="stage" id="stage" aria-hidden="true"></div>
+    <div class="intro" id="intro">
+      <span class="mono">Lekan Lawal · Data, BI and AI · Canada</span>
+      <h1 id="hero-title">Messy data in.<br><i>Trusted</i> tools out.</h1>
+      <p>Eight tools that check their own work. Turn the globe and pick a point, or tell me what you're hiring for.</p>
+      <div class="roles" role="group" aria-labelledby="roles-label">
+        <span class="mono" id="roles-label">Hiring for</span>
+        <button type="button" data-role="analyst" aria-pressed="false">Data analyst</button><button type="button" data-role="bi" aria-pressed="false">BI</button><button type="button" data-role="ai" aria-pressed="false">AI engineer</button><button type="button" data-role="ops" aria-pressed="false">Operations</button>
       </div>
-      <div class="cap c1" id="c1"><span class="mono">01 · Clean</span><h2>Sorted into <i>rows</i>.</h2>
-        <p>Junk rows found and reported, never quietly dropped. Duplicates removed. Every column checked.</p></div>
-      <div class="cap c2" id="c2"><span class="mono">02 · Count</span><h2>Counted, never <i>guessed</i>.</h2>
-        <p>These bars are that store's real monthly sales, 2015 to 2018, worked out in SQL.</p></div>
-      <div class="cap c3" id="c3"><span class="mono">03 · Check</span><h2>Checked, then <i>shipped</i>.</h2>
-        <p>When AI is involved, code checks every answer it gives. Eight tools built this way, all live.</p></div>
-      <div class="scroll mono" id="hint">Scroll ↓</div>
-      <div class="prog mono" id="prog" aria-hidden="true">[ 01 / 04 ] messy</div>
+      <p class="role-note mono" id="role-note" aria-live="polite">Pick one and the globe turns to the work that fits.</p>
+      <div class="cta"><a class="go-tour" href="demos/fine-print/" data-tour="first"><span id="tour-label">Take the tour</span> <span aria-hidden="true">→</span></a><a class="go-work" href="#work">See all the work</a></div>
     </div>
+    <div class="gbar">
+      <span class="hint mono" id="ghint"><b>Drag</b> to turn · <b>pick</b> a point</span>
+      <div class="gnames" id="gnames"></div>
+      <div class="garrows"><button type="button" id="gprev" aria-label="Previous project">←</button><button type="button" id="gnext" aria-label="Next project">→</button></div>
+    </div>
+    <aside class="gfile" id="gfile" aria-live="polite"></aside>
   </section>
 
   <!-- the work: a map of every project wired to the skills it uses. Scrolling steps through the
@@ -102,6 +97,16 @@
         which has taught me a lot about patience.</p>
       <p>I'm looking for AI, data and BI roles in Canada, on a team that turns messy data into decisions people trust.</p>
     </div>
+    <figure class="howi" aria-labelledby="howi-title">
+      <div class="howi-stage" id="howi-stage" aria-hidden="true"></div>
+      <figcaption>
+        <span class="mono" id="howi-title">How I work, in four steps</span>
+        <div class="howi-steps" role="group" aria-label="Steps">
+          <button type="button" data-s="0" class="on">01 Messy</button><button type="button" data-s="1">02 Clean</button><button type="button" data-s="2">03 Count</button><button type="button" data-s="3">04 Check</button>
+        </div>
+        <p id="howi-text">2,000 of a real store's sales lines, as they arrive: duplicates, junk rows, gaps.</p>
+      </figcaption>
+    </figure>
   </section>
 
   <section class="contact" id="contact" aria-labelledby="c-title">
@@ -143,8 +148,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-<script src="projects.js?v=20261106"></script>
-<script type="module" src="home.js?v=20261110"></script>
+<script src="projects.js?v=20261111"></script>
+<script type="module" src="home.js?v=20261112"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "50d455a6ac424591b8acaa97dc3975a9"}'></script>
 </body>
 </html>

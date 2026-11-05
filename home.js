@@ -40,7 +40,7 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("cli
 }));
 let lastScroll = scrollY, dockAway = false, dockRest = 0, dockPast = false, dockPin = false;
 addEventListener("scroll", () => {
-  const past = scrollY > $("story").offsetHeight - innerHeight * 0.6;
+  const past = scrollY > $("top").offsetHeight - 80;
   document.querySelector(".nav").classList.toggle("solid", past);
   // on desktop the pinned work section has its own step bar along the bottom: the dock steps aside there
   const pr = $("pin").getBoundingClientRect(), inPin = !small() && pr.top < innerHeight * 0.5 && pr.bottom > innerHeight * 0.5;
@@ -50,129 +50,92 @@ addEventListener("scroll", () => {
   $("dock").classList.toggle("on", past && !inPin && !dockAway);
 }, { passive: true });
 
-// ------------------------------------------------------------------ the story
-// The scroll position becomes p, 0 to 3: each whole number is a shape (messy, clean, count, check),
-// and each shape holds for a while before the next change starts.
-const SALES = [14237, 4520, 55691, 28014, 23648, 34595, 33946, 27909, 81777, 31453, 78629, 69546, 18174, 11951, 38726, 34195, 30132, 24797, 28765, 36898, 64596, 31405, 75973, 74920,
-  18542, 22979, 51716, 38750, 56988, 40345, 39262, 31115, 73410, 59688, 79412, 96999, 43971, 20301, 58872, 36522, 44261, 52982, 45264, 63121, 87867, 77777, 118448, 83829];
-const SEG = [0.45, 1, 0.6, 1, 0.6, 1, 0.75];
-const TOT = SEG.reduce((a, b) => a + b, 0);
-function toP(f) { let x = f * TOT, p = 0; for (let i = 0; i < SEG.length; i++) { const L = SEG[i]; if (i % 2) p += Math.min(1, Math.max(0, x / L)); if (x <= L) break; x -= L; } return p; }
-const story = { p: 0, shown: 0 };
-function storyProgress() {
-  const el = $("story"), r = el.getBoundingClientRect(), span = el.offsetHeight - innerHeight;
-  return Math.min(1, Math.max(0, -r.top / Math.max(1, span)));
+// ------------------------------------------------------------------ the globe (centerpiece)
+// globe.js draws and turns it; this part owns the file that opens beside it. Picking a project
+// turns it to face you and zooms in; the file arrives as the zoom settles.
+const hero = $("top"), gfile = $("gfile");
+let G = null, gcur = -1, gT = 0;
+function fileHTML(p, i) {
+  return `<div class="top mono"><span>File ${pad(i)} // ${esc(p.kind)}</span><button type="button" class="x" aria-label="Close the file">&times;</button></div>
+    <h2>${esc(p.name)}</h2><p>${esc(p.line)}</p>
+    <div class="proof"><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}</span></div>
+    <a class="shot" href="${p.live[1]}" aria-label="Open ${esc(p.name)}">${still
+      ? `<img src="${p.img}" alt=""${p.phone ? ' class="phone"' : ""}>`
+      : `<video src="assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${p.img}"`} autoplay muted loop playsinline aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>
+    <div class="stack">${p.skills.map((k) => `<span>${esc(k)}</span>`).join("")}</div>
+    <div class="go"><a href="${p.live[1]}">${esc(p.live[0])} ↗</a>${p.study !== p.live[1] ? `<a class="o" href="${p.study}">Case study</a>` : ""}${p.download ? `<a class="o" href="${p.download}" download>Workbook</a>` : ""}${p.source ? `<a class="o" href="${p.source}">Source</a>` : ""}</div>
+    <a class="tour-here mono" href="${p.tour || p.live[1]}" data-tour="${p.id}">Tour from here: ${pad(i)} of ${pad(P.length - 1)}, then the rest →</a>`;
 }
-const caps = [$("c0"), $("c1"), $("c2"), $("c3")];
-const LABEL = ["messy", "clean", "count", "check"];
-function captions(p) {
-  caps.forEach((el, i) => {
-    const o = Math.max(0, 1 - Math.abs(p - i) * 2.4);
-    el.style.opacity = o.toFixed(3);
-    el.style.transform = `translateY(${((1 - o) * 24).toFixed(1)}px)`;
-    el.setAttribute("aria-hidden", o < 0.5 ? "true" : "false");
-  });
-  const k = Math.min(3, Math.round(p));
-  $("prog").textContent = `[ 0${k + 1} / 04 ] ${LABEL[k]}`;
-  $("hint").style.opacity = Math.max(0, 1 - p * 4);
+function playOrStill(root) {
+  const v = root.querySelector(".shot video");
+  const q = v && v.play && v.play();
+  if (q && q.catch) q.catch(() => { const img = document.createElement("img"); img.alt = ""; img.src = v.getAttribute("poster") || P[gcur >= 0 ? gcur : cur].img; v.replaceWith(img); });
 }
-
-let gl = null;    // { render(p, t) } once Three.js is up
-async function startGL() {
-  const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js");
-  const canvas = $("gl");
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  const S = small(), COLS = 48, ROWS = S ? 30 : 50, N = COLS * ROWS;
-  const rnd = (a, b) => a + Math.random() * (b - a);
-  const A = new Float32Array(N * 3), B = new Float32Array(N * 3), C = new Float32Array(N * 3), D = new Float32Array(N * 3), seed = new Float32Array(N);
-  const W = S ? 3.9 : 9, H = S ? 6 : 5.2, max = Math.max(...SALES);
-  for (let c = 0; c < COLS; c++) for (let r = 0; r < ROWS; r++) {
-    const i = c * ROWS + r, k = i * 3; seed[i] = Math.random();
-    const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), rad = Math.cbrt(Math.random()) * (Math.random() < 0.08 ? 5.5 : 3.2);
-    A[k] = rad * Math.sin(ph) * Math.cos(th) * (S ? 0.9 : 1.5) + rnd(-0.3, 0.3); A[k + 1] = rad * Math.cos(ph) * 0.9; A[k + 2] = rad * Math.sin(ph) * Math.sin(th);
-    B[k] = (c / (COLS - 1) - 0.5) * W; B[k + 1] = S ? (r / (ROWS - 1) - 0.5) * 3.8 + 0.7 : (r / (ROWS - 1) - 0.5) * H * 0.8; B[k + 2] = 0;
-    C[k] = B[k]; C[k + 1] = S ? -1.0 + (r / (ROWS - 1)) * (SALES[c] / max * 4.0) : -H / 2 + (r / (ROWS - 1)) * (SALES[c] / max * H); C[k + 2] = 0;
-    const t = (i / N) * Math.PI * 2, a = t * 7 + seed[i] * 0.4, R = (S ? 2.0 : 2.6) + Math.sin(i * 0.37) * 0.28 + rnd(-0.12, 0.12);
-    D[k] = Math.cos(t) * R; D[k + 1] = Math.sin(t) * R; D[k + 2] = Math.sin(a) * 0.35;
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(A), 3));
-  for (const [n, a] of [["aA", A], ["aB", B], ["aC", C], ["aD", D]]) geo.setAttribute(n, new THREE.BufferAttribute(a, 3));
-  geo.setAttribute("aSeed", new THREE.BufferAttribute(seed, 1));
-  // each point moves between the shapes a little early or late, so every change ripples
-  const mat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uP: { value: 0 }, uT: { value: 0 }, uK: { value: 0 }, uM: { value: new THREE.Vector3(0, 0, 0) }, uSize: { value: (S ? 3.6 : 4.6) * Math.min(devicePixelRatio, 2) } },
-    vertexShader: `attribute vec3 aA, aB, aC, aD; attribute float aSeed; uniform float uP, uT, uSize, uK; uniform vec3 uM; varying float vG;
-      void main() {
-        float d = aSeed * .35;
-        float s1 = smoothstep(0., 1., clamp((uP - d) * 1.55, 0., 1.));
-        float s2 = smoothstep(0., 1., clamp((uP - 1. - d) * 1.55, 0., 1.));
-        float s3 = smoothstep(0., 1., clamp((uP - 2. - d) * 1.55, 0., 1.));
-        vec3 p = mix(aA, aB, s1); p = mix(p, aC, s2); p = mix(p, aD, s3);
-        p += vec3(sin(uT * .6 + aSeed * 40.), cos(uT * .5 + aSeed * 31.), sin(uT * .4 + aSeed * 17.)) * .08 * ((1. - s1) + s3 * .5);
-        float ka = uK * (1.2 + aSeed * 2.); p.xy = mat2(cos(ka), -sin(ka), sin(ka), cos(ka)) * p.xy * (1. + uK * .45 * sin(aSeed * 31.));
-        vec2 dm = p.xy - uM.xy; float rm = length(dm);
-        p.xy += dm / max(rm, .001) * uM.z * smoothstep(1.5, 0., rm) * .75;
-        vec4 mv = modelViewMatrix * vec4(p, 1.); gl_Position = projectionMatrix * mv;
-        vG = .55 + .45 * sin(uT * 1.4 + aSeed * 60.);
-        gl_PointSize = uSize * (.7 + aSeed * .7) * (9. / -mv.z);
-      }`,
-    fragmentShader: `varying float vG; void main() { vec2 c = gl_PointCoord - .5; float d = length(c); if (d > .5) discard;
-      float a = smoothstep(.5, 0., d); vec3 col = mix(vec3(1., .62, .22), vec3(1., .93, .78), a * a); gl_FragColor = vec4(col, min(1., a * vG * 1.35)); }` });
-  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-  cam.position.set(0, 0, S ? 13 : 11);
-  const group = new THREE.Group(); group.add(new THREE.Points(geo, mat)); scene.add(group);
-  const glow = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.ShaderMaterial({ transparent: true, depthWrite: false,
-    vertexShader: `varying vec2 vU; void main() { vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
-    fragmentShader: `varying vec2 vU; void main() { float d = distance(vU, vec2(.5, .47)); gl_FragColor = vec4(1., .55, .15, smoothstep(.32, 0., d) * .16); }` }));
-  glow.position.z = -4; scene.add(glow);
-  const size = () => { renderer.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); };
-  size(); addEventListener("resize", size);
-  let mx = 0, my = 0;
-  let push = 0, lastMove = 0;
-  addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; lastMove = performance.now(); });
-  let burst = 0, touched = 0;
-  const touchAt = (t) => { mx = t.clientX / innerWidth - 0.5; my = t.clientY / innerHeight - 0.5; lastMove = touched = performance.now(); };
-  addEventListener("touchstart", (e) => { touchAt(e.touches[0]); burst = 1; }, { passive: true });
-  addEventListener("touchmove", (e) => touchAt(e.touches[0]), { passive: true });
-  const coarse = matchMedia("(pointer: coarse)").matches;
-  const half = Math.tan((cam.fov / 2) * Math.PI / 180) * cam.position.z;
-  let kick = 0;
-  return {
-    kick() { kick = 1; },
-    render(p, t) {
-      kick *= 0.955; mat.uniforms.uK.value = reduce ? 0 : kick * kick;
-      mat.uniforms.uP.value = p; mat.uniforms.uT.value = reduce ? 0 : t;
-      group.rotation.y = (p < 1 && !reduce ? (1 - p) * t * 0.12 : 0) + mx * 0.25 * (1 - Math.min(1, p) * 0.6);
-      // where the pointer sits on the particles' plane, and how hard it pushes (fades when it stops)
-      const now = performance.now();
-      if (coarse && !reduce && now - touched > 2500) {   // nobody touching: let the push drift on its own
-        mx = Math.sin(t * 0.41) * 0.28; my = Math.sin(t * 0.53 + 1) * 0.22; lastMove = now; }
-      burst *= 0.94;
-      const want = reduce ? 0 : (now - lastMove < 900 ? (coarse && now - touched > 2500 ? 0.6 : 1) : 0) + burst * 1.3;
-      push += (want - push) * (want > push ? 0.25 : 0.06);
-      mat.uniforms.uM.value.set(mx * 2 * half * cam.aspect - group.position.x, -my * 2 * half - group.position.y, push);
-      group.rotation.x = my * 0.15; group.position.y = S ? 1.4 * Math.min(1, p) : 0; group.rotation.z = Math.max(0, p - 2) * 0.15;
-      group.position.x = S ? 0 : 2.2 * Math.max(0, 1 - p) - 1.4 * Math.min(1, p) + 1.0 * Math.max(0, Math.min(1, p - 2));
-      renderer.render(scene, cam);
-    },
+function drawGNames() {
+  $("gnames").innerHTML = P.map((p, i) => `<button type="button" data-i="${i}"${i === gcur ? ' class="on"' : ""}>${esc(p.name.split(" ").slice(-1)[0])}</button>`).join("");
+}
+function gopen(i) {
+  i = (i + P.length) % P.length;
+  const swap = gcur >= 0;
+  gcur = i;
+  hero.classList.add("open");
+  if (G) G.focus(i);
+  $("gnames").querySelectorAll("button").forEach((b, k) => b.classList.toggle("on", k === i));
+  const render = () => {
+    gfile.innerHTML = fileHTML(P[i], i);
+    gfile.querySelector(".x").addEventListener("click", gclose);
+    gfile.classList.remove("swap"); gfile.classList.add("show");
+    playOrStill(gfile);
   };
+  clearTimeout(gT);
+  if (reduce) render();
+  else if (swap) { gfile.classList.add("swap"); gT = setTimeout(render, 420); }   // out, turn, back in
+  else { gfile.classList.remove("show"); gT = setTimeout(render, 380); }          // let the zoom start first
 }
-startGL().then((g) => { gl = g; }).catch(() => document.documentElement.classList.add("no-gl"));
+function gclose() {
+  clearTimeout(gT); gcur = -1; hero.classList.remove("open"); gfile.classList.remove("show");
+  $("gnames").querySelectorAll("button").forEach((b) => b.classList.remove("on"));
+  if (G) G.release();
+}
+drawGNames();
+$("gnames").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) gopen(+b.dataset.i); });
+$("gprev").addEventListener("click", () => gopen(gcur < 0 ? P.length - 1 : gcur - 1));
+$("gnext").addEventListener("click", () => gopen(gcur < 0 ? 0 : gcur + 1));
+addEventListener("keydown", (e) => {
+  const r = hero.getBoundingClientRect();
+  if (r.bottom < innerHeight * 0.5 || /input|textarea|select/i.test(e.target.tagName)) return;
+  if (e.key === "Escape" && gcur >= 0) gclose();
+  if (e.key === "ArrowRight") { e.preventDefault(); gopen(gcur + 1); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); gopen(gcur < 0 ? P.length - 1 : gcur - 1); }
+});
+// phones: swipe the open file sideways for the next or previous project
+let gsx = 0, gsy = 0;
+gfile.addEventListener("touchstart", (e) => { gsx = e.touches[0].clientX; gsy = e.touches[0].clientY; }, { passive: true });
+gfile.addEventListener("touchend", (e) => {
+  const dx = e.changedTouches[0].clientX - gsx, dy = e.changedTouches[0].clientY - gsy;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) gopen(gcur + (dx < 0 ? 1 : -1));
+}, { passive: true });
 
-const t0 = performance.now();
-function frame(now) {
-  story.p = toP(storyProgress());
-  story.shown += (story.p - story.shown) * (reduce ? 1 : 0.09);
-  captions(story.shown);
-  // only draw while the story is on screen
-  const onScreen = $("story").getBoundingClientRect().bottom > 0;
-  $("gl").style.visibility = onScreen ? "visible" : "hidden";
-  if (gl && onScreen) gl.render(story.shown, (now - t0) / 1000);
-  requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
+// the side piece in About: the four-step story, small and self-playing
+const HOWI = ["2,000 of a real store's sales lines, as they arrive: duplicates, junk rows, gaps.",
+  "Sorted into rows. Junk rows found and reported, never quietly dropped. Every column checked.",
+  "Counted, never guessed: the bars are that store's real monthly sales, 2015 to 2018, worked out in SQL.",
+  "Checked, then shipped. When AI is involved, code checks every answer it gives before you see it."];
+let story = null;
+const howiStep = (k) => {
+  document.querySelectorAll(".howi-steps button").forEach((b) => b.classList.toggle("on", +b.dataset.s === k));
+  $("howi-text").textContent = HOWI[k];
+};
+document.querySelector(".howi-steps").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; howiStep(+b.dataset.s); if (story) story.go(+b.dataset.s); });
+
+import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js").then(async (THREE) => {
+  const [{ makeGlobe }, { makeStory }] = await Promise.all([import("./globe.js?v=20261112"), import("./story.js?v=20261112")]);
+  G = makeGlobe(THREE, { hero, stage: $("stage"), projects: P, onPick: gopen,
+    keepClear: () => { const r = $("intro").getBoundingClientRect(), t = hero.getBoundingClientRect(); return r.bottom - t.top + 8; } });
+  if (gcur >= 0) G.focus(gcur);
+  try { if (sessionStorage.getItem("pf-role")) G.dim(P.slice(0, 3).map((p) => p.id)); } catch {}
+  try { story = makeStory(THREE, { box: $("howi-stage"), onStep: howiStep }); } catch { document.querySelector(".howi").classList.add("no-gl"); }
+}).catch(() => document.documentElement.classList.add("no-gl"));
 
 // ------------------------------------------------------------------ the work map
 const map = $("map"), cv = $("lines"), ctx = cv.getContext("2d"), hud = $("hud");
@@ -223,13 +186,21 @@ function related(n) {
 }
 let lastShown = null;
 function paint() {
+  // pointing at a project or skill lights it up on the map; only a click changes the file
   const n = shown(), rel = related(n);
   map.classList.toggle("focus", !!n);
   nodes.forEach((m) => { m.el.classList.toggle("lit", !!rel && rel.has(m)); if (m.k === "p") m.el.classList.toggle("cur", m.i === cur); });
-  if (n === lastShown) return;
-  lastShown = n;
-  if (!n) return;
-  if (n.k === "p") swapPanel(() => showProject(n.i), !!hover); else swapPanel(() => showSkill(n.id), true);
+  const c = nodes.find((m) => m.k === "p" && m.i === cur);
+  if (!c || c === lastShown) return;
+  lastShown = c;
+  swapPanel(() => showProject(cur));
+}
+// a click on the map zooms in on that project and back out as its file arrives
+function zoomMap(i) {
+  const n = nodes.find((m) => m.k === "p" && m.i === i);
+  if (reduce || !n || !map.animate) return;
+  map.style.transformOrigin = `${n.x}px ${n.y}px`;
+  map.animate([{ transform: "scale(1)" }, { transform: "scale(1.22)", offset: 0.42 }, { transform: "scale(1)" }], { duration: 950, easing: "cubic-bezier(.3,.7,.2,1)" });
 }
 // Changing project: the old panel lifts away, the new one settles in line by line, its name
 // resolving out of scrambled letters, while a packet of light travels the map between the two.
@@ -344,6 +315,7 @@ let gliding = false, glideT = 0;
 const easeIO = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 function go(i, jump) {
   i = (i + P.length) % P.length;
+  if (i !== cur) zoomMap(i);
   if (pinST) {
     // the page glides to that project's place while the panel goes straight from this one to that
     // one: no flicker through the projects in between
@@ -416,12 +388,9 @@ function draw(t) {
 
 function boot() {
   layout(); setCur(cur); setupPin(); requestAnimationFrame(draw);
-  // a link like /#economy (the "All projects" pill on each project) opens that project
+  // a link like /#economy (the "All projects" pill on each project) comes back to that project on the globe
   const id = location.hash.slice(1), i = P.findIndex((p) => p.id === id);
-  if (i >= 0) {
-    if (pinST) { requestAnimationFrame(() => { const y = pinST.start + (i / (P.length - 1)) * (pinST.end - pinST.start); scrollTo(0, y + 2); if (lenis) lenis.scrollTo(y + 2, { immediate: true }); setCur(i); }); }
-    else { setCur(i); $("work").scrollIntoView(); }
-  }
+  if (i >= 0) { scrollTo(0, 0); gopen(i); }
 }
 let lastW = innerWidth, lastH = innerHeight, rt;
 addEventListener("resize", () => {
@@ -455,7 +424,9 @@ function pickRole(role, quiet) {
   try { sessionStorage.setItem("pf-role", role); } catch {}
   saveOrder();
   if (W) { cur = 0; layout(); drawNames(); lastShown = null; setCur(0); if (hasGsap) ScrollTrigger.refresh(); }
-  if (!quiet && gl) gl.kick();
+  if (G) { G.refresh(); G.dim(P.slice(0, 3).map((p) => p.id)); }
+  drawGNames();
+  if (!quiet) gopen(0);
 }
 document.querySelectorAll("[data-role]").forEach((b) => b.addEventListener("click", () => pickRole(b.dataset.role)));
 $("role-note").addEventListener("click", (e) => {
@@ -464,9 +435,10 @@ $("role-note").addEventListener("click", (e) => {
   const byId = Object.fromEntries(P.map((p) => [p.id, p]));
   P.splice(0, P.length, ...ORIGINAL.map((id) => byId[id]));
   document.querySelectorAll("[data-role]").forEach((b) => b.setAttribute("aria-pressed", "false"));
-  $("role-note").textContent = "Pick one and the tour starts with the work that fits."; $("role-note").classList.remove("set");
+  $("role-note").textContent = "Pick one and the globe turns to the work that fits."; $("role-note").classList.remove("set");
   $("tour-label").textContent = "Take the tour";
-  saveOrder(); cur = 0; layout(); drawNames(); lastShown = null; setCur(0); if (gl) gl.kick();
+  saveOrder(); cur = 0; layout(); drawNames(); lastShown = null; setCur(0);
+  gclose(); if (G) { G.refresh(); G.dim(null); } drawGNames();
 });
 const ORIGINAL = P.map((p) => p.id);
 try { const r = sessionStorage.getItem("pf-role"); if (r) pickRole(r, true); } catch {}

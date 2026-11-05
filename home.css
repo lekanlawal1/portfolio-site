@@ -324,3 +324,97 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 @keyframes hin-side { from { opacity: 0; transform: translate(var(--sx, 0px), 6px); } }
 @media (max-width: 420px) { .map { aspect-ratio: 1.12; } .node.p b { font-size: 12.5px; max-width: 86px; } }
 .no-gl .beat::after { display: none; }
+
+/* =============================== the globe: the home page's centerpiece =============================== */
+.hero { position: relative; z-index: 2; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; background: var(--bg); }
+.stage { position: absolute; inset: 0; touch-action: pan-y; cursor: grab; }
+.stage.dragging { cursor: grabbing; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero .intro { position: absolute; z-index: 4; left: 32px; top: 104px; max-width: 470px; pointer-events: none; transition: opacity .5s, transform .6s cubic-bezier(.2, .8, .2, 1); }
+.hero .intro > * { pointer-events: auto; }
+.hero .intro > .mono { color: var(--amber); }
+.hero h1 { margin: 12px 0 14px; font: 500 clamp(44px, 5.4vw, 84px)/.96 "Inter Tight"; letter-spacing: -.045em; }
+.hero h1 i { color: var(--amber); }
+.hero .intro > p:not(.role-note) { margin: 0; color: var(--ink2); font-size: 17px; max-width: 26rem; }
+.hero.open .intro { opacity: 0; transform: translateX(-24px); }
+.hero.open .intro > * { pointer-events: none; }
+/* project labels, pinned to their points */
+.mk { position: absolute; z-index: 3; left: 0; top: 0; background: none; border: 0; padding: 6px; color: var(--ink); font: 500 14px "Inter Tight"; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: opacity .3s; will-change: transform; }
+.mk i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--amber); background: rgba(14, 13, 12, .6); box-shadow: 0 0 12px rgba(255, 181, 71, .7); flex: none; transition: transform .3s, background .3s; }
+.mk span { text-shadow: 0 0 8px var(--bg), 0 0 3px var(--bg); }
+.mk small { font: 500 10.5px "JetBrains Mono"; color: var(--mut); }
+.mk:hover i { transform: scale(1.3); }
+.mk.back { opacity: .16; pointer-events: none; }
+.mk.off { opacity: 0; visibility: hidden; pointer-events: none; }
+.mk.on i { background: var(--amber); transform: scale(1.35); }
+.mk.on span { color: var(--amber); }
+.mk.dim:not(.on) { opacity: .32; }
+.mk:focus-visible { outline: 1px solid var(--amber); outline-offset: 2px; }
+/* the bottom bar: hint, names, arrows */
+.gbar { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 14px; padding: 16px 32px 22px; }
+.gbar .hint { color: var(--mut); }
+.gbar .hint b { color: var(--amber); font-weight: 500; }
+.gnames { display: flex; gap: 12px; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+.gnames button { all: unset; cursor: pointer; font: 500 12px "JetBrains Mono"; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
+.gnames button.on, .gnames button:hover, .gnames button:focus-visible { color: var(--amber); }
+.garrows { display: flex; gap: 8px; }
+.garrows button { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: rgba(14, 13, 12, .6); color: var(--ink); font-size: 18px; cursor: pointer; }
+.garrows button:hover { border-color: var(--amber); color: var(--amber); }
+/* the file that opens beside the globe */
+.gfile { position: absolute; z-index: 6; right: 28px; top: 86px; bottom: 84px; width: min(430px, 38vw); padding: 20px 20px 18px; overflow: auto; overscroll-behavior: contain;
+  background: rgba(14, 13, 12, .9); border: 1px solid rgba(255, 181, 71, .3); transform: translateX(calc(100% + 40px)); opacity: 0; visibility: hidden;
+  transition: transform .65s cubic-bezier(.2, .8, .2, 1), opacity .45s, visibility 0s .65s; }
+.gfile::before { content: ""; position: absolute; top: -1px; right: -1px; width: 24px; height: 24px; border: 2px solid var(--amber); border-left: 0; border-bottom: 0; }
+.gfile.show { transform: none; opacity: 1; visibility: visible; transition: transform .65s cubic-bezier(.2, .8, .2, 1), opacity .45s, visibility 0s; }
+.gfile > * { transition: opacity .25s, transform .3s; }
+.gfile.swap > * { opacity: 0; transform: translateY(10px); }
+.gfile .top { display: flex; justify-content: space-between; align-items: center; color: var(--amber); }
+.gfile .x { all: unset; cursor: pointer; color: var(--mut); font-size: 22px; line-height: 1; padding: 2px 4px; }
+.gfile .x:hover { color: var(--ink); }
+.gfile h2 { margin: 10px 0 6px; font: 500 36px/1 "Inter Tight"; letter-spacing: -.03em; }
+.gfile p { margin: 0 0 12px; color: var(--ink2); font-size: 15.5px; }
+.gfile .proof { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+.gfile .proof b { font: 500 32px/1 "Inter Tight"; color: var(--amber); letter-spacing: -.03em; white-space: nowrap; }
+.gfile .proof span { font-size: 14px; color: var(--ink2); line-height: 1.4; }
+.gfile .shot { aspect-ratio: 16 / 10; }
+.gfile .stack { margin: 12px 0 14px; }
+@media (min-height: 0) { .gfile .shot { max-height: none; } }
+/* phones: the globe sits lower; the file slides up from the bottom */
+@media (max-width: 900px) {
+  .hero .intro { left: 18px; right: 18px; top: 74px; max-width: none; }
+  .hero h1 { font-size: clamp(36px, 10vw, 52px); }
+  .hero .intro > p:not(.role-note) { font-size: 15.5px; }
+  .gbar { padding: 10px 18px 18px; }
+  .gnames { display: none; }
+  .garrows { margin-left: auto; }
+  .mk { font-size: 12.5px; padding: 8px; } .mk small { display: none; }
+  .gfile { left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 62%; border-left: 0; border-right: 0; border-bottom: 0;
+    transform: translateY(100%); padding: 16px 18px 22px; }
+  .gfile h2 { font-size: 28px; }
+  .hero.open .gbar { opacity: 0; pointer-events: none; }
+}
+@media (max-width: 900px) and (max-height: 700px) { .hero .intro > p:not(.role-note) { display: none; } }
+.no-gl .stage { display: none; }
+.no-gl .hero { height: auto; min-height: 0; padding-bottom: 90px; }
+.no-gl .hero .intro { position: relative; left: auto; top: auto; padding: 110px 32px 20px; max-width: 640px; }
+.no-gl .gbar { position: relative; }
+.no-gl .gnames { display: flex; margin-left: 0; justify-content: flex-start; }
+.no-gl .gfile { position: relative; inset: auto; width: auto; margin: 0 32px; display: none; }
+.no-gl .gfile.show { display: block; }
+
+/* =============================== the side piece: the four-step story in About =============================== */
+.howi { grid-column: 1 / -1; margin: 10px 0 0; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 0; border: 1px solid var(--line); background: var(--bg-2); }
+.howi-stage { position: relative; height: 300px; min-width: 0; border-right: 1px solid var(--line); }
+.howi-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.howi figcaption { padding: 22px 22px 20px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+.howi figcaption > .mono { color: var(--amber); }
+.howi-steps { display: flex; flex-wrap: wrap; gap: 6px; }
+.howi-steps button { font: 500 12px "JetBrains Mono"; letter-spacing: .04em; text-transform: uppercase; color: var(--mut); background: none; border: 1px solid var(--line); padding: 6px 9px; cursor: pointer; }
+.howi-steps button.on { color: var(--amber); border-color: var(--amber); }
+.howi figcaption p { margin: 0; color: var(--ink2); font-size: 16px; min-height: 4.8em; }
+.howi.no-gl .howi-stage { display: none; } .howi.no-gl { grid-template-columns: 1fr; }
+@media (max-width: 900px) {
+  .howi { grid-template-columns: 1fr; }
+  .howi-stage { height: 230px; border-right: 0; border-bottom: 1px solid var(--line); }
+}
