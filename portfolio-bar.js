@@ -20,7 +20,7 @@
     ["econ", "Canada Economy", "https://lekanlawal1.github.io/project5-canada-economy-platform/", "Scroll to Your inflation rate and put in what you actually spend."],
     ["sorted", "Sorted", "https://lekanlawal1.github.io/project2-ai-ticket-triage/", "Press Random real message, then filter the inbox to the mistakes."],
     ["fifa", "The Gaffer", "https://lekanlawal1.github.io/football-agent/", "Tap a suggested question, then open The play to see the SQL it ran."],
-    ["store", "Money Snitch", "https://lekanlawal1.github.io/project1-bi-dashboard/", "Try it with sample data and find which discounts lose money."],
+    ["store", "Money Snitch", "https://lekanlawal1.github.io/project1-bi-dashboard/", "Load the sample data and find which discounts lose money."],
     ["triage", "App Review Insights", "https://lekanlawal1.github.io/app-review-insights/", "Search an app you use and read what its users complain about."],
     ["dock", "Docket", PORTFOLIO + "go/docket.html", "Drop in any PDF. Nothing leaves your device, so try a real one."],
     ["wh", "Discrepancy Checker", PORTFOLIO + "demos/discrepancy-checker/", "Change a blue number in the sheet and watch every check update."],
