@@ -13,8 +13,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="home.css?v=20261106">
+<link rel="stylesheet" href="home.css?v=20261107">
 <script>try { sessionStorage.setItem("pf-from", "1"); } catch {}</script>
+<script src="warp.js?v=20261106"></script>
 </head>
 <body>
 <a class="skip" href="#work">Skip to the work</a>
@@ -35,9 +36,14 @@
       <div class="cap c0" id="c0">
         <span class="mono">Lekan Lawal · Data, BI and AI · Canada</span>
         <h1>Messy data in.<br><i>Trusted</i> tools out.</h1>
-        <p>I build data, BI and AI tools that check their own work. These 2,400 points are a real store's sales
-          lines. Scroll to watch what I do with them, or take the tour: eight live tools, one after another.</p>
-        <div class="cta"><a class="go-tour" href="demos/fine-print/" data-tour="fine-print">Take the tour <span aria-hidden="true">→</span></a><a class="go-work" href="#work">See all the work</a></div>
+        <p>I build data, BI and AI tools that check their own work. These points are a real store's sales lines:
+          scroll to see what I do with them.</p>
+        <div class="roles" role="group" aria-labelledby="roles-label">
+          <span class="mono" id="roles-label">Hiring for</span>
+          <button type="button" data-role="analyst" aria-pressed="false">Data analyst</button><button type="button" data-role="bi" aria-pressed="false">BI</button><button type="button" data-role="ai" aria-pressed="false">AI engineer</button><button type="button" data-role="ops" aria-pressed="false">Operations</button>
+        </div>
+        <p class="role-note mono" id="role-note" aria-live="polite">Pick one and the tour starts with the work that fits.</p>
+        <div class="cta"><a class="go-tour" href="demos/fine-print/" data-tour="first"><span id="tour-label">Take the tour</span> <span aria-hidden="true">→</span></a><a class="go-work" href="#work">See all the work</a></div>
       </div>
       <div class="cap c1" id="c1"><span class="mono">01 · Clean</span><h2>Sorted into <i>rows</i>.</h2>
         <p>Junk rows found and reported, never quietly dropped. Duplicates removed. Every column checked.</p></div>
@@ -60,7 +66,7 @@
       </div>
       <div class="map" id="map"><canvas id="lines" aria-hidden="true"></canvas><div class="hub" aria-hidden="true">LL</div></div>
       <aside class="hud" id="hud" aria-live="polite"></aside>
-      <div class="steps"><span class="mono" id="count">01 / 08</span><span class="line"><i id="fill"></i></span><span class="names mono" id="names"></span></div>
+      <div class="steps"><span class="mono" id="count">01 / 08</span><span class="mono nexthint" id="nexthint" aria-hidden="true"></span><span class="line"><i id="fill"></i></span><span class="names mono" id="names"></span></div>
       <div class="phone-nav"><button type="button" id="prev" aria-label="Previous project">←</button><span class="mono" id="pcount">01 / 08</span><button type="button" id="next" aria-label="Next project">→</button></div>
     </div>
   </section>
@@ -109,13 +115,34 @@
   </section>
 </main>
 
+<!-- a small dock once you're past the intro: back to the start, or straight to a section -->
+<nav class="dock" id="dock" aria-label="Quick links">
+  <a href="#top" class="home" aria-label="Back to the start"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="#FFB547">
+    <circle cx="12" cy="4" r="1.6"/><circle cx="17.7" cy="6.3" r="1.6"/><circle cx="20" cy="12" r="1.6"/><circle cx="17.7" cy="17.7" r="1.6"/><circle cx="12" cy="20" r="1.6"/><circle cx="6.3" cy="17.7" r="1.6"/><circle cx="4" cy="12" r="1.6"/><circle cx="6.3" cy="6.3" r="1.6"/></g></svg></a>
+  <a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+</nav>
+
+<!-- the end of the tour -->
+<dialog class="finale" id="finale" aria-labelledby="fin-title">
+  <div class="fin-ring" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b>LL</b></div>
+  <p class="mono">Tour complete · 8 of 8</p>
+  <h2 id="fin-title">That's all eight.<br><i>Let's talk.</i></h2>
+  <p>Every one of them checks its own work. If that's what your team needs, I'd like to hear about it.</p>
+  <div class="fin-go">
+    <button type="button" data-copy="lekan1553@gmail.com">Copy my email <small class="mono">lekan1553@gmail.com</small></button>
+    <a href="https://www.linkedin.com/in/lekan-lawal/">LinkedIn</a>
+    <a href="assets/Lekan_Lawal_Resume.pdf" download>Résumé PDF</a>
+  </div>
+  <button type="button" class="fin-close" id="fin-close">Back to the map</button>
+</dialog>
+
 <footer class="foot mono">© 2026 Lekan Lawal · Built by hand: Three.js, GSAP and plain JavaScript.</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="projects.js?v=20261106"></script>
-<script type="module" src="home.js?v=20261106"></script>
+<script type="module" src="home.js?v=20261107"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "50d455a6ac424591b8acaa97dc3975a9"}'></script>
 </body>
 </html>

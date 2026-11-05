@@ -16,7 +16,7 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 
 .nav { position: fixed; z-index: 20; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 20px 32px;
   transition: background .3s; }
-.nav.solid { background: rgba(14, 13, 12, .82); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.nav.solid { background: rgba(14, 13, 12, .95); }
 .nav .name { font-weight: 600; font-size: 16px; letter-spacing: .02em; text-decoration: none; text-transform: uppercase; }
 .nav .links { display: flex; gap: 26px; font-size: 15px; }
 .nav .links a { text-decoration: none; color: var(--ink2); }
@@ -230,4 +230,80 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   .hud { display: flex; flex-direction: column; max-height: 100%; }
   .hud > * { flex: 0 0 auto; }
   .hud .shot { flex: 0 1 auto; min-height: 90px; max-height: none; height: auto; }
+}
+
+/* ---- hiring for: the role picker in the hero ---- */
+.roles { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 24px; pointer-events: auto; }
+.roles .mono { color: var(--mut); margin-right: 4px; }
+.roles button { font: 500 14px "Inter Tight"; color: var(--ink); background: rgba(14, 13, 12, .45); border: 1px solid var(--line); padding: 8px 13px; cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s; }
+.roles button:hover { border-color: var(--amber); }
+.roles button[aria-pressed="true"] { background: rgba(255, 181, 71, .14); border-color: var(--amber); color: var(--amber); }
+.role-note { margin: 10px 0 0 !important; font-size: 11.5px !important; color: var(--mut) !important; pointer-events: auto; min-height: 1.5em; }
+.role-note.set { color: var(--amber) !important; }
+.role-note button { all: unset; cursor: pointer; color: var(--ink2); text-decoration: underline; text-underline-offset: 3px; margin-left: 6px; }
+.cta { margin-top: 18px; }
+.cap[aria-hidden="true"] .roles, .cap[aria-hidden="true"] .role-note { pointer-events: none; }
+.no-gl .roles, .no-gl .role-note { pointer-events: auto; }
+
+/* ---- the step bar's "next" hint ---- */
+.steps .nexthint { color: var(--amber); white-space: nowrap; animation: nudge 2.4s ease-in-out infinite; }
+@keyframes nudge { 0%, 100% { transform: translateY(0); opacity: .75; } 50% { transform: translateY(3px); opacity: 1; } }
+
+/* ---- the project panel changing over ---- */
+.hud > * { transition: opacity .18s ease, transform .18s ease; }
+.hud.leaving > * { opacity: 0; transform: translateY(-8px); }
+.hud.entering > * { animation: hin .55s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
+@keyframes hin { from { opacity: 0; transform: translateY(12px); } }
+
+/* ---- the dock ---- */
+.dock { position: fixed; z-index: 21; left: 50%; bottom: 18px; display: flex; align-items: center; gap: 2px; padding: 4px;
+  background: rgba(20, 18, 16, .96); border: 1px solid rgba(255, 181, 71, .26); border-radius: 999px;
+  transform: translate(-50%, 140%); opacity: 0; transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .3s; box-shadow: 0 12px 30px rgba(0, 0, 0, .35); }
+.dock.on { transform: translate(-50%, 0); opacity: 1; }
+.dock a { text-decoration: none; color: var(--ink2); font: 500 14px "Inter Tight"; padding: 9px 14px; border-radius: 999px; display: inline-flex; align-items: center; }
+.dock a:hover, .dock a:focus-visible { color: var(--ink); background: rgba(255, 255, 255, .07); outline: none; }
+.dock a.home svg { transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
+.dock a.home:hover svg { transform: rotate(90deg) scale(1.1); }
+.foot { padding-bottom: 90px; }
+
+/* ---- the end of the tour ---- */
+.finale { width: min(560px, calc(100vw - 32px)); max-height: calc(100svh - 32px); padding: 34px 30px 26px; background: var(--bg); color: var(--ink);
+  border: 1px solid rgba(255, 181, 71, .35); text-align: center; overflow: auto; }
+.finale::backdrop { background: rgba(14, 13, 12, .8); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.finale h2 { font: 500 clamp(34px, 6vw, 48px)/1 "Inter Tight"; letter-spacing: -.035em; margin: 10px 0 12px; }
+.finale h2 i { color: var(--amber); }
+.finale > p { color: var(--ink2); margin: 0 auto 18px; max-width: 26rem; }
+.finale > p.mono { color: var(--amber); margin-bottom: 0; }
+.fin-ring { position: relative; width: 120px; height: 120px; margin: 0 auto 18px; }
+.fin-ring i { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 12px var(--amber); opacity: 0; }
+.fin-ring b { position: absolute; inset: 0; display: grid; place-items: center; font: 500 15px "JetBrains Mono"; color: var(--amber); letter-spacing: .1em; opacity: 0; }
+.finale.play .fin-ring b { animation: finfade .5s 1.1s both; }
+.finale.play .fin-ring i { animation: finin .7s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes finfade { to { opacity: 1; } }
+@keyframes finin { from { opacity: 0; transform: rotate(var(--a)) translateY(-160px) scale(.4); } to { opacity: 1; transform: rotate(var(--a)) translateY(-50px); } }
+.fin-ring i:nth-child(1) { --a: 0deg; animation-delay: 0s !important; } .fin-ring i:nth-child(2) { --a: 45deg; animation-delay: .08s !important; }
+.fin-ring i:nth-child(3) { --a: 90deg; animation-delay: .16s !important; } .fin-ring i:nth-child(4) { --a: 135deg; animation-delay: .24s !important; }
+.fin-ring i:nth-child(5) { --a: 180deg; animation-delay: .32s !important; } .fin-ring i:nth-child(6) { --a: 225deg; animation-delay: .4s !important; }
+.fin-ring i:nth-child(7) { --a: 270deg; animation-delay: .48s !important; } .fin-ring i:nth-child(8) { --a: 315deg; animation-delay: .56s !important; }
+.fin-ring i { transform: rotate(var(--a)) translateY(-50px); }
+.fin-go { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 16px; }
+.fin-go a, .fin-go button { font: 600 13px "Inter Tight"; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; color: var(--ink); border: 1px solid var(--line);
+  background: none; padding: 11px 14px; cursor: pointer; }
+.fin-go button { background: var(--amber); color: #1A1510; border-color: var(--amber); }
+.fin-go button small { display: block; font-size: 10px; text-transform: none; letter-spacing: .02em; opacity: .7; margin-top: 3px; }
+.fin-go a:hover { border-color: var(--amber); }
+.fin-close { all: unset; cursor: pointer; font: 500 12px "JetBrains Mono"; letter-spacing: .08em; text-transform: uppercase; color: var(--mut); }
+.fin-close:hover { color: var(--amber); }
+
+@media (max-width: 900px) {
+  .roles button { padding: 7px 11px; font-size: 13.5px; }
+  .dock { bottom: 12px; } .dock a { padding: 9px 12px; }
+}
+@media (max-width: 420px) {
+  .roles .mono { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hud.entering > *, .finale.play .fin-ring i, .finale.play .fin-ring b, .steps .nexthint { animation: none; opacity: 1; }
+  .dock { transition: none; }
 }

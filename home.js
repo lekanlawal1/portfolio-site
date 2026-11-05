@@ -21,27 +21,30 @@ if (hasGsap) {
     gsap.ticker.lagSmoothing(0);
   }
 }
-const scrollToY = (y) => (lenis ? lenis.scrollTo(y, { duration: 1.1 }) : scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" }));
-// A short hop scrolls smoothly; anything longer than about a screen and a half fades out, jumps and
-// fades back in, so nobody has to watch the whole page (or every project) slide past.
-const veil = document.createElement("div"); veil.className = "veil"; veil.setAttribute("aria-hidden", "true"); document.body.appendChild(veil);
-let jumping = false;
-function jumpTo(y, then) {
-  if (Math.abs(y - scrollY) < innerHeight * 1.5) { scrollToY(y); then && then(); return; }
-  const land = () => { if (lenis) lenis.scrollTo(y, { immediate: true, force: true }); else scrollTo(0, y); then && then(); };
-  if (reduce) { land(); return; }
-  if (jumping) return; jumping = true;
-  veil.classList.add("on");
-  setTimeout(() => { land(); requestAnimationFrame(() => { veil.classList.remove("on"); jumping = false; }); }, 180);
+const scrollToY = (y, d = 1.1) => (lenis ? lenis.scrollTo(y, { duration: d }) : scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" }));
+const land = (y) => { if (lenis) lenis.scrollTo(y, { immediate: true, force: true }); else scrollTo(0, y); };
+// A short hop glides. Anything longer warps (warp.js): the page gathers into a ring with the
+// destination's name, and opens again there, so nobody has to watch the whole page slide past.
+const WARP = window.PFWarp;
+const SECTION = { top: "Back to the start|Messy data in", work: "The work|Eight builds", about: "About|Lekan Lawal", contact: "Contact|Let's talk" };
+function jumpTo(y, label) {
+  if (Math.abs(y - scrollY) < innerHeight * 1.2 || !WARP || reduce) { scrollToY(y); return; }
+  WARP.out(() => land(y), { label });
 }
 document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
-  const t = document.querySelector(a.getAttribute("href"));
+  const id = a.getAttribute("href").slice(1), t = document.getElementById(id);
   if (!t) return;
   e.preventDefault();
-  jumpTo(t.getBoundingClientRect().top + scrollY);
-  history.replaceState(null, "", a.getAttribute("href") === "#top" ? location.pathname : a.getAttribute("href"));
+  jumpTo(id === "top" ? 0 : t.getBoundingClientRect().top + scrollY, SECTION[id]);
+  history.replaceState(null, "", id === "top" ? location.pathname : `#${id}`);
 }));
-addEventListener("scroll", () => document.querySelector(".nav").classList.toggle("solid", scrollY > $("story").offsetHeight - innerHeight * 0.6), { passive: true });
+addEventListener("scroll", () => {
+  const past = scrollY > $("story").offsetHeight - innerHeight * 0.6;
+  document.querySelector(".nav").classList.toggle("solid", past);
+  // on desktop the pinned work section has its own step bar along the bottom: the dock steps aside there
+  const pr = $("pin").getBoundingClientRect(), inPin = !small() && pr.top < innerHeight * 0.5 && pr.bottom > innerHeight * 0.5;
+  $("dock").classList.toggle("on", past && !inPin);
+}, { passive: true });
 
 // ------------------------------------------------------------------ the story
 // The scroll position becomes p, 0 to 3: each whole number is a shape (messy, clean, count, check),
@@ -95,8 +98,8 @@ async function startGL() {
   geo.setAttribute("aSeed", new THREE.BufferAttribute(seed, 1));
   // each point moves between the shapes a little early or late, so every change ripples
   const mat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uP: { value: 0 }, uT: { value: 0 }, uM: { value: new THREE.Vector3(0, 0, 0) }, uSize: { value: (S ? 3.6 : 4.6) * Math.min(devicePixelRatio, 2) } },
-    vertexShader: `attribute vec3 aA, aB, aC, aD; attribute float aSeed; uniform float uP, uT, uSize; uniform vec3 uM; varying float vG;
+    uniforms: { uP: { value: 0 }, uT: { value: 0 }, uK: { value: 0 }, uM: { value: new THREE.Vector3(0, 0, 0) }, uSize: { value: (S ? 3.6 : 4.6) * Math.min(devicePixelRatio, 2) } },
+    vertexShader: `attribute vec3 aA, aB, aC, aD; attribute float aSeed; uniform float uP, uT, uSize, uK; uniform vec3 uM; varying float vG;
       void main() {
         float d = aSeed * .35;
         float s1 = smoothstep(0., 1., clamp((uP - d) * 1.55, 0., 1.));
@@ -104,6 +107,7 @@ async function startGL() {
         float s3 = smoothstep(0., 1., clamp((uP - 2. - d) * 1.55, 0., 1.));
         vec3 p = mix(aA, aB, s1); p = mix(p, aC, s2); p = mix(p, aD, s3);
         p += vec3(sin(uT * .6 + aSeed * 40.), cos(uT * .5 + aSeed * 31.), sin(uT * .4 + aSeed * 17.)) * .08 * ((1. - s1) + s3 * .5);
+        float ka = uK * (1.2 + aSeed * 2.); p.xy = mat2(cos(ka), -sin(ka), sin(ka), cos(ka)) * p.xy * (1. + uK * .45 * sin(aSeed * 31.));
         vec2 dm = p.xy - uM.xy; float rm = length(dm);
         p.xy += dm / max(rm, .001) * uM.z * smoothstep(1.5, 0., rm) * .75;
         vec4 mv = modelViewMatrix * vec4(p, 1.); gl_Position = projectionMatrix * mv;
@@ -125,8 +129,11 @@ async function startGL() {
   let push = 0, lastMove = 0;
   addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; lastMove = performance.now(); });
   const half = Math.tan((cam.fov / 2) * Math.PI / 180) * cam.position.z;
+  let kick = 0;
   return {
+    kick() { kick = 1; },
     render(p, t) {
+      kick *= 0.955; mat.uniforms.uK.value = reduce ? 0 : kick * kick;
       mat.uniforms.uP.value = p; mat.uniforms.uT.value = reduce ? 0 : t;
       group.rotation.y = (p < 1 && !reduce ? (1 - p) * t * 0.12 : 0) + mx * 0.25 * (1 - Math.min(1, p) * 0.6);
       // where the pointer sits on the particles' plane, and how hard it pushes (fades when it stops)
@@ -206,8 +213,41 @@ function paint() {
   if (n === lastShown) return;
   lastShown = n;
   if (!n) return;
-  if (n.k === "p") showProject(n.i); else showSkill(n.id);
+  if (n.k === "p") swapPanel(() => showProject(n.i), !!hover); else swapPanel(() => showSkill(n.id), true);
 }
+// Changing project: the old panel lifts away, the new one settles in line by line, its name
+// resolving out of scrambled letters, while a packet of light travels the map between the two.
+const GLYPH = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/#%";
+function scramble(el, ms = 460) {
+  if (!el || reduce) return;
+  const text = el.textContent, t0 = performance.now();
+  const tick = (now) => {
+    const k = Math.min(1, (now - t0) / ms), n = Math.floor(k * text.length);
+    el.textContent = text.slice(0, n) + text.slice(n).replace(/\S/g, () => GLYPH[(Math.random() * GLYPH.length) | 0]);
+    if (k < 1) requestAnimationFrame(tick); else el.textContent = text;
+  };
+  requestAnimationFrame(tick);
+}
+let swapT = 0;
+function swapPanel(render, quick) {
+  clearTimeout(swapT);
+  const enter = () => {
+    hud.classList.remove("leaving"); render();
+    [...hud.children].forEach((c, k) => c.style.setProperty("--i", k));
+    hud.classList.remove("entering"); void hud.offsetWidth; hud.classList.add("entering");
+    scramble(hud.querySelector("h3")); scramble(hud.querySelector(".proof b"), 380);
+  };
+  if (reduce || quick || !hud.children.length) { enter(); return; }
+  hud.classList.add("leaving");
+  swapT = setTimeout(enter, 190);
+}
+let packet = null;   // { a, b, t0 }: light travelling from one project to another
+function send(from, to) {
+  if (reduce || from === to) return;
+  const a = nodes.find((n) => n.k === "p" && n.i === from), b = nodes.find((n) => n.k === "p" && n.i === to);
+  if (a && b) packet = { a, b, t0: performance.now() };
+}
+
 // each panel plays a short silent clip of the live tool; people who ask for less motion or less data get a still
 const still = reduce || !!(navigator.connection && navigator.connection.saveData);
 function showProject(i) {
@@ -230,13 +270,18 @@ function showSkill(s) {
     <p class="mono" style="color:var(--mut);margin-top:14px">Click a project on the map to open it.</p>`;
 }
 function setCur(i) {
-  cur = (i + P.length) % P.length;
+  i = (i + P.length) % P.length;
+  if (i !== cur) send(cur, i);
+  cur = i;
+  const nx = P[cur + 1];
+  $("nexthint").textContent = pinST ? (nx ? `Next: ${nx.name} ↓` : "Then: about me ↓") : "";
   $("count").textContent = $("pcount").textContent = `${pad(cur)} / ${pad(P.length - 1)}`;
   $("fill").style.width = `${(cur / (P.length - 1)) * 100}%`;
   $("names").querySelectorAll("button").forEach((b, k) => b.classList.toggle("on", k === cur));
   paint();
 }
-$("names").innerHTML = P.map((p, i) => `<button type="button" data-i="${i}">${esc(p.name.split(" ").slice(-1)[0])}</button>`).join("");
+const drawNames = () => { $("names").innerHTML = P.map((p, i) => `<button type="button" data-i="${i}">${esc(p.name.split(" ").slice(-1)[0])}</button>`).join(""); };
+drawNames();
 $("names").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(+b.dataset.i, true); });
 $("prev").addEventListener("click", () => go(cur - 1));
 addEventListener("keydown", (e) => {
@@ -247,6 +292,13 @@ addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1); }
 });
 $("next").addEventListener("click", () => go(cur + 1));
+// phones: swipe the panel sideways for the next or previous project
+let sx = 0, sy = 0;
+hud.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+hud.addEventListener("touchend", (e) => {
+  const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) go(cur + (dx < 0 ? 1 : -1));
+}, { passive: true });
 
 // Desktop: the section pins and scrolling steps through the projects. Elsewhere: buttons and taps.
 let pinST = null;
@@ -254,22 +306,39 @@ function setupPin() {
   if (pinST) { pinST.kill(); pinST = null; }
   if (!hasGsap || small()) return;
   pinST = ScrollTrigger.create({ trigger: "#pin", pin: true, start: "top top", end: () => `+=${(P.length - 1) * innerHeight * 0.45}`,
-    snap: reduce ? false : { snapTo: 1 / (P.length - 1), duration: { min: 0.15, max: 0.4 }, delay: 0.08, ease: "power1.inOut" },
-    onUpdate: (s) => { const k = Math.round(s.progress * (P.length - 1)); if (k !== cur) { hover = null; setCur(k); } } });
+    snap: reduce ? false : { snapTo: 1 / (P.length - 1), duration: { min: 0.35, max: 0.7 }, delay: 0.12, ease: "power2.inOut" },
+    onUpdate: (s) => { if (gliding) return; const k = Math.round(s.progress * (P.length - 1)); if (k !== cur) { hover = null; setCur(k); } } });
 }
+let gliding = false, glideT = 0;
+const easeIO = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 function go(i, jump) {
   i = (i + P.length) % P.length;
   if (pinST) {
-    // straight to that project: the panel blinks over instead of scrolling past the ones between
+    // the page glides to that project's place while the panel goes straight from this one to that
+    // one: no flicker through the projects in between
     const y = pinST.start + (i / (P.length - 1)) * (pinST.end - pinST.start);
     hover = null; setCur(i);
-    if (lenis) lenis.scrollTo(y + 1, { immediate: true, force: true }); else scrollTo(0, y + 1);
+    if (!lenis) { scrollTo(0, y + 1); return; }
+    gliding = true; clearTimeout(glideT);
+    const d = Math.min(1.1, 0.55 + Math.abs(y - scrollY) / innerHeight * 0.18);
+    lenis.scrollTo(y + 1, { duration: d, easing: easeIO, force: true, onComplete: () => { gliding = false; } });
+    glideT = setTimeout(() => { gliding = false; }, d * 1000 + 300);
   } else {
     hover = null; setCur(i);
-    if (jump && small()) hud.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
+    // phones and tablets: bring the new panel's top into view, gently
+    const r = hud.getBoundingClientRect();
+    if (r.top < 60 || r.top > innerHeight * 0.55) scrollToY(scrollY + r.top - 76, 0.8);
   }
 }
 
+// one soft glow, drawn once and stamped wherever a dot needs one (blurring every dot each frame is slow)
+const GLOW = (() => {
+  const g = document.createElement("canvas"); g.width = g.height = 64;
+  const c = g.getContext("2d"), r = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+  r.addColorStop(0, "rgba(255,236,200,1)"); r.addColorStop(0.18, "rgba(255,200,120,.9)"); r.addColorStop(0.45, "rgba(255,181,71,.28)"); r.addColorStop(1, "rgba(255,181,71,0)");
+  c.fillStyle = r; c.fillRect(0, 0, 64, 64); return g;
+})();
+const glow = (x, y, size, alpha) => { ctx.globalAlpha = alpha; ctx.drawImage(GLOW, x - size, y - size, size * 2, size * 2); ctx.globalAlpha = 1; };
 function draw(t) {
   if (!W) { requestAnimationFrame(draw); return; }
   const r = map.getBoundingClientRect();
@@ -290,10 +359,22 @@ function draw(t) {
     ctx.lineWidth = on ? 1.4 : 1; ctx.setLineDash(e.hub ? [] : [2, 5]); ctx.stroke(); ctx.setLineDash([]);
     if (!dim) e.q.forEach((q) => {
       const s = reduce ? q : (q + t * (on ? 0.00028 : 0.00009)) % 1, u = 1 - s;
-      ctx.beginPath(); ctx.arc(u * u * ax + 2 * u * s * mx + s * s * bx, u * u * ay + 2 * u * s * my + s * s * by, on ? 2.1 : 1.3, 0, 7);
-      ctx.fillStyle = on ? "rgba(255,215,150,.95)" : "rgba(255,181,71,.45)"; ctx.shadowColor = "#FFB547"; ctx.shadowBlur = on ? 10 : 4; ctx.fill(); ctx.shadowBlur = 0;
+      glow(u * u * ax + 2 * u * s * mx + s * s * bx, u * u * ay + 2 * u * s * my + s * s * by, on ? 7 : 4, on ? 1 : 0.6);
     });
   });
+  if (packet) {
+    // a bright packet with a short tail: out of the old project, through the hub, into the new one
+    const k = Math.min(1, (t - packet.t0) / 700), { a, b } = packet;
+    const at = (q) => { const s = q < 0.5 ? q * 2 : (q - 0.5) * 2, [x0, y0, x1, y1] = q < 0.5 ? [a.dx, a.dy, W / 2, H / 2] : [W / 2, H / 2, b.dx, b.dy], u = 1 - s;
+      const cx = (x0 + x1) / 2 + (y0 - y1) * 0.12, cy = (y0 + y1) / 2 + (x1 - x0) * 0.12;
+      return [u * u * x0 + 2 * u * s * cx + s * s * x1, u * u * y0 + 2 * u * s * cy + s * s * y1]; };
+    const e = easeIO(k);
+    for (let j = 0; j < 14; j++) {
+      const q = Math.max(0, e - j * 0.018), [x, y] = at(q);
+      glow(x, y, (j ? 9 : 18) * (1 - j / 16), (1 - j / 14) * (1 - Math.max(0, k - 0.85) / 0.15));
+    }
+    if (k >= 1) packet = null;
+  }
   for (let i = 0; i < 90; i++) {
     const a = (i / 90) * Math.PI * 2 + (reduce ? 0 : t * 0.0002), rr = 34 + Math.sin(i * 1.7 + t * 0.001) * 3;
     ctx.beginPath(); ctx.arc(W / 2 + Math.cos(a) * rr, H / 2 + Math.sin(a) * rr, 1.1, 0, 7); ctx.fillStyle = "rgba(255,181,71,.7)"; ctx.fill();
@@ -317,17 +398,64 @@ addEventListener("resize", () => {
 });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(boot); else boot();
 
+// ------------------------------------------------------------------ hiring for
+// Picking a role puts the work that fits it first: on the map, in the step bar, and on the tour.
+const ROLES = {
+  analyst: ["Data analyst", ["economy", "superstore", "football", "discrepancy", "sorted", "triage", "fine-print", "docket"]],
+  bi: ["BI", ["superstore", "economy", "discrepancy", "football", "triage", "sorted", "docket", "fine-print"]],
+  ai: ["AI engineer", ["fine-print", "sorted", "football", "triage", "economy", "superstore", "docket", "discrepancy"]],
+  ops: ["Operations", ["discrepancy", "superstore", "docket", "sorted", "economy", "triage", "fine-print", "football"]],
+};
+const TOUR_ID = Object.fromEntries(Object.entries(VISIT_ID).map(([k, v]) => [v, k]));
+const saveOrder = () => { try { sessionStorage.setItem("pf-order", JSON.stringify(P.map((p) => TOUR_ID[p.id]))); } catch {} };
+function pickRole(role, quiet) {
+  const r = ROLES[role]; if (!r) return;
+  const byId = Object.fromEntries(P.map((p) => [p.id, p]));
+  P.splice(0, P.length, ...r[1].map((id) => byId[id]).filter(Boolean));
+  document.querySelectorAll("[data-role]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.role === role)));
+  $("role-note").innerHTML = `${esc(P[0].name)}, ${esc(P[1].name)} and ${esc(P[2].name)} first. <button type="button" id="role-clear">Show all</button>`;
+  $("role-note").classList.add("set");
+  $("tour-label").textContent = `Take the ${r[0]} tour`;
+  try { sessionStorage.setItem("pf-role", role); } catch {}
+  saveOrder();
+  if (W) { cur = 0; layout(); drawNames(); lastShown = null; setCur(0); if (hasGsap) ScrollTrigger.refresh(); }
+  if (!quiet && gl) gl.kick();
+}
+document.querySelectorAll("[data-role]").forEach((b) => b.addEventListener("click", () => pickRole(b.dataset.role)));
+$("role-note").addEventListener("click", (e) => {
+  if (!e.target.closest("#role-clear")) return;
+  try { sessionStorage.removeItem("pf-role"); } catch {}
+  const byId = Object.fromEntries(P.map((p) => [p.id, p]));
+  P.splice(0, P.length, ...ORIGINAL.map((id) => byId[id]));
+  document.querySelectorAll("[data-role]").forEach((b) => b.setAttribute("aria-pressed", "false"));
+  $("role-note").textContent = "Pick one and the tour starts with the work that fits."; $("role-note").classList.remove("set");
+  $("tour-label").textContent = "Take the tour";
+  saveOrder(); cur = 0; layout(); drawNames(); lastShown = null; setCur(0); if (gl) gl.kick();
+});
+const ORIGINAL = P.map((p) => p.id);
+try { const r = sessionStorage.getItem("pf-role"); if (r) pickRole(r, true); } catch {}
+
 // ------------------------------------------------------------------ the tour
-// "Take the tour" opens the first project; on every project the portfolio pill then shows the stop
-// number and a link straight to the next one (portfolio-bar.js), so you can go project to project.
+// "Take the tour" warps into the first project; on every project the pill then shows a stop card,
+// the eight stops as a small constellation, and the way to the next one (portfolio-bar.js).
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-tour]");
   if (!b) return;
   e.preventDefault();
   const from = Math.max(0, P.findIndex((p) => p.id === b.dataset.tour));
   try { sessionStorage.setItem("pf-tour", "1"); } catch {}
-  location.href = P[from].tour || P[from].live[1];
+  saveOrder();
+  const url = P[from].tour || P[from].live[1], label = `Stop ${from + 1} of ${P.length}|${P[from].name}`;
+  if (WARP) WARP.out(url, { label }); else location.href = url;
 });
+
+// the end of the tour: the eight stops close into the ring, and a way to get in touch
+let finale = false;
+try { finale = sessionStorage.getItem("pf-finale") === "1"; sessionStorage.removeItem("pf-finale"); } catch {}
+if (finale && $("finale").showModal) {
+  setTimeout(() => { $("finale").showModal(); $("finale").classList.add("play"); }, reduce ? 0 : 650);
+  $("fin-close").addEventListener("click", () => { $("finale").close(); jumpTo($("work").getBoundingClientRect().top + scrollY, SECTION.work); });
+}
 
 // ------------------------------------------------------------------ contact
 document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
