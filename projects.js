@@ -3,7 +3,7 @@
 window.PROJECTS = [
   { id: "fine-print", name: "Fine Print", kind: "iPhone app", line: "Paste a lease or job offer and see which clauses Ontario law has already made void, with the section of the law for each.",
     proof: ["0", "wrong legal verdicts across a 12-document test set built to trip it up"], img: "assets/fine-print/2-results.png", phone: true,
-    live: ["Check your own document", "demos/fine-print/#your-document"], study: "projects/fine-print.html", source: "https://github.com/lekanlawal1/fine-print",
+    live: ["Check your own document", "demos/fine-print/#your-document"], tour: "demos/fine-print/", study: "projects/fine-print.html", source: "https://github.com/lekanlawal1/fine-print",
     skills: ["Swift", "Gemini API", "AI output checks", "Apple on-device AI", "PDF parsing and OCR", "Cloudflare Workers"] },
   { id: "economy", name: "Canada Economy", kind: "Data platform", line: "Canada's economy by province, refreshed by itself whenever Statistics Canada publishes, with a briefing whose every number is checked.",
     proof: ["89", "automatic checks run before every update; 11 of 11 headline figures match StatCan"], img: "assets/shots/economy.jpg",

@@ -187,3 +187,47 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .narrow-only { display: none; }
 @media (max-width: 900px) { .wide-only { display: none; } .narrow-only { display: inline; } }
 @media (max-width: 600px) { .scroll { left: auto; right: 18px; translate: none; } }
+
+/* the hero's two ways in */
+.cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; pointer-events: auto; }
+.cta a { font: 600 13px "Inter Tight"; letter-spacing: .05em; text-transform: uppercase; text-decoration: none; padding: 13px 18px; }
+.go-tour { background: var(--amber); color: #1A1510; }
+.go-tour:hover { filter: brightness(1.08); }
+.go-work { border: 1px solid var(--line); color: var(--ink); background: rgba(14, 13, 12, .4); }
+.go-work:hover { border-color: var(--amber); }
+.cap[aria-hidden="true"] .cta { pointer-events: none; }
+.no-gl .cta { pointer-events: auto; }
+.tour-here { display: inline-block; margin-top: 14px; color: var(--mut); text-decoration: none; font-size: 11.5px; }
+.tour-here:hover { color: var(--amber); }
+/* long jumps: a quick fade over the page while it moves */
+.veil { position: fixed; inset: 0; z-index: 30; background: var(--bg); opacity: 0; pointer-events: none; transition: opacity .18s ease; }
+.veil.on { opacity: 1; }
+
+/* preview clips in the project panel */
+.shot { background: #1a1816; }
+.shot video, .shot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.shot > .mono { position: absolute; left: 8px; bottom: 8px; z-index: 1; font-size: 10.5px; padding: 3px 7px; background: rgba(14, 13, 12, .78); color: var(--amber); }
+.shot > .mono::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); margin-right: 6px; vertical-align: 1px; }
+.shot img.phone { object-fit: contain; background: #E9E5DC; }
+/* laptops with short screens: the pinned panel has to fit between the heading and the step bar */
+@media (min-width: 901px) {
+  .shot { max-height: 30vh; width: 100%; }
+}
+@media (min-width: 901px) and (max-height: 820px) {
+  .whead h2 { font-size: clamp(32px, 3.6vw, 52px); }
+  .whead p { font-size: 14.5px; }
+  .hud { padding: 16px 18px 14px; }
+  .hud h3 { font-size: 28px; }
+  .hud p { font-size: 14.5px; margin-bottom: 8px; }
+  .hud .proof { margin-bottom: 8px; } .hud .proof b { font-size: 28px; } .hud .proof span { font-size: 13.5px; }
+  .shot { max-height: 24vh; }
+  .stack { margin: 8px 0 10px; } .stack span { font-size: 10.5px; padding: 1px 6px; }
+  .go a { padding: 8px 12px; font-size: 12px; }
+  .tour-here { display: none; }
+}
+/* the panel never grows past its row: the preview gives up height first */
+@media (min-width: 901px) {
+  .hud { display: flex; flex-direction: column; max-height: 100%; }
+  .hud > * { flex: 0 0 auto; }
+  .hud .shot { flex: 0 1 auto; min-height: 90px; max-height: none; height: auto; }
+}

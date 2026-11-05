@@ -22,12 +22,24 @@ if (hasGsap) {
   }
 }
 const scrollToY = (y) => (lenis ? lenis.scrollTo(y, { duration: 1.1 }) : scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" }));
-// in-page links go through the same smooth scroll
+// A short hop scrolls smoothly; anything longer than about a screen and a half fades out, jumps and
+// fades back in, so nobody has to watch the whole page (or every project) slide past.
+const veil = document.createElement("div"); veil.className = "veil"; veil.setAttribute("aria-hidden", "true"); document.body.appendChild(veil);
+let jumping = false;
+function jumpTo(y, then) {
+  if (Math.abs(y - scrollY) < innerHeight * 1.5) { scrollToY(y); then && then(); return; }
+  const land = () => { if (lenis) lenis.scrollTo(y, { immediate: true, force: true }); else scrollTo(0, y); then && then(); };
+  if (reduce) { land(); return; }
+  if (jumping) return; jumping = true;
+  veil.classList.add("on");
+  setTimeout(() => { land(); requestAnimationFrame(() => { veil.classList.remove("on"); jumping = false; }); }, 180);
+}
 document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
   const t = document.querySelector(a.getAttribute("href"));
   if (!t) return;
   e.preventDefault();
-  scrollToY(t.getBoundingClientRect().top + scrollY - (a.getAttribute("href") === "#top" ? 0 : 0));
+  jumpTo(t.getBoundingClientRect().top + scrollY);
+  history.replaceState(null, "", a.getAttribute("href") === "#top" ? location.pathname : a.getAttribute("href"));
 }));
 addEventListener("scroll", () => document.querySelector(".nav").classList.toggle("solid", scrollY > $("story").offsetHeight - innerHeight * 0.6), { passive: true });
 
@@ -83,8 +95,8 @@ async function startGL() {
   geo.setAttribute("aSeed", new THREE.BufferAttribute(seed, 1));
   // each point moves between the shapes a little early or late, so every change ripples
   const mat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uP: { value: 0 }, uT: { value: 0 }, uSize: { value: (S ? 3.6 : 4.6) * Math.min(devicePixelRatio, 2) } },
-    vertexShader: `attribute vec3 aA, aB, aC, aD; attribute float aSeed; uniform float uP, uT, uSize; varying float vG;
+    uniforms: { uP: { value: 0 }, uT: { value: 0 }, uM: { value: new THREE.Vector3(0, 0, 0) }, uSize: { value: (S ? 3.6 : 4.6) * Math.min(devicePixelRatio, 2) } },
+    vertexShader: `attribute vec3 aA, aB, aC, aD; attribute float aSeed; uniform float uP, uT, uSize; uniform vec3 uM; varying float vG;
       void main() {
         float d = aSeed * .35;
         float s1 = smoothstep(0., 1., clamp((uP - d) * 1.55, 0., 1.));
@@ -92,6 +104,8 @@ async function startGL() {
         float s3 = smoothstep(0., 1., clamp((uP - 2. - d) * 1.55, 0., 1.));
         vec3 p = mix(aA, aB, s1); p = mix(p, aC, s2); p = mix(p, aD, s3);
         p += vec3(sin(uT * .6 + aSeed * 40.), cos(uT * .5 + aSeed * 31.), sin(uT * .4 + aSeed * 17.)) * .08 * ((1. - s1) + s3 * .5);
+        vec2 dm = p.xy - uM.xy; float rm = length(dm);
+        p.xy += dm / max(rm, .001) * uM.z * smoothstep(1.5, 0., rm) * .75;
         vec4 mv = modelViewMatrix * vec4(p, 1.); gl_Position = projectionMatrix * mv;
         vG = .55 + .45 * sin(uT * 1.4 + aSeed * 60.);
         gl_PointSize = uSize * (.7 + aSeed * .7) * (9. / -mv.z);
@@ -108,11 +122,16 @@ async function startGL() {
   const size = () => { renderer.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); };
   size(); addEventListener("resize", size);
   let mx = 0, my = 0;
-  addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; });
+  let push = 0, lastMove = 0;
+  addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; lastMove = performance.now(); });
+  const half = Math.tan((cam.fov / 2) * Math.PI / 180) * cam.position.z;
   return {
     render(p, t) {
       mat.uniforms.uP.value = p; mat.uniforms.uT.value = reduce ? 0 : t;
       group.rotation.y = (p < 1 && !reduce ? (1 - p) * t * 0.12 : 0) + mx * 0.25 * (1 - Math.min(1, p) * 0.6);
+      // where the pointer sits on the particles' plane, and how hard it pushes (fades when it stops)
+      push += ((performance.now() - lastMove < 900 && !reduce ? 1 : 0) - push) * 0.06;
+      mat.uniforms.uM.value.set(mx * 2 * half * cam.aspect - group.position.x, -my * 2 * half - group.position.y, push);
       group.rotation.x = my * 0.15; group.position.y = S ? 1.4 * Math.min(1, p) : 0; group.rotation.z = Math.max(0, p - 2) * 0.15;
       group.position.x = S ? 0 : 2.2 * Math.max(0, 1 - p) - 1.4 * Math.min(1, p) + 1.0 * Math.max(0, Math.min(1, p - 2));
       renderer.render(scene, cam);
@@ -189,14 +208,19 @@ function paint() {
   if (!n) return;
   if (n.k === "p") showProject(n.i); else showSkill(n.id);
 }
+// each panel plays a short silent clip of the live tool; people who ask for less motion or less data get a still
+const still = reduce || !!(navigator.connection && navigator.connection.saveData);
 function showProject(i) {
   const p = P[i];
   hud.innerHTML = `<div class="bar mono"><span>File ${pad(i)} // ${esc(p.name)}</span><span>${esc(p.kind)}</span></div>
     <h3>${esc(p.name)}</h3><p>${esc(p.line)}</p>
     <div class="proof"><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}</span></div>
-    <a class="shot reveal${p.phone ? " phone" : ""}" href="${p.live[1]}" style="background-image:url('${p.img}')" aria-label="Open ${esc(p.name)}"></a>
+    <a class="shot reveal" href="${p.live[1]}" aria-label="Open ${esc(p.name)}">${still
+      ? `<img src="${p.img}" alt=""${p.phone ? ' class="phone"' : ""}>`
+      : `<video src="assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${p.img}"`} autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>
     <div class="stack">${p.skills.map((s) => `<span>${esc(s)}</span>`).join("")}</div>
-    <div class="go"><a href="${p.live[1]}">${esc(p.live[0])} ↗</a>${p.study !== p.live[1] ? `<a class="o" href="${p.study}">Case study</a>` : ""}${p.download ? `<a class="o" href="${p.download}" download>Workbook</a>` : ""}${p.source ? `<a class="o" href="${p.source}">Source</a>` : ""}</div>`;
+    <div class="go"><a href="${p.live[1]}">${esc(p.live[0])} ↗</a>${p.study !== p.live[1] ? `<a class="o" href="${p.study}">Case study</a>` : ""}${p.download ? `<a class="o" href="${p.download}" download>Workbook</a>` : ""}${p.source ? `<a class="o" href="${p.source}">Source</a>` : ""}</div>
+    <a class="tour-here mono" href="${p.tour || p.live[1]}" data-tour="${p.id}">Tour from here: ${pad(i)} of ${pad(P.length - 1)}, then the rest →</a>`;
 }
 function showSkill(s) {
   const ps = P.filter((p) => p.skills.includes(s));
@@ -215,6 +239,13 @@ function setCur(i) {
 $("names").innerHTML = P.map((p, i) => `<button type="button" data-i="${i}">${esc(p.name.split(" ").slice(-1)[0])}</button>`).join("");
 $("names").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(+b.dataset.i, true); });
 $("prev").addEventListener("click", () => go(cur - 1));
+addEventListener("keydown", (e) => {
+  if (e.altKey || e.metaKey || e.ctrlKey || /input|textarea|select/i.test(e.target.tagName)) return;
+  const r = $("pin").getBoundingClientRect();
+  if (r.top > innerHeight * 0.3 || r.bottom < innerHeight * 0.7) return;
+  if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1); }
+});
 $("next").addEventListener("click", () => go(cur + 1));
 
 // Desktop: the section pins and scrolling steps through the projects. Elsewhere: buttons and taps.
@@ -222,14 +253,17 @@ let pinST = null;
 function setupPin() {
   if (pinST) { pinST.kill(); pinST = null; }
   if (!hasGsap || small()) return;
-  pinST = ScrollTrigger.create({ trigger: "#pin", pin: true, start: "top top", end: () => `+=${(P.length - 1) * innerHeight * 0.7}`,
+  pinST = ScrollTrigger.create({ trigger: "#pin", pin: true, start: "top top", end: () => `+=${(P.length - 1) * innerHeight * 0.45}`,
+    snap: reduce ? false : { snapTo: 1 / (P.length - 1), duration: { min: 0.15, max: 0.4 }, delay: 0.08, ease: "power1.inOut" },
     onUpdate: (s) => { const k = Math.round(s.progress * (P.length - 1)); if (k !== cur) { hover = null; setCur(k); } } });
 }
 function go(i, jump) {
   i = (i + P.length) % P.length;
   if (pinST) {
+    // straight to that project: the panel blinks over instead of scrolling past the ones between
     const y = pinST.start + (i / (P.length - 1)) * (pinST.end - pinST.start);
-    hover = null; setCur(i); scrollToY(y + 2);
+    hover = null; setCur(i);
+    if (lenis) lenis.scrollTo(y + 1, { immediate: true, force: true }); else scrollTo(0, y + 1);
   } else {
     hover = null; setCur(i);
     if (jump && small()) hud.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
@@ -282,6 +316,18 @@ addEventListener("resize", () => {
   rt = setTimeout(() => { const crossed = (lastW <= 900) !== (innerWidth <= 900); lastW = innerWidth; layout(); lastShown = null; paint(); if (crossed) setupPin(); if (hasGsap) ScrollTrigger.refresh(); }, 200);
 });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(boot); else boot();
+
+// ------------------------------------------------------------------ the tour
+// "Take the tour" opens the first project; on every project the portfolio pill then shows the stop
+// number and a link straight to the next one (portfolio-bar.js), so you can go project to project.
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-tour]");
+  if (!b) return;
+  e.preventDefault();
+  const from = Math.max(0, P.findIndex((p) => p.id === b.dataset.tour));
+  try { sessionStorage.setItem("pf-tour", "1"); } catch {}
+  location.href = P[from].tour || P[from].live[1];
+});
 
 // ------------------------------------------------------------------ contact
 document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
