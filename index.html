@@ -4,266 +4,117 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lekan Lawal | AI, Data & BI</title>
-<meta name="description" content="Portfolio of Lekan Lawal: BI dashboards, data pipelines, Excel tools and AI with guardrails. Explore it as a little town where every building is a project.">
+<meta name="description" content="Lekan Lawal builds data, BI and AI tools that check their own work. Eight live projects: an iOS contract checker, a self-refreshing economic data platform, AI ticket routing, a football stats agent and more.">
 <meta property="og:title" content="Lekan Lawal | AI, Data & BI">
-<meta property="og:description" content="Seven projects you can use in your browser. Explore the town: every building is a project.">
-<meta property="og:image" content="https://lekanlawal1.github.io/portfolio-site/assets/og-home.png?v=20261022">
+<meta property="og:description" content="Messy data in, trusted tools out. Eight live projects, each one checks its own numbers.">
+<meta property="og:image" content="https://lekanlawal1.github.io/portfolio-site/assets/og-home.png?v=20261105">
+<meta name="theme-color" content="#0E0D0C">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css?v=20261112">
-<script src="site.js?v=20261111"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="home.css?v=20261105">
+<script>try { sessionStorage.setItem("pf-from", "1"); } catch {}</script>
 </head>
 <body>
+<a class="skip" href="#work">Skip to the work</a>
+<canvas id="gl" aria-hidden="true"></canvas>
 
-<header class="site">
-  <div class="wrap">
-    <a class="brand" href="#top"><span class="dot">LL</span>Lekan Lawal</a>
-    <nav class="top">
-      <a href="#projects">Projects</a>
-      <a href="#about" class="hide-sm">About</a>
-      <a href="resume.html" class="hide-xs">Résumé</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </div>
+<header class="nav">
+  <a class="name" href="#top">Lekan Lawal</a>
+  <nav class="links" aria-label="Sections">
+    <a href="#work">Work</a><a href="#about">About</a><a href="resume.html">Résumé</a><a href="#contact">Contact</a>
+  </nav>
 </header>
 
 <main id="top">
-  <div class="hero">
-    <div class="stars-bg"></div>
-    <div class="cloud" style="top:12%;animation-duration:70s;animation-delay:-20s;--s:1"></div>
-    <div class="cloud" style="top:30%;animation-duration:95s;animation-delay:-60s;--s:.7"></div>
-    <div class="cloud" style="top:62%;animation-duration:80s;animation-delay:-5s;--s:.85"></div>
-    <div class="wrap">
-      <div>
-        <span class="kicker"><span class="live"></span>Data, BI and AI · Canada</span>
-        <h1>I clean up messy data, build AI tools people can <span class="hl">trust</span>, and turn everyday problems into apps you can use today.</h1>
-        <div class="cta">
-          <a class="btn primary" href="#projects">See the work <span class="arrow">&rarr;</span></a>
-          <a class="btn" href="resume.html">Résumé</a>
-          <a class="btn" href="#contact">Say hi</a>
-        </div>
-        <div class="hint">
-          <span class="quest" id="quest"><span class="stars"></span><span class="count"></span></span>
-          <span>This is my town. Each building is a project: tap one to visit it, or tap the grass to plant a tree.</span>
-        </div>
+  <!-- the story: 2,400 points that start as a messy cloud, sort into rows, become a real store's
+       monthly sales, and close into a ring. The captions are plain text, readable without the canvas. -->
+  <section class="story" id="story" aria-label="Introduction">
+    <div class="beat">
+      <div class="cap c0" id="c0">
+        <span class="mono">Lekan Lawal · Data, BI and AI · Canada</span>
+        <h1>Messy data in.<br><i>Trusted</i> tools out.</h1>
+        <p>I build data, BI and AI tools that check their own work. These 2,400 points are a real store's sales
+          lines. Scroll to watch what I do with them.</p>
       </div>
-      <div class="town-wrap">
-        <svg id="town" class="town" role="group" aria-label="An island town where each building links to a project"></svg>
-      </div>
-    </div>
-  </div>
-
-  <section class="skills-band" aria-labelledby="sk-title">
-    <div class="wrap">
-      <div class="sk-head"><h2 id="sk-title">Skills</h2><p>Click one to see which projects use it.</p>
-        <p class="sk-status" role="status" aria-live="polite"></p></div>
-      <div class="sk-groups">
-        <div class="sk-group"><h3>Languages</h3><div class="sk-row"><button type="button" class="sk-chip" data-p="economy superstore football" aria-pressed="false">Python<i>3</i></button><button type="button" class="sk-chip" data-p="economy superstore football" aria-pressed="false">SQL<i>3</i></button><button type="button" class="sk-chip" data-p="docket economy discrepancy superstore triage football" aria-pressed="false">JavaScript<i>6</i></button><button type="button" class="sk-chip" data-p="fine-print" aria-pressed="false">Swift<i>1</i></button></div></div>
-        <div class="sk-group"><h3>Data</h3><div class="sk-row"><button type="button" class="sk-chip" data-p="economy superstore football" aria-pressed="false">pandas<i>3</i></button><button type="button" class="sk-chip" data-p="economy superstore football" aria-pressed="false">DuckDB<i>3</i></button><button type="button" class="sk-chip" data-p="football" aria-pressed="false">scikit-learn<i>1</i></button><button type="button" class="sk-chip" data-p="economy" aria-pressed="false">statsmodels<i>1</i></button><button type="button" class="sk-chip" data-p="economy superstore" aria-pressed="false">Data quality checks<i>2</i></button><button type="button" class="sk-chip" data-p="superstore discrepancy" aria-pressed="false">Reconciliation<i>2</i></button></div></div>
-        <div class="sk-group"><h3>AI</h3><div class="sk-row"><button type="button" class="sk-chip" data-p="fine-print economy triage football" aria-pressed="false">Gemini API<i>4</i></button><button type="button" class="sk-chip" data-p="football" aria-pressed="false">NL-to-SQL agents<i>1</i></button><button type="button" class="sk-chip" data-p="fine-print economy triage football" aria-pressed="false">AI output checks<i>4</i></button><button type="button" class="sk-chip" data-p="fine-print" aria-pressed="false">Apple on-device AI<i>1</i></button></div></div>
-        <div class="sk-group"><h3>BI and documents</h3><div class="sk-row"><button type="button" class="sk-chip" data-p="discrepancy" aria-pressed="false">Excel<i>1</i></button><button type="button" class="sk-chip" data-p="economy" aria-pressed="false">Plotly<i>1</i></button><button type="button" class="sk-chip" data-p="docket superstore fine-print" aria-pressed="false">PDF parsing and OCR<i>3</i></button></div></div>
-        <div class="sk-group"><h3>Build and ship</h3><div class="sk-row"><button type="button" class="sk-chip" data-p="fine-print triage football" aria-pressed="false">Cloudflare Workers<i>3</i></button><button type="button" class="sk-chip" data-p="docket economy superstore triage football" aria-pressed="false">GitHub Actions<i>5</i></button><button type="button" class="sk-chip" data-p="docket superstore" aria-pressed="false">Playwright<i>2</i></button></div></div>
-      </div>
+      <div class="cap c1" id="c1"><span class="mono">01 · Clean</span><h2>Sorted into <i>rows</i>.</h2>
+        <p>Junk rows found and reported, never quietly dropped. Duplicates removed. Every column checked.</p></div>
+      <div class="cap c2" id="c2"><span class="mono">02 · Count</span><h2>Counted, never <i>guessed</i>.</h2>
+        <p>These bars are that store's real monthly sales, 2015 to 2018, worked out in SQL.</p></div>
+      <div class="cap c3" id="c3"><span class="mono">03 · Check</span><h2>Checked, then <i>shipped</i>.</h2>
+        <p>When AI is involved, code checks every answer it gives. Eight tools built this way, all live.</p></div>
+      <div class="scroll mono" id="hint">Scroll ↓</div>
+      <div class="prog mono" id="prog" aria-hidden="true">[ 01 / 04 ] messy</div>
     </div>
   </section>
 
-  <section id="projects">
-    <div class="wrap">
-      <h2 class="section">Seven builds. Click into any of them.</h2>
-      <p class="section-sub">An iOS app that checks contracts against Ontario law, a private all-in-one PDF toolkit, a self-refreshing economic data platform,
-        an Excel tool for warehouse audits, a sales dashboard for your own data, an App Store review analyzer, and a football stats agent
-        that turns plain English into checked SQL. Every one of them has something you can use right now.</p>
-
-      <div class="cards">
-        <div class="card wide c-fine" id="fine-print">
-          <span class="badge">iPhone app</span>
-          <a class="shot" href="projects/fine-print.html"><div class="frame"><img src="assets/fine-print/banner.webp" alt="Fine Print iOS app: home, results and clause detail screens" loading="lazy"></div></a>
-          <div class="body">
-            <h3><a href="projects/fine-print.html">Fine Print: iOS Contract Checker</a></h3>
-            <p class="hook">Paste a lease or job offer and it shows which clauses Ontario law has already made void,
-            with the section of the law for each. The AI only reads and quotes; code checks every quote and label before
-            a written rule decides. Zero wrong legal verdicts across a 12-document test set built to trip it up. It's an
-            iPhone app, and you can now try it on your own document in the browser.</p>
-            <div class="tags"><span class="tag">Swift</span><span class="tag">SwiftUI</span><span class="tag">On-device AI</span><span class="tag">Gemini API</span><span class="tag">Vision OCR</span><span class="tag">AI safety</span></div>
-            <div class="links">
-              <a href="demos/fine-print/#your-document">Check your own document</a>
-              <a href="projects/fine-print.html">Video and case study</a>
-              <a href="https://github.com/lekanlawal1/fine-print">Source</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="card wide c-dock" id="docket">
-          <span class="badge">New</span>
-          <a class="shot" href="projects/docket.html" data-clip="assets/clips/docket.mp4"><div class="frame"><img src="assets/docket/card.png" alt="Docket: PDF tools grouped into piers, each with its own sea-themed icon" loading="lazy"></div></a>
-          <div class="body">
-            <h3><a href="projects/docket.html">Docket: Every PDF Tool, Private</a></h3>
-            <p class="hook">38 PDF and document tools that run entirely in your browser: merge, sign, redact, compare two
-            versions, type on any PDF, compress, read scanned pages, and convert to Word or Excel. Nothing is uploaded, so it's
-            safe for a lease or a bank statement. Redaction is checked after the fact: if any blacked-out text can still
-            be found, nothing is saved.</p>
-            <div class="tags"><span class="tag">JavaScript</span><span class="tag">PDF.js</span><span class="tag">pdf-lib</span><span class="tag">WebAssembly</span><span class="tag">OCR</span><span class="tag">Playwright</span></div>
-            <div class="links">
-              <a href="https://lekanlawal1.github.io/docket/">Use it now</a>
-              <a href="projects/docket.html">Case study</a>
-              <a href="https://github.com/lekanlawal1/docket">Source</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="card wide c-econ" id="economy">
-          <span class="badge">Refreshes itself</span>
-          <a class="shot" href="projects/project5.html" data-clip="assets/clips/canada.mp4"><div class="frame"><img src="assets/p5.png" alt="Canada Economy Intelligence dashboard: headline indicators and the AI monthly briefing" loading="lazy"></div></a>
-          <div class="body">
-            <h3><a href="projects/project5.html">Canada Economy Intelligence Platform</a></h3>
-            <p class="hook">Canada's economy by province, updated by itself every time Statistics Canada publishes. Enter
-            what you spend in a month and it works out your own inflation rate and why it differs from the official one.
-            The math is checked against StatCan's: official spending in, official inflation out. 89 automatic checks run
-            before every update.</p>
-            <div class="tags"><span class="tag">Python</span><span class="tag">DuckDB</span><span class="tag">SQL</span><span class="tag">statsmodels</span><span class="tag">GitHub Actions</span><span class="tag">Gemini API</span><span class="tag">Plotly.js</span></div>
-            <div class="links">
-              <a href="https://lekanlawal1.github.io/project5-canada-economy-platform/#mine-section">Work out your inflation rate</a>
-              <a href="projects/project5.html">Case study</a>
-              <a href="https://github.com/lekanlawal1/project5-canada-economy-platform">Source</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="card wide c-wh" id="discrepancy">
-          <a class="shot" href="demos/discrepancy-checker/" data-clip="assets/clips/discrepancy.mp4"><div class="frame"><img src="assets/discrepancy-checker.png" alt="Discrepancy Checker: totals for count, receiving and billing exceptions with charts by type, reason and client" loading="lazy"></div></a>
-          <div class="body">
-            <h3><a href="demos/discrepancy-checker/">Shipment and Inventory Discrepancy Checker</a></h3>
-            <p class="hook">An Excel workbook for warehouse and 3PL operations that checks cycle counts against the
-            system, receipts against the packing slip and PO, and storage invoices against the rate card, then
-            totals every exception on one dashboard. The browser version reads the same workbook, lets you edit
-            counts and watch the checks update, and checks your own file without uploading it.</p>
-            <div class="tags"><span class="tag">Excel</span><span class="tag">INDEX/MATCH</span><span class="tag">SUMIFS</span><span class="tag">Conditional formatting</span><span class="tag">JavaScript</span><span class="tag">SheetJS</span></div>
-            <div class="links">
-              <a href="demos/discrepancy-checker/">Try it in your browser</a>
-              <a href="demos/discrepancy-checker/Discrepancy_Checker_Sample.xlsx" download>Download the workbook</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="card c-store" id="superstore">
-          <a class="shot" href="projects/project1.html" data-clip="assets/clips/snitch.mp4"><div class="frame"><img src="assets/margin-console.png" alt="Money Snitch, margins tab: headline numbers, findings in plain English and sales and margin by month" loading="lazy"></div></a>
-          <div class="body">
-            <h3><a href="projects/project1.html">Money Snitch</a></h3>
-            <p class="hook">Two money checks for a small business, in your browser. Drop in a sales export to see where the
-            profit goes: the discount cliff, products that lose money, margin month by month, with the SQL behind every
-            chart. Or drop in a card processing statement: every fee is checked against the card networks' published
-            rates and sorted into what's fixed and what your processor keeps, which is the part you can negotiate.</p>
-            <div class="tags"><span class="tag">SQL</span><span class="tag">DuckDB</span><span class="tag">BI</span><span class="tag">PDF parsing</span><span class="tag">Data viz</span><span class="tag">JavaScript</span></div>
-            <div class="links">
-              <a href="https://lekanlawal1.github.io/project1-bi-dashboard/">Check your margins</a>
-              <a href="https://lekanlawal1.github.io/project1-bi-dashboard/#fees">Check your card fees</a>
-              <a href="projects/project1.html">Case study</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="card c-triage" id="triage">
-          <a class="shot" href="projects/app-reviews.html" data-clip="assets/clips/reviews.mp4"><div class="frame"><img src="assets/app-reviews.png" alt="App Review Insights: Wealthsimple's recent reviews average 3.5 stars against an all-time 4.6" loading="lazy"></div></a>
-          <div class="body">
-            <h3><a href="projects/app-reviews.html">App Review Insights</a></h3>
-            <p class="hook">Pick any iPhone app and see what its users love, hate and ask for, from its latest App Store
-            reviews: ratings by week and by version, plus AI themes where every quote is checked against the real
-            review. Wealthsimple's recent reviews average 3.5 stars, not the 4.6 it shows.</p>
-            <div class="tags"><span class="tag">JavaScript</span><span class="tag">Gemini API</span><span class="tag">Cloudflare Workers</span><span class="tag">Data viz</span></div>
-            <div class="links">
-              <a href="https://lekanlawal1.github.io/app-review-insights/">Try it on any app</a>
-              <a href="projects/app-reviews.html">Case study</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="card wide c-fifa" id="football">
-          <span id="churn" class="anchor"></span><span id="agent" class="anchor"></span>
-          <a class="shot" href="projects/football-agent.html" data-clip="assets/clips/football.mp4"><div class="frame"><img src="assets/football-agent.png" alt="Football Stats Agent: a question about late-game tackles answered with a ranked table and the SQL behind it" loading="lazy"></div></a>
-          <div class="body">
-            <h3><a href="projects/football-agent.html">Football Stats Agent</a></h3>
-            <p class="hook">Ask a football question in plain English, like who made the most tackles in the last
-            20 minutes of games, and an AI writes the SQL that your own browser runs on 1,853 matches of event
-            data. The query is always shown. It asks when a question is vague, declines what the data can't
-            answer, and stopped all 12 attacks in its evaluation. Includes my own expected goals model.</p>
-            <div class="tags"><span class="tag">Gemini API</span><span class="tag">DuckDB-WASM</span><span class="tag">SQL</span><span class="tag">scikit-learn</span><span class="tag">Cloudflare Workers</span><span class="tag">AI safety</span></div>
-            <div class="links">
-              <a href="https://lekanlawal1.github.io/football-agent/">Ask it a question</a>
-              <a href="projects/football-agent.html">Case study</a>
-              <a href="https://github.com/lekanlawal1/football-agent">Source</a>
-            </div>
-          </div>
-        </div>
+  <!-- the work: a map of every project wired to the skills it uses. Scrolling steps through the
+       projects; pointing at a project or skill shows it; clicking a project jumps to it. -->
+  <section class="work" id="work" aria-labelledby="work-title">
+    <div class="pin" id="pin">
+      <div class="whead">
+        <h2 id="work-title">Eight builds, <i>one</i> toolkit.</h2>
+        <p><span class="wide-only">Each project is wired to the skills it uses. Scroll to step through them, or point at a skill to see where it shows up.</span><span class="narrow-only">Each project is wired to the skills it uses. Tap a project, or use the arrows, to open its file.</span></p>
       </div>
-
-      <div class="stats">
-        <div class="stat"><div class="v" data-count="11" data-suffix="/11">11/11</div><div class="l">headline figures matching Statistics Canada's official releases</div></div>
-        <div class="stat"><div class="v" data-count="89">89</div><div class="l">automatic checks that block a bad update</div></div>
-        <div class="stat"><div class="v" data-count="15" data-suffix="/15">15/15</div><div class="l">planted errors caught by the AI briefing's number checker</div></div>
-        <div class="stat"><div class="v" data-count="0">0</div><div class="l">wrong legal verdicts across Fine Print's 12-document test set</div></div>
-      </div>
-      <div class="derby-rail">
-        <a class="derby-side" href="https://dailyderby.app/" target="_blank" rel="noopener" aria-label="Derby, a daily football quiz I'm building. Try it">
-          <span class="tab">Try it &rarr;</span>
-          <img src="assets/derby-mini.webp" width="240" height="360" alt="" loading="lazy">
-          <span class="cap"><span class="pre">Also building</span><b>Derby</b><span>Daily football quiz</span></span>
-        </a>
-      </div>
+      <div class="map" id="map"><canvas id="lines" aria-hidden="true"></canvas><div class="hub" aria-hidden="true">LL</div></div>
+      <aside class="hud" id="hud" aria-live="polite"></aside>
+      <div class="steps"><span class="mono" id="count">01 / 08</span><span class="line"><i id="fill"></i></span><span class="names mono" id="names"></span></div>
+      <div class="phone-nav"><button type="button" id="prev" aria-label="Previous project">←</button><span class="mono" id="pcount">01 / 08</span><button type="button" id="next" aria-label="Next project">→</button></div>
     </div>
   </section>
 
-  <section id="about" class="alt">
-    <div class="wrap">
-      <h2 class="section">About</h2>
-      <div class="about-grid">
-        <figure class="me">
-          <img src="assets/lekan.webp" width="480" height="480" alt="Lekan Lawal in a green graduation gown and cap" loading="lazy" decoding="async">
-          <figcaption><b>Lekan Lawal</b><span>Computer Science, Trent University, 2026</span></figcaption>
-        </figure>
-        <div class="about-text">
-          <p>I build tools for the boring problems that matter: the contract nobody reads closely, the PDF that
-          has to be signed tonight, the warehouse count that doesn't match, the card fee nobody noticed.</p>
-          <p style="margin-top:14px">One rule runs through all of it: nothing reaches you unchecked. Fine Print only flags a
-          clause in a contract once code has confirmed it. The football agent writes its own SQL, then checks it
-          twice and shows it, so every number can be verified. Docket goes the other way: 38 PDF tools that never
-          upload your file. Away from the keyboard I'm a Tottenham fan, which has taught me a lot about patience.</p>
-          <p style="margin-top:14px">I'm looking for AI, data and BI roles in Canada, on a team that turns messy data into
-          decisions people trust. If that's your team, say hi.</p>
-        </div>
-      </div>
+  <section class="receipts" aria-labelledby="r-title">
+    <h2 id="r-title" class="mono">The receipts</h2>
+    <div class="nums">
+      <div><b>11/11</b><span>headline figures matching Statistics Canada's official releases</span></div>
+      <div><b>89</b><span>automatic checks that block a bad data update</span></div>
+      <div><b>0</b><span>wrong legal verdicts across Fine Print's 12-document test set</span></div>
+      <div><b>12/12</b><span>prompt-injection and data attacks stopped by The Gaffer</span></div>
+    </div>
+    <a class="derby" href="https://dailyderby.app/" target="_blank" rel="noopener">
+      <img src="assets/derby-mini.webp" width="240" height="360" alt="" loading="lazy">
+      <span><span class="mono">Also building</span><b>Derby</b> a daily football quiz <i>Try it ↗</i></span>
+    </a>
+  </section>
+
+  <section class="about" id="about" aria-labelledby="a-title">
+    <figure class="me">
+      <img src="assets/lekan.webp" width="480" height="480" alt="Lekan Lawal in a green graduation gown and cap" loading="lazy" decoding="async">
+      <figcaption><b>Lekan Lawal</b><span>Computer Science, Trent University, 2026</span></figcaption>
+    </figure>
+    <div class="about-text">
+      <h2 id="a-title">About</h2>
+      <p>I build tools for the boring problems that matter: the contract nobody reads closely, the PDF that
+        has to be signed tonight, the warehouse count that doesn't match, the card fee nobody noticed.</p>
+      <p>One rule runs through all of it: nothing reaches you unchecked. Fine Print only flags a clause once code
+        has confirmed it. The Gaffer writes its own SQL, then checks it and shows it, so every number can be verified.
+        Sorted only routes a message when an AI and a plain model agree. Away from the keyboard I'm a Tottenham fan,
+        which has taught me a lot about patience.</p>
+      <p>I'm looking for AI, data and BI roles in Canada, on a team that turns messy data into decisions people trust.</p>
     </div>
   </section>
 
-  <section id="contact">
-    <div class="wrap">
-      <div class="contact-card">
-        <div class="blob" aria-hidden="true"></div>
-        <div style="position:relative">
-          <h2>Got messy data?<br>Let's talk.</h2>
-          <p>Open to AI, data and BI roles in Canada.</p>
-        </div>
-        <ul class="contact-list">
-          <li><button type="button" data-copy="lekan1553@gmail.com">lekan1553@gmail.com <small>Copy</small></button></li>
-          <li><a href="https://www.linkedin.com/in/lekan-lawal/">LinkedIn <small>lekan-lawal</small></a></li>
-          <li><a href="https://github.com/lekanlawal1">GitHub <small>lekanlawal1</small></a></li>
-          <li><a href="assets/Lekan_Lawal_Resume.pdf" download>Résumé <small>PDF</small></a></li>
-          <li><a href="tel:+12896715308">+1 (289) 671 5308 <small>Call</small></a></li>
-        </ul>
-      </div>
-    </div>
+  <section class="contact" id="contact" aria-labelledby="c-title">
+    <h2 id="c-title">Got messy data?<br><i>Let's talk.</i></h2>
+    <p>Open to AI, data and BI roles in Canada.</p>
+    <ul class="clist">
+      <li><button type="button" data-copy="lekan1553@gmail.com">lekan1553@gmail.com <small class="mono">copy</small></button></li>
+      <li><a href="https://www.linkedin.com/in/lekan-lawal/">LinkedIn <small class="mono">lekan-lawal</small></a></li>
+      <li><a href="https://github.com/lekanlawal1">GitHub <small class="mono">lekanlawal1</small></a></li>
+      <li><a href="assets/Lekan_Lawal_Resume.pdf" download>Résumé <small class="mono">PDF</small></a></li>
+      <li><a href="tel:+12896715308">+1 (289) 671 5308 <small class="mono">call</small></a></li>
+    </ul>
   </section>
 </main>
 
-<footer class="site">
-  <div class="wrap">© 2026 Lekan Lawal · Built by hand, no frameworks. The town is drawn in code: Three.js, with a plain SVG version for slower devices.</div>
-</footer>
+<footer class="foot mono">© 2026 Lekan Lawal · Built by hand: Three.js, GSAP and plain JavaScript.</footer>
 
-<script src="town.js?v=20261107"></script>
-<script type="module" src="town3d.js?v=20261107"></script>
-<script src="sound.js?v=20261028b"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="projects.js?v=20261105"></script>
+<script type="module" src="home.js?v=20261105"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "50d455a6ac424591b8acaa97dc3975a9"}'></script>
 </body>
 </html>

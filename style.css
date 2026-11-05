@@ -252,7 +252,7 @@ p.section-sub { color: var(--ink-2); margin-bottom: 38px; max-width: 46rem; font
 .card .links a:hover { text-decoration: none; transform: translateY(-2px); }
 
 /* project colours */
-.c-fine { --c: #FF4F8B; } .c-econ { --c: #E63946; } .c-store { --c: #FFB020; } .c-triage { --c: #3E8BFF; }
+.c-fine { --c: #FF4F8B; } .c-econ { --c: #E63946; } .c-store { --c: #FFB020; } .c-triage { --c: #3E8BFF; } .c-sorted { --c: #3E8BFF; }
 .c-fifa { --c: #22C3A6; } .c-dock { --c: #2E86AB; } .c-agent { --c: #8A4DFF; } .c-wh { --c: #FF6B35; }
 
 /* stats strip */

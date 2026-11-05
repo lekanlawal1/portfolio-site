@@ -3,20 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Support Ticket Triage | Lekan Lawal</title>
+<title>Sorted: AI ticket triage for bank support | Lekan Lawal</title>
+<meta name="description" content="Bank support messages routed to the right team only when an AI and a plain model agree. 99.1% of the messages it sorted on its own were right.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../style.css?v=20261021">
+<link rel="stylesheet" href="../style.css?v=20261105">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-<script src="../site.js?v=20261022"></script>
+<script src="../site.js?v=20261105"></script>
 </head>
-<body class="c-triage">
+<body class="c-sorted">
 <header class="site">
   <div class="wrap">
     <a class="brand" href="../index.html"><span class="dot">LL</span>Lekan Lawal</a>
     <nav class="top">
-      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#work">Projects</a>
       <a href="../index.html#about" class="hide-sm">About</a>
       <a href="../index.html#contact">Contact</a>
     </nav>
@@ -26,54 +27,66 @@
 
 <main class="wrap">
   <div class="project-hero">
-    <a class="backlink" href="../index.html#triage">&larr; All projects</a>
-    <p class="archived">Archived. This project grew into <a href="app-reviews.html">App Review Insights</a>, which works on
-    real App Store reviews instead of synthetic tickets. The live demo below still works.</p>
-    <h1>AI Support Ticket Triage: Sorting Support Tickets, and Catching the AI When It's Wrong</h1>
-    <p class="one-liner">A tool that reads incoming support tickets and decides what each one is about, how urgent it is and
-    which team should get it. When the AI isn't sure, a person decides instead.</p>
+    <a class="backlink" href="../index.html#sorted">&larr; All projects</a>
+    <h1>Sorted: Bank Support Messages, Routed Only When Two Models Agree</h1>
+    <p class="one-liner">Type a message a bank customer might send and watch it go to one of seven support teams, or
+    get held for a person. An AI and a plain model both read it, and code only sends it on when they agree.</p>
     <div class="meta-row">
-      <span class="tag">Python</span><span class="tag">Gemini API</span><span class="tag">structured output</span>
-      <span class="tag">Streamlit</span><span class="tag">prompt engineering</span>
+      <span class="tag">Gemini API</span><span class="tag">scikit-learn</span><span class="tag">JavaScript</span>
+      <span class="tag">Cloudflare Workers</span><span class="tag">AI evaluation</span>
     </div>
   </div>
 
-  <a class="big-shot" href="https://project2-ai-ticket-triage-ubf6qjhxmukei7tzjp5xgo.streamlit.app">
-    <img src="../assets/p2.png" alt="AI Support Ticket Triage demo screenshot">
+  <div class="project-links" style="margin:0 0 26px">
+    <a class="btn primary" href="https://lekanlawal1.github.io/project2-ai-ticket-triage/">Sort a message</a>
+    <a class="btn" href="https://github.com/lekanlawal1/project2-ai-ticket-triage">View the code</a>
+  </div>
+
+  <a class="big-shot" href="https://lekanlawal1.github.io/project2-ai-ticket-triage/">
+    <img src="../assets/shots/sorted.jpg" alt="Sorted: a message box at the top, and an inbox of test messages sorted into seven team queues">
   </a>
 
   <article class="case">
-    <h2>What it does</h2>
-    <p>Support teams spend a few minutes on every ticket just working out what it is and who should handle it. This
-    tool does that first step with Google's Gemini: it labels each ticket with a category, a priority and a team,
-    and gives a confidence score. Anything under 75% confident isn't sent anywhere automatically. It goes to a review
-    pile for a person, with the AI's guess attached as a suggestion.</p>
-    <p>The rest of the work is making it dependable. Every answer has to come back in a fixed format, so there's no
-    guessing at free text. If the AI service is slow, refuses, or sends something broken, the tool waits and tries
-    again, and if it still fails, the ticket goes to the review pile with the reason written down. Nothing is ever
-    dropped silently.</p>
+    <h2>The problem</h2>
+    <p>A support desk spends minutes on every message just working out who should handle it. An AI can do that first
+    pass in a second, but it can be confidently wrong, and its own "how sure am I" doesn't catch that. The first
+    version of this project proved it: it filed complaints that mentioned money as billing questions at 95% confidence,
+    and the confidence check never noticed.</p>
 
-    <h2>What testing found</h2>
-    <p>I tested it on 171 tickets with known answers, including 15 written to be ambiguous. The most useful result
-    wasn't the score. Complaints that mentioned money were being filed as billing questions with 95% confidence,
-    because of one tie-breaking rule in my instructions to the AI. The confidence check couldn't catch it, because
-    the AI wasn't unsure, it was consistently wrong. The lesson: a confidence score catches vague tickets, not a
-    systematic mistake, so the mistakes themselves have to be measured.</p>
+    <h2>How it works</h2>
+    <p><b>The AI reads the message.</b> Gemini returns a team, a priority, how sure it is and the words that decided it,
+    in a fixed shape it can't step outside. Code checks that the quoted words are really in the message.</p>
+    <p><b>A plain model reads it too.</b> A small text classifier trained on 10,003 labelled bank messages. It runs in
+    your browser and never sees the AI's answer.</p>
+    <p><b>Code decides.</b> A message goes straight to a team only when both pick the same team, the AI is at least 80%
+    sure, and its quote checks out. Everything else goes to a person, with the reasons. The 80% bar was set before
+    scoring, not tuned on the results.</p>
+
+    <h2>The data</h2>
+    <p>Banking77, a public set of 13,083 real customer messages to a bank, each labelled by people with one of 77 request
+    types. I grouped those into seven teams a bank would actually have, and set priorities, before running any model.
+    Nothing in the test set was written by me, so the scores can be checked.</p>
+
+    <h2>What the first full run found</h2>
     <div class="numbers">
-      <div class="num"><div class="v">90%</div><div class="l">of tickets the AI handled alone were put in the right category</div></div>
-      <div class="num"><div class="v">5.8%</div><div class="l">of tickets were sent to a person because the AI wasn't confident enough</div></div>
-      <div class="num"><div class="v">~62 hrs</div><div class="l">of sorting time saved per 1,000 tickets a month, by my estimate (the working is in the repo)</div></div>
+      <div class="num"><div class="v">87.3%</div><div class="l">of 770 test messages were sorted with no person involved</div></div>
+      <div class="num"><div class="v">99.1%</div><div class="l">of those reached the right team (6 wrong out of 672)</div></div>
+      <div class="num"><div class="v">64</div><div class="l">would have gone to the wrong team if the AI's confidence alone had been trusted</div></div>
     </div>
+    <p>The AI's confidence is only loosely related to whether it's right: messages it rated 80 to 90% sure were right
+    just 61% of the time. Most of its misses are on Transfers, where it often reads "top-up by bank transfer" as a
+    Top-ups question. My grouping says Transfers; its reading is defensible.</p>
 
-    <h2>Why it's archived</h2>
-    <p>The test tickets were ones I wrote, so the 90% can't be checked against real support traffic. Its successor,
-    <a href="app-reviews.html">App Review Insights</a>, keeps the same idea (the AI suggests, code checks) and applies
-    it to real App Store reviews anyone can look up.</p>
+    <h2>The honest catch</h2>
+    <p>The plain model on its own, sending only its 672 most confident messages, let 4 wrong ones through. On this data
+    the AI doesn't make routing safer than a model trained on 10,000 labelled examples. What it adds is a quoted reason
+    a person can check, and it works with no training data at all, which is the realistic case for a new inbox. The page
+    shows both opinions and the right answer for every test message, and lets you filter to just the mistakes.</p>
   </article>
 
   <div class="project-links">
-    <a class="btn primary" href="https://project2-ai-ticket-triage-ubf6qjhxmukei7tzjp5xgo.streamlit.app">Try the live demo</a>
-    <a class="btn" href="https://github.com/lekanlawal1/project2-ai-ticket-triage">View code & prompt docs</a>
+    <a class="btn primary" href="https://lekanlawal1.github.io/project2-ai-ticket-triage/">Sort a message</a>
+    <a class="btn" href="https://github.com/lekanlawal1/project2-ai-ticket-triage">View the code</a>
   </div>
 </main>
 

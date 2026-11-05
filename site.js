@@ -125,7 +125,7 @@
     // the town quest: every project counts once it has been seen, however the visitor got there
     // (an island building, a project card, or the page itself). Finishing unlocks the contact card.
     const quest = document.getElementById("quest");
-    const BODY_TO_ID = { "c-econ": "econ", "c-store": "store", "c-triage": "triage", "c-fifa": "fifa", "c-fine": "fine", "c-wh": "wh", "c-dock": "dock" };
+    const BODY_TO_ID = { "c-econ": "econ", "c-store": "store", "c-triage": "triage", "c-fifa": "fifa", "c-fine": "fine", "c-wh": "wh", "c-dock": "dock", "c-sorted": "sorted" };
     const CARD_TO_ID = { economy: "econ", superstore: "store", triage: "triage", football: "fifa", "fine-print": "fine", discrepancy: "wh", docket: "dock" };
     const readVisited = () => { try { return JSON.parse(localStorage.getItem("town-visited") || "[]"); } catch { return []; } };
     const markVisited = (id) => {
@@ -266,19 +266,6 @@
       else if (e.detail === 10 && treeToasts++ === 0) toast("10 trees. This town owes you one.");
     });
 
-    // case studies: tour progress next to the "All projects" link
-    const backlink = document.querySelector("a.backlink");
-    if (backlink && here) {
-      const seen = new Set(readVisited()), total = Object.keys(BODY_TO_ID).length;
-      const n = Object.values(BODY_TO_ID).filter((id) => seen.has(id)).length;
-      const pill = document.createElement("a");
-      pill.className = "tour-pill" + (n >= total ? " done" : "");
-      pill.href = backlink.getAttribute("href").replace(/#.*$/, "") + (n >= total ? "#reward" : "#tour");
-      pill.innerHTML = `<span class="stars">${Array.from({ length: total }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>`
-        + (n >= total ? "Reward unlocked" : `Tour ${n}/${total} · see what's left`);
-      backlink.insertAdjacentElement("afterend", pill);
-    }
-
     // "All projects" links on project pages wipe back home in the page's colour
     document.querySelectorAll("a.backlink").forEach((a) => a.addEventListener("click", (e) => {
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
@@ -330,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const band = document.querySelector(".skills-band"), cards = document.querySelector(".cards");
   if (!band || !cards) return;
   const status = band.querySelector(".sk-status");
-  const names = { "fine-print": "Fine Print", docket: "Docket", economy: "Canada Economy", discrepancy: "Discrepancy Checker", superstore: "Money Snitch", triage: "App Review Insights", football: "Football Stats Agent" };
+  const names = { "fine-print": "Fine Print", docket: "Docket", economy: "Canada Economy", discrepancy: "Discrepancy Checker", superstore: "Money Snitch", triage: "App Review Insights", football: "The Gaffer" };
   let on = null;
   function clear() {
     if (on) on.setAttribute("aria-pressed", "false");
