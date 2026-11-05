@@ -130,6 +130,12 @@ export function makeGlobe(THREE, { hero, stage, projects: P, onPick, keepClear }
     vy = 0;
     marks.forEach((m, k) => m.classList.toggle("on", k === i));
   }
+  // turn a project round to face you without opening it (no zoom): used by "Hiring for"
+  function turn(i) {
+    if (!spots[i]) return;
+    const a = angleFor(i); let d = a.yaw - yaw; d = Math.atan2(Math.sin(d), Math.cos(d));
+    target = { yaw: yaw + d, pitch: a.pitch * 0.6 }; vy = 0; lastInput = performance.now();
+  }
   function release() { cur = -1; target = null; marks.forEach((m) => m.classList.remove("on")); }
   function dim(ids) { marks.forEach((m, k) => m.classList.toggle("dim", !!ids && !ids.includes(P[k].id))); }
 
@@ -191,5 +197,5 @@ export function makeGlobe(THREE, { hero, stage, projects: P, onPick, keepClear }
   }
   const gz = () => globe.position.z;
   requestAnimationFrame(frame);
-  return { focus, release, refresh, dim, wasDrag: () => moved > 6 };
+  return { focus, turn, release, refresh, dim, wasDrag: () => moved > 6 };
 }

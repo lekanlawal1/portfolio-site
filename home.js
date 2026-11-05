@@ -129,7 +129,7 @@ const howiStep = (k) => {
 document.querySelector(".howi-steps").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; howiStep(+b.dataset.s); if (story) story.go(+b.dataset.s); });
 
 import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js").then(async (THREE) => {
-  const [{ makeGlobe }, { makeStory }] = await Promise.all([import("./globe.js?v=20261113"), import("./story.js?v=20261113")]);
+  const [{ makeGlobe }, { makeStory }] = await Promise.all([import("./globe.js?v=20261114"), import("./story.js?v=20261113")]);
   G = makeGlobe(THREE, { hero, stage: $("stage"), projects: P, onPick: gopen,
     keepClear: () => { const r = $("intro").getBoundingClientRect(), t = hero.getBoundingClientRect(); return r.bottom - t.top + 8; } });
   if (gcur >= 0) G.focus(gcur);
@@ -428,11 +428,15 @@ function pickRole(role, quiet) {
   if (W) { cur = 0; layout(); drawNames(); lastShown = null; setCur(0); if (hasGsap) ScrollTrigger.refresh(); }
   if (G) { G.refresh(); G.dim(P.slice(0, 3).map((p) => p.id)); }
   drawGNames();
-  if (!quiet) gopen(0);
+  // the globe turns to the best fit and lights the three that fit; the buttons stay put
+  if (!quiet) { gclose(); if (G) G.turn(0); }
 }
-document.querySelectorAll("[data-role]").forEach((b) => b.addEventListener("click", () => pickRole(b.dataset.role)));
-$("role-note").addEventListener("click", (e) => {
-  if (!e.target.closest("#role-clear")) return;
+// clicking the chosen role again unselects it
+document.querySelectorAll("[data-role]").forEach((b) => b.addEventListener("click", () => {
+  if (b.getAttribute("aria-pressed") === "true") clearRole(); else pickRole(b.dataset.role);
+}));
+$("role-note").addEventListener("click", (e) => { if (e.target.closest("#role-clear")) clearRole(); });
+function clearRole() {
   try { sessionStorage.removeItem("pf-role"); } catch {}
   const byId = Object.fromEntries(P.map((p) => [p.id, p]));
   P.splice(0, P.length, ...ORIGINAL.map((id) => byId[id]));
@@ -441,7 +445,7 @@ $("role-note").addEventListener("click", (e) => {
   $("tour-label").textContent = "Take the tour";
   saveOrder(); cur = 0; layout(); drawNames(); lastShown = null; setCur(0);
   gclose(); if (G) { G.refresh(); G.dim(null); } drawGNames();
-});
+}
 const ORIGINAL = P.map((p) => p.id);
 try { const r = sessionStorage.getItem("pf-role"); if (r) pickRole(r, true); } catch {}
 
