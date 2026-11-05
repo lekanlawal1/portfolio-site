@@ -1,0 +1,159 @@
+/* Discrepancy Checker: the page is the workbook. Excel's green ribbon, a formula bar, grid lines,
+   sheet tabs along the bottom, typed values in blue. Inter for text, JetBrains Mono for formulas. */
+:root {
+  --g: #107C41; --g-2: #E6F2EA; --ink: #1F2328; --ink-2: #4B525B; --grid: #D9DDE2; --hd: #F3F4F6; --bg: #EEF0F2;
+  --card: #FFFFFF; --bad: #C42B1C; --bad-bg: #FDECEA; --ok: #107C41; --ok-bg: #E6F2EA; --amber: #C77700;
+  --input: #0B57D0; --input-bg: #EEF4FF; --field: #F7F8FA;
+}
+* { box-sizing: border-box; margin: 0; }
+html { -webkit-text-size-adjust: 100%; background: var(--bg); }
+body { background: var(--bg); color: var(--ink); font: 15.5px/1.55 Inter, system-ui, sans-serif; }
+a { color: var(--g); }
+.mono, code { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
+:focus-visible { outline: 2px solid var(--g); outline-offset: 2px; }
+.app { max-width: 1280px; margin: 20px auto; background: var(--card); border-radius: 10px; overflow: hidden; box-shadow: 0 20px 50px rgba(0, 0, 0, .12); }
+
+.ribbon { background: var(--g); color: #fff; display: flex; align-items: center; gap: 20px; padding: 11px 20px; font-size: 14.5px; flex-wrap: wrap; }
+.ribbon a { color: #fff; text-decoration: none; }
+.ribbon .file { font-weight: 700; font-size: 16px; }
+.ribbon .rtabs { display: flex; gap: 18px; opacity: .92; }
+.ribbon .rtabs a:hover, .ribbon .who:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ribbon .who { margin-left: auto; }
+.fx { display: flex; align-items: stretch; border-bottom: 1px solid var(--grid); font: 500 13.5px "JetBrains Mono", monospace; }
+.fx .nm { width: 90px; padding: 7px 10px; border-right: 1px solid var(--grid); }
+.fx .f { padding: 7px 10px; color: var(--ink-2); border-right: 1px solid var(--grid); font-style: italic; }
+.fx code { padding: 7px 12px; flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.fx code b { color: var(--g); }
+
+/* the hero sits on the sheet's grid */
+.hero { display: grid; grid-template-columns: 40px minmax(0, 1fr); }
+.rows { background: var(--hd); border-right: 1px solid var(--grid); font: 500 12px Inter; color: var(--ink-2); text-align: center; }
+.rows span { display: block; height: 46px; line-height: 46px; border-bottom: 1px solid var(--grid); }
+.cells { padding: 28px 30px 32px; background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 46px, linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 130px 100%; }
+.cells h1 { font: 800 clamp(34px, 5.2vw, 70px)/1.22 Inter; letter-spacing: -.035em; max-width: 18ch; }
+.cells h1 span { background: #fff; box-decoration-break: clone; -webkit-box-decoration-break: clone; padding: 0 6px; }
+.cells h1 .red { color: var(--bad); }
+.cells .lead { margin: 14px 0 0; max-width: 46rem; font-size: 18px; line-height: 1.7; color: var(--ink-2); }
+.cells .lead span { background: #fff; box-decoration-break: clone; -webkit-box-decoration-break: clone; padding: 2px 6px; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+.btn { display: inline-block; padding: 11px 18px; border-radius: 4px; background: var(--g); color: #fff; font-weight: 600; text-decoration: none; border: 1px solid var(--g); }
+.btn:hover { background: #0B5E31; }
+.btn.o { background: #fff; color: var(--g); }
+.btn.o:hover { background: var(--g-2); }
+.btns.end { margin: 34px 0 6px; }
+
+.body { padding: 26px 30px 30px; border-top: 1px solid var(--grid); }
+.notice { font-size: 14.5px; color: var(--ink-2); background: var(--field); border: 1px solid var(--grid); border-radius: 4px; padding: 10px 14px; }
+.notice b { color: var(--ink); }
+.why { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 16px 0 6px; }
+.why > div { border: 1px solid var(--grid); border-radius: 4px; padding: 14px 16px; }
+.why .ref { font: 600 12px "JetBrains Mono"; color: var(--g); }
+.why h3 { font-size: 17px; margin: 2px 0 4px; }
+.why p { font-size: 14.5px; color: var(--ink-2); }
+
+.source { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin: 30px 0 14px; scroll-margin-top: 10px; }
+.seg { display: inline-flex; border: 1px solid var(--grid); border-radius: 4px; overflow: hidden; }
+.seg button { font: 600 14px Inter; border: 0; background: #fff; color: var(--ink-2); padding: 8px 14px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--grid); }
+.seg button[aria-pressed="true"] { background: var(--g); color: #fff; }
+.status { font-size: 14.5px; color: var(--ink-2); }
+.status b { color: var(--ink); }
+.status:has(.loading-stripes), .status:has(.done-tick) { display: inline-flex; align-items: center; gap: 8px; }
+.done-tick { display: inline-grid; place-items: center; width: 18px; height: 18px; flex: none; border-radius: 50%; background: var(--ok); color: #fff; font-size: 11px; font-weight: 800; }
+/* A striped bar that slides while something is in progress. Adapted from a loader on Uiverse.io by bernethe (MIT). */
+.loading-stripes { display: inline-block; flex: none; width: 46px; height: 14px; border: 1.5px solid var(--g); border-radius: 3px;
+  background: linear-gradient(-60deg, transparent 0 50%, var(--g) 50% 75%, transparent 75%) 0 0 / 16px 24px; animation: loading-stripes .8s linear infinite; }
+@keyframes loading-stripes { to { background-position: -16px 0; } }
+@media (prefers-reduced-motion: reduce) { .loading-stripes { animation-duration: 2.4s; } }
+
+.drop { display: none; border: 1.5px dashed var(--g); border-radius: 4px; padding: 22px; text-align: center; background: var(--field); margin-bottom: 16px; }
+.drop.show { display: block; }
+.drop.over { background: var(--g-2); }
+.drop p { margin: 4px 0; color: var(--ink-2); font-size: 14.5px; }
+.drop .err { color: var(--bad); font-weight: 700; }
+.drop details { text-align: left; max-width: 44rem; margin: 10px auto 0; font-size: 14.5px; color: var(--ink-2); }
+.drop summary { cursor: pointer; font-weight: 700; color: var(--ink); text-align: center; }
+.drop ul { margin: 8px 0 0; padding-left: 20px; }
+
+/* key numbers as selected cells */
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kpi { position: relative; border: 1px solid var(--grid); border-radius: 4px; padding: 12px 14px; min-width: 0; }
+.kpi:hover { outline: 2px solid var(--g); outline-offset: -1px; }
+.kpi:hover::after { content: ""; position: absolute; right: -4px; bottom: -4px; width: 7px; height: 7px; background: var(--g); border: 1px solid #fff; }
+.kpi .l { font-weight: 600; font-size: 14.5px; }
+.kpi .v { font: 700 clamp(24px, 2.6vw, 32px)/1.2 Inter; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.kpi.bad .v { color: var(--bad); }
+.kpi .s { font-size: 13.5px; color: var(--ink-2); }
+.charts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.charts > *, .kpis > * { min-width: 0; }
+.panel { border: 1px solid var(--grid); border-radius: 4px; padding: 14px; }
+.panel h3 { font-size: 15px; margin-bottom: 12px; }
+.bars { display: grid; grid-template-columns: minmax(0, 9.5em) 1fr; gap: 8px 10px; align-items: center; font-size: 13.5px; }
+.bars .lab { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bars .track { position: relative; height: 18px; }
+.bars .fill { position: absolute; top: 2px; bottom: 2px; transition: width .4s ease, left .4s ease; }
+.bars .val { position: absolute; top: 0; line-height: 18px; font: 600 12.5px "JetBrains Mono"; white-space: nowrap; }
+.bars .axis { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--ink-2); }
+
+h2.dc { font: 800 clamp(26px, 3vw, 34px)/1.15 Inter; letter-spacing: -.025em; margin: 40px 0 4px; scroll-margin-top: 10px; }
+.dc-sub { color: var(--ink-2); margin: 0 0 12px; max-width: 48rem; }
+.grid-tools { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.chk { font-size: 14.5px; color: var(--ink-2); display: inline-flex; gap: 6px; align-items: center; font-weight: 600; }
+.linkbtn { font: 600 14.5px Inter; background: none; border: 0; color: var(--g); cursor: pointer; padding: 4px; text-decoration: underline; }
+.tablewrap { border: 1px solid var(--grid); overflow: auto; max-height: 560px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th { position: sticky; top: 0; z-index: 1; background: var(--hd); text-align: left; font-weight: 600; padding: 7px 9px; border: 1px solid var(--grid); white-space: nowrap; }
+td { padding: 6px 9px; border: 1px solid var(--grid); white-space: nowrap; }
+td.n, th.n { text-align: right; }
+td.calc { background: var(--field); }
+tr.bad td { background: var(--bad-bg); }
+tr.bad td.calc { background: #FADAD5; }
+.pill { display: inline-block; font-size: 12.5px; font-weight: 700; padding: 0 8px; border-radius: 3px; }
+.pill.ok { color: var(--ok); background: var(--ok-bg); }
+.pill.bad { color: var(--bad); background: #FFF; border: 1px solid var(--bad); }
+.neg { color: var(--bad); font-weight: 600; }
+td input { width: 5.5em; font: 600 14px "JetBrains Mono"; color: var(--input); text-align: right; background: var(--input-bg); border: 1px solid transparent; border-radius: 2px; padding: 2px 4px; }
+td input.money { width: 7.5em; }
+td input:focus { outline: none; border-color: var(--input); background: #fff; }
+td input.changed { background: #DCE8FF; border-color: var(--input); }
+/* sheet tabs under the grid, as in Excel */
+.tabs { display: flex; gap: 2px; background: var(--hd); border: 1px solid var(--grid); border-top: 0; padding: 0 8px; overflow-x: auto; }
+.tab { font: 500 14px Inter; padding: 8px 14px; border: 0; background: none; color: var(--ink-2); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+.tab[aria-selected="true"] { background: #fff; color: var(--g); font-weight: 700; border-bottom-color: var(--g); }
+.tab .c { display: inline-block; min-width: 1.4em; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--bad); color: #fff; font-size: 12px; text-align: center; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13.5px; color: var(--ink-2); margin: 12px 2px 0; }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; border: 1px solid var(--grid); }
+.legend .i::before { background: var(--input-bg); border-color: var(--input); }
+.legend .f::before { background: var(--field); }
+.legend .r::before { background: var(--bad-bg); border-color: var(--bad); }
+
+details.formulas-box { margin-top: 26px; scroll-margin-top: 10px; }
+details.formulas-box > summary { cursor: pointer; display: inline-block; font-weight: 700; padding: 9px 16px; border: 1px solid var(--g); color: var(--g); border-radius: 4px; }
+details.formulas-box > summary:hover { background: var(--g-2); }
+.formulas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.formulas > * { min-width: 0; }
+.f-card { border: 1px solid var(--grid); border-radius: 4px; padding: 14px 16px; }
+.f-card .where { font: 600 12px "JetBrains Mono"; color: var(--g); }
+.f-card h4 { margin: 2px 0 8px; font-size: 16px; }
+.f-card code { display: block; background: var(--field); border: 1px solid var(--grid); padding: 8px 10px; font-size: 12.5px; overflow-x: auto; white-space: pre; }
+.f-card p { margin: 8px 0 0; font-size: 14.5px; color: var(--ink-2); }
+.f-card .alt { font-size: 13.5px; margin-top: 8px; color: var(--ink-2); }
+.f-card .alt code { margin-top: 4px; }
+
+.sheetbar { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; background: var(--hd); border-top: 1px solid var(--grid); padding: 0 12px; font-size: 13.5px; color: var(--ink-2); }
+.sheetbar span { padding: 8px 12px; }
+.sheetbar span.on { background: #fff; color: var(--g); font-weight: 600; border-bottom: 2px solid var(--g); }
+.sheetbar em { margin-left: auto; font-style: normal; padding: 8px 4px; font-size: 13px; }
+
+@media (max-width: 900px) { .charts, .why { grid-template-columns: minmax(0, 1fr); } .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .formulas { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .app { margin: 0; border-radius: 0; }
+  .ribbon .rtabs { display: none; }
+  .fx .f { display: none; }
+  .hero { grid-template-columns: 26px minmax(0, 1fr); }
+  .cells { padding: 20px 16px 24px; }
+  .cells .lead { font-size: 16.5px; }
+  .body { padding: 20px 16px 24px; }
+  .sheetbar span:not(.on) { display: none; }
+  .bars { grid-template-columns: minmax(0, 7.5em) 1fr; }
+}

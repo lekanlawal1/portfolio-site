@@ -197,9 +197,9 @@
   const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
   function renderCharts(c) {
-    bars("c-type", c.types, css("--bad"));
-    bars("c-reason", c.reasons, css("--sky"));
-    bars("c-client", c.clients, (v) => (v >= 0 ? css("--amber") : css("--accent-2")), money);
+    bars("c-type", c.types, css("--g"));
+    bars("c-reason", c.reasons, css("--g"));
+    bars("c-client", c.clients, (v) => (v >= 0 ? css("--bad") : css("--amber")), money);
   }
 
   const input = (tab, i, key, v, cls = "") =>
