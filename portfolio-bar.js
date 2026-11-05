@@ -1,12 +1,14 @@
-/* The portfolio bar: a slim strip at the top of every live project and demo with a way back to the
-   portfolio's projects, plus the visitor's progress on the island tour.
+/* "Back to all projects": a small pill in the corner of every live project and demo, shown only to
+   people who came from the portfolio. Someone who opens a project from a résumé, LinkedIn or a
+   bookmark sees the project and nothing else.
 
    Load it from any page on lekanlawal1.github.io:
      <script src="https://lekanlawal1.github.io/portfolio-site/portfolio-bar.js" data-project="econ" defer></script>
    data-project is the island building's id (econ, store, triage, fifa, fine, wh, dock). Opening the page
-   counts as visiting that project. Pages on this origin share localStorage with the portfolio, so the
-   tour sees visits however people arrive. Leave data-project off for archived projects.
-   The tour counter only shows to visitors who've started the tour; everyone else gets just the way back. */
+   counts as visiting that project for the island tour, whose progress shows as dots in the pill.
+
+   "Came from the portfolio" means the portfolio set a flag in this tab's sessionStorage (all projects
+   share its origin, and a tab opened from it gets a copy), or the page was opened straight from it. */
 (() => {
   const PORTFOLIO = "https://lekanlawal1.github.io/portfolio-site/";
   const TOUR = ["fine", "dock", "econ", "wh", "store", "triage", "fifa"];
@@ -15,49 +17,52 @@
   const project = me && me.dataset.project;
   const base = (me && me.dataset.portfolio) || PORTFOLIO;   // a relative path when served from the portfolio itself
 
+  let fromPortfolio = !!(me && me.dataset.portfolio) || document.referrer.startsWith(PORTFOLIO);
+  try {
+    if (fromPortfolio) sessionStorage.setItem("pf-from", "1");
+    else fromPortfolio = sessionStorage.getItem("pf-from") === "1";
+  } catch { /* private mode */ }
+
+  // a visit still counts for the tour however people arrive
   let visited = [];
-  try { visited = JSON.parse(localStorage.getItem("town-visited") || "[]"); } catch { /* private mode */ }
-  // The tour only means something to people who've seen the island: they came here from the portfolio,
-  // or they've opened a project before. Someone arriving from a résumé or LinkedIn link just gets the way back.
-  const fromPortfolio = /^https:\/\/lekanlawal1\.github\.io\/portfolio-site\//.test(document.referrer) || (me && me.dataset.portfolio);
-  const touring = fromPortfolio || visited.some((id) => TOUR.includes(id));
+  try { visited = JSON.parse(localStorage.getItem("town-visited") || "[]"); } catch {}
   if (project && TOUR.includes(project) && !visited.includes(project)) {
     visited.push(project);
-    try { localStorage.setItem("town-visited", JSON.stringify(visited)); } catch { /* private mode */ }
+    try { localStorage.setItem("town-visited", JSON.stringify(visited)); } catch {}
   }
+  if (!fromPortfolio) return;
+
   const n = TOUR.filter((id) => visited.includes(id)).length;
   const done = n >= TOUR.length;
-
   const css = `
-.pf-strip { position: relative; z-index: 2147483000; display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  min-height: 40px; padding: 6px 16px; background: #1D1535; color: #FFF7EA; font: 600 13.5px/1.2 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
-.pf-strip a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 5px 10px; }
-.pf-strip a:hover, .pf-strip a:focus-visible { background: rgba(255, 247, 234, .14); outline: none; }
-.pf-strip .pf-arrow { font-size: 16px; line-height: 1; }
-.pf-strip .pf-label, .pf-strip .pf-label-long { font: inherit; }
-.pf-strip .pf-tour { border: 1.5px solid rgba(255, 247, 234, .35); }
-.pf-strip .pf-dots { display: inline-flex; gap: 3px; }
-.pf-strip .pf-dots i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #FFF7EA; }
-.pf-strip .pf-dots i.on { background: #FFC23C; border-color: #FFC23C; }
-.pf-strip .pf-tour.done { background: #FFC23C; color: #1D1535; border-color: #FFC23C; }
-.pf-strip .pf-tour.done .pf-dots i { border-color: #1D1535; background: #1D1535; }
-@media (max-width: 420px) { .pf-strip .pf-label-long { display: none; } }
-@media print { .pf-strip { display: none; } }`;
+.pf-pill { position: fixed; left: 14px; bottom: 14px; z-index: 2147483000; display: flex; align-items: center; gap: 2px; padding: 4px;
+  background: rgba(255, 255, 255, .86); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #18181B;
+  border: 1px solid rgba(0, 0, 0, .1); border-radius: 999px; box-shadow: 0 6px 24px rgba(0, 0, 0, .12);
+  font: 600 13px/1 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; transition: opacity .2s, transform .2s; }
+.pf-pill a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border-radius: 999px; white-space: nowrap; }
+.pf-pill a:hover, .pf-pill a:focus-visible { background: rgba(0, 0, 0, .06); outline: none; }
+.pf-pill .pf-dots { display: inline-flex; gap: 3px; }
+.pf-pill .pf-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(0, 0, 0, .18); }
+.pf-pill .pf-dots i.on { background: #FFB020; }
+.pf-pill .pf-sep { width: 1px; height: 18px; background: rgba(0, 0, 0, .12); }
+.pf-pill.done .pf-tour { color: #8A5A00; }
+.pf-pill.away { opacity: 0; transform: translateY(8px); pointer-events: none; }
+@media (prefers-color-scheme: dark) { .pf-pill { background: rgba(24, 24, 27, .82); color: #F4F4F5; border-color: rgba(255, 255, 255, .14); }
+  .pf-pill a:hover { background: rgba(255, 255, 255, .1); } .pf-pill .pf-dots i { background: rgba(255, 255, 255, .25); } .pf-pill .pf-sep { background: rgba(255, 255, 255, .16); } }
+@media (prefers-reduced-motion: reduce) { .pf-pill { transition: none; } }
+@media print { .pf-pill { display: none; } }`;
   const style = document.createElement("style");
   style.textContent = css;
-
-  const strip = document.createElement("nav");
-  strip.className = "pf-strip";
-  strip.setAttribute("aria-label", "Portfolio");
+  const pill = document.createElement("nav");
+  pill.className = `pf-pill${done ? " done" : ""}`;
+  pill.setAttribute("aria-label", "Portfolio");
   const back = base + "index.html" + (project ? `#${CARD[project]}` : "#projects");
-  strip.innerHTML = `
-    <a class="pf-back" href="${back}"><span class="pf-arrow" aria-hidden="true">&larr;</span><span class="pf-label">Back to <span class="pf-label-long">all </span>projects</span></a>
-    ${touring ? `<a class="pf-tour${done ? " done" : ""}" href="${base}index.html#${done ? "reward" : "tour"}"
-       aria-label="Island tour: ${n} of ${TOUR.length} projects explored${done ? ", reward unlocked" : ""}">
-      <span class="pf-dots" aria-hidden="true">${TOUR.map((_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>
-      ${done ? "Reward unlocked" : `Tour ${n}/${TOUR.length}`}
-    </a>` : ""}`;
-
-  const mount = () => { document.head.appendChild(style); document.body.prepend(strip); };
+  pill.innerHTML = `<a href="${back}"><span aria-hidden="true">&larr;</span>All projects</a><span class="pf-sep" aria-hidden="true"></span>
+    <a class="pf-tour" href="${base}index.html#${done ? "reward" : "tour"}" aria-label="Island tour: ${n} of ${TOUR.length} projects explored${done ? ", reward unlocked" : ""}">
+      <span class="pf-dots" aria-hidden="true">${TOUR.map((_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>${done ? "Reward" : `${n}/${TOUR.length}`}</a>`;
+  // keep out of the way: hide while scrolling down, come back when scrolling up or at rest near the top
+  let lastY = scrollY;
+  addEventListener("scroll", () => { const y = scrollY; pill.classList.toggle("away", y > lastY && y > 200); lastY = y; }, { passive: true });
+  const mount = () => { document.head.appendChild(style); document.body.appendChild(pill); };
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
 })();

@@ -6,6 +6,9 @@
   const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
   root.dataset.theme = dark ? "dark" : "light";
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Projects show a small "back to all projects" pill only to people who came from here, in this tab
+  // (portfolio-bar.js reads this; a project opened in a new tab from here gets a copy of it).
+  try { sessionStorage.setItem("pf-from", "1"); } catch {}
 
   const ICONS = `<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="#1D1535" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="#fff"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>`
     + `<svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="#FFE9A8" stroke="#1D1535" stroke-width="2.2" stroke-linejoin="round"/></svg>`;
