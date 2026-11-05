@@ -252,6 +252,7 @@ function swapPanel(render, quick) {
     [...hud.children].forEach((c, k) => c.style.setProperty("--i", k));
     hud.classList.remove("entering"); void hud.offsetWidth; hud.classList.add("entering");
     scramble(hud.querySelector("h3")); scramble(hud.querySelector(".proof b"), 380);
+    fallbackStill();
   };
   if (reduce || quick || !hud.children.length) { enter(); return; }
   hud.classList.add("leaving");
@@ -277,6 +278,16 @@ function showProject(i) {
     <div class="stack">${p.skills.map((s) => `<span>${esc(s)}</span>`).join("")}</div>
     <div class="go"><a href="${p.live[1]}">${esc(p.live[0])} ↗</a>${p.study !== p.live[1] ? `<a class="o" href="${p.study}">Case study</a>` : ""}${p.download ? `<a class="o" href="${p.download}" download>Workbook</a>` : ""}${p.source ? `<a class="o" href="${p.source}">Source</a>` : ""}</div>
     <a class="tour-here mono" href="${p.tour || p.live[1]}" data-tour="${p.id}">Tour from here: ${pad(i)} of ${pad(P.length - 1)}, then the rest →</a>`;
+}
+function fallbackStill() {
+  const v = hud.querySelector(".shot video");
+  if (!v) return;
+  const p = v.play && v.play();
+  if (p && p.catch) p.catch(() => {
+    const img = document.createElement("img"); img.alt = ""; img.src = v.getAttribute("poster") || P[cur].img;
+    if (P[cur].phone) img.className = "phone";
+    v.replaceWith(img);
+  });
 }
 function showSkill(s) {
   const ps = P.filter((p) => p.skills.includes(s));
@@ -412,8 +423,12 @@ function boot() {
     else { setCur(i); $("work").scrollIntoView(); }
   }
 }
-let lastW = innerWidth, rt;
+let lastW = innerWidth, lastH = innerHeight, rt;
 addEventListener("resize", () => {
+  // phones report a resize every time the address bar shrinks or grows while scrolling: only a real
+  // change of width (or a desktop window changing height) should rebuild the map and panel
+  if (innerWidth === lastW && (small() || Math.abs(innerHeight - lastH) < 120)) return;
+  lastH = innerHeight;
   clearTimeout(rt);
   rt = setTimeout(() => { const crossed = (lastW <= 900) !== (innerWidth <= 900); lastW = innerWidth; layout(); lastShown = null; paint(); if (crossed) setupPin(); if (hasGsap) ScrollTrigger.refresh(); }, 200);
 });
