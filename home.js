@@ -38,12 +38,16 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("cli
   jumpTo(id === "top" ? 0 : t.getBoundingClientRect().top + scrollY, SECTION[id]);
   history.replaceState(null, "", id === "top" ? location.pathname : `#${id}`);
 }));
+let lastScroll = scrollY, dockAway = false, dockRest = 0, dockPast = false, dockPin = false;
 addEventListener("scroll", () => {
   const past = scrollY > $("story").offsetHeight - innerHeight * 0.6;
   document.querySelector(".nav").classList.toggle("solid", past);
   // on desktop the pinned work section has its own step bar along the bottom: the dock steps aside there
   const pr = $("pin").getBoundingClientRect(), inPin = !small() && pr.top < innerHeight * 0.5 && pr.bottom > innerHeight * 0.5;
-  $("dock").classList.toggle("on", past && !inPin);
+  const down = scrollY > lastScroll + 2, up = scrollY < lastScroll - 2; lastScroll = scrollY;
+  if (down) dockAway = true; else if (up) dockAway = false;
+  dockPast = past; dockPin = inPin;
+  $("dock").classList.toggle("on", past && !inPin && !dockAway);
 }, { passive: true });
 
 // ------------------------------------------------------------------ the story
@@ -87,8 +91,8 @@ async function startGL() {
     const i = c * ROWS + r, k = i * 3; seed[i] = Math.random();
     const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), rad = Math.cbrt(Math.random()) * (Math.random() < 0.08 ? 5.5 : 3.2);
     A[k] = rad * Math.sin(ph) * Math.cos(th) * (S ? 0.9 : 1.5) + rnd(-0.3, 0.3); A[k + 1] = rad * Math.cos(ph) * 0.9; A[k + 2] = rad * Math.sin(ph) * Math.sin(th);
-    B[k] = (c / (COLS - 1) - 0.5) * W; B[k + 1] = (r / (ROWS - 1) - 0.5) * H * 0.8; B[k + 2] = 0;
-    C[k] = B[k]; C[k + 1] = -H / 2 + (r / (ROWS - 1)) * (SALES[c] / max * H); C[k + 2] = 0;
+    B[k] = (c / (COLS - 1) - 0.5) * W; B[k + 1] = S ? (r / (ROWS - 1) - 0.5) * 3.8 + 0.7 : (r / (ROWS - 1) - 0.5) * H * 0.8; B[k + 2] = 0;
+    C[k] = B[k]; C[k + 1] = S ? -1.0 + (r / (ROWS - 1)) * (SALES[c] / max * 4.0) : -H / 2 + (r / (ROWS - 1)) * (SALES[c] / max * H); C[k + 2] = 0;
     const t = (i / N) * Math.PI * 2, a = t * 7 + seed[i] * 0.4, R = (S ? 2.0 : 2.6) + Math.sin(i * 0.37) * 0.28 + rnd(-0.12, 0.12);
     D[k] = Math.cos(t) * R; D[k + 1] = Math.sin(t) * R; D[k + 2] = Math.sin(a) * 0.35;
   }
@@ -127,7 +131,12 @@ async function startGL() {
   size(); addEventListener("resize", size);
   let mx = 0, my = 0;
   let push = 0, lastMove = 0;
-  addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; lastMove = performance.now(); });
+  addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; lastMove = performance.now(); });
+  let burst = 0, touched = 0;
+  const touchAt = (t) => { mx = t.clientX / innerWidth - 0.5; my = t.clientY / innerHeight - 0.5; lastMove = touched = performance.now(); };
+  addEventListener("touchstart", (e) => { touchAt(e.touches[0]); burst = 1; }, { passive: true });
+  addEventListener("touchmove", (e) => touchAt(e.touches[0]), { passive: true });
+  const coarse = matchMedia("(pointer: coarse)").matches;
   const half = Math.tan((cam.fov / 2) * Math.PI / 180) * cam.position.z;
   let kick = 0;
   return {
@@ -137,7 +146,12 @@ async function startGL() {
       mat.uniforms.uP.value = p; mat.uniforms.uT.value = reduce ? 0 : t;
       group.rotation.y = (p < 1 && !reduce ? (1 - p) * t * 0.12 : 0) + mx * 0.25 * (1 - Math.min(1, p) * 0.6);
       // where the pointer sits on the particles' plane, and how hard it pushes (fades when it stops)
-      push += ((performance.now() - lastMove < 900 && !reduce ? 1 : 0) - push) * 0.06;
+      const now = performance.now();
+      if (coarse && !reduce && now - touched > 2500) {   // nobody touching: let the push drift on its own
+        mx = Math.sin(t * 0.41) * 0.28; my = Math.sin(t * 0.53 + 1) * 0.22; lastMove = now; }
+      burst *= 0.94;
+      const want = reduce ? 0 : (now - lastMove < 900 ? (coarse && now - touched > 2500 ? 0.6 : 1) : 0) + burst * 1.3;
+      push += (want - push) * (want > push ? 0.25 : 0.06);
       mat.uniforms.uM.value.set(mx * 2 * half * cam.aspect - group.position.x, -my * 2 * half - group.position.y, push);
       group.rotation.x = my * 0.15; group.position.y = S ? 1.4 * Math.min(1, p) : 0; group.rotation.z = Math.max(0, p - 2) * 0.15;
       group.position.x = S ? 0 : 2.2 * Math.max(0, 1 - p) - 1.4 * Math.min(1, p) + 1.0 * Math.max(0, Math.min(1, p - 2));
@@ -271,7 +285,11 @@ function showSkill(s) {
 }
 function setCur(i) {
   i = (i + P.length) % P.length;
-  if (i !== cur) send(cur, i);
+  if (i !== cur) {
+    send(cur, i);
+    const fwd = (i - cur + P.length) % P.length <= P.length / 2;
+    hud.style.setProperty("--sx", small() ? (fwd ? "34px" : "-34px") : "0px");
+  }
   cur = i;
   const nx = P[cur + 1];
   $("nexthint").textContent = pinST ? (nx ? `Next: ${nx.name} ↓` : "Then: about me ↓") : "";
@@ -325,9 +343,10 @@ function go(i, jump) {
     glideT = setTimeout(() => { gliding = false; }, d * 1000 + 300);
   } else {
     hover = null; setCur(i);
-    // phones and tablets: bring the new panel's top into view, gently
-    const r = hud.getBoundingClientRect();
-    if (r.top < 60 || r.top > innerHeight * 0.55) scrollToY(scrollY + r.top - 76, 0.8);
+    // phones and tablets: keep the map and the top of the new panel in view together, so you see
+    // the light travel and the panel arrive
+    const m = map.getBoundingClientRect();
+    if (m.top < 40 || m.top > innerHeight * 0.3) scrollToY(scrollY + m.top - 64, 0.8);
   }
 }
 
