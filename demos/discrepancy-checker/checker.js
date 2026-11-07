@@ -302,7 +302,7 @@
     render();
     const parts = [["inventory", "count rows"], ["receiving", "receipts"], ["billing", "invoices"]]
       .filter(([k]) => data[k]).map(([k, w]) => `${data[k].length} ${w}`);
-    $("status").innerHTML = `<span class="done-tick" aria-hidden="true">✓</span>Read <b>${esc(name)}</b>: ${parts.join(", ")}`;
+    $("status").innerHTML = `<span class="done-tick" aria-hidden="true"><svg class="ic" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.2 6.4l2.4 2.4 5.2-5.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Read <b>${esc(name)}</b>: ${parts.join(", ")}`;
     $("drop-err").textContent = errors.length ? `Skipped: ${errors.join(". ")}.` : "";
   }
 
