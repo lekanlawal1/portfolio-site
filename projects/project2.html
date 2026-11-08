@@ -78,10 +78,34 @@
     the AI doesn't make routing safer than a model trained on 10,000 labelled examples. What it adds is a quoted reason
     a person can check, and it works with no training data at all, which is the realistic case for a new inbox. The page
     shows both opinions and the right answer for every test message, and lets you filter to just the mistakes.</p>
+
+    <h2>Try it on your own messages</h2>
+    <p>A second page runs the same method on a support desk's own teams and history, as a trial before anyone switches
+    anything on. You upload past messages as a CSV, ideally with the team each one really went to, and describe 2 to 12
+    teams in a line each. The plain model is trained in your browser on most of that history; I wrote the training in
+    JavaScript and checked it against scikit-learn on the same split, where both score 81.5%. Up to 200 messages it never
+    saw go to the AI, with emails, links, postcodes and long numbers hidden first, and the report shows how many would
+    have been sent automatically, how many of those were right, which teams the AI confuses, and why the rest were held.</p>
+    <div class="numbers">
+      <div class="num"><div class="v">97.9%</div><div class="l">right when sent automatically, on 193 bank messages, learning from only 577</div></div>
+      <div class="num"><div class="v">6</div><div class="l">fewer mistakes than the plain model alone at the same coverage</div></div>
+      <div class="num"><div class="v">~1 min</div><div class="l">from upload to report, for 200 messages</div></div>
+    </div>
+    <p>That second number turns the honest catch around. With 10,000 examples the plain model was as safe on its own; with
+    577, requiring the AI to agree let 6 fewer mistakes through. Most teams have hundreds of past messages, not tens of
+    thousands, which is where the second opinion earns its place.</p>
+
+    <h2>Using it for real</h2>
+    <p>The trial tells a team whether AI routing would be safe on their messages. Running it on every new message is a
+    bigger job: a connection to the helpdesk that sets the team and leaves a note with the reason, a paid AI account with
+    the data kept in Canada instead of the free tier, a few weeks of shadow mode where it only suggests, retraining from
+    agents' corrections, a weekly check for drift, and a record of every decision. The page spells this out, because a
+    trial that looks like a product would be the wrong thing to hand a support team.</p>
   </article>
 
   <div class="project-links">
     <a class="btn primary" href="https://lekanlawal1.github.io/project2-ai-ticket-triage/">Sort a message</a>
+    <a class="btn" href="https://lekanlawal1.github.io/project2-ai-ticket-triage/own.html">Try your own messages</a>
     <a class="btn" href="https://github.com/lekanlawal1/project2-ai-ticket-triage">View the code</a>
   </div>
 </main>
