@@ -66,7 +66,7 @@ html.pf-in body { visibility: hidden; }
   function out(target, opts = {}) {
     const go = () => {
       try { sessionStorage.setItem(KEY, JSON.stringify({ label: opts.label || "" })); } catch {}
-      if (typeof target === "function") { target(); play(opts); } else location.href = target;
+      location.href = target;
     };
     if (reduce || busy || !document.body) {
       if (typeof target === "function") { target(); return; }
@@ -75,7 +75,7 @@ html.pf-in body { visibility: hidden; }
     busy = true;
     const S = stage(opts.label), T = 640, t0 = performance.now();
     let done = false;
-    const finish = () => { if (done) return; done = true; if (typeof target === "function") { sessionStorage.removeItem(KEY); target(); S.el.remove(); busy = false; play(opts); } else go(); };
+    const finish = () => { if (done) return; done = true; if (typeof target === "function") { target(); S.el.remove(); busy = false; play(opts); } else go(); };
     S.el.addEventListener("pointerdown", finish);
     const tick = (now) => {
       if (done) return;

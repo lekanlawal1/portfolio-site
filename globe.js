@@ -146,10 +146,11 @@ export function makeGlobe(THREE, { hero, stage, projects: P, onPick, keepClear }
   addEventListener("resize", () => { if (small() && innerWidth === lastW) return; size(); });
   const t0 = performance.now(), v = new THREE.Vector3(), fv = new THREE.Vector3();
   let camZ = small() ? 15.5 : 9.6, push = 0, gx = 0, gy = 0;
+  let onScreen = true;
+  new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; }).observe(hero);
   function frame(now) {
     requestAnimationFrame(frame);
-    const r = hero.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > innerHeight) return;   // off screen: don't draw
+    if (!onScreen) return;   // off screen: don't draw
     const t = (now - t0) / 1000, open = cur >= 0, S = small();
     mat.uniforms.uT.value = reduce ? 0 : t;
     if (!reduce) mat.uniforms.uIn.value = Math.min(1, t / 2.4);

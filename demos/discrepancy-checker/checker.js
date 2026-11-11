@@ -71,7 +71,7 @@
     return { idx, rows: out };
   }
 
-  const num = (v) => (v == null || v === "" ? null : Number(v));
+  const num = (v) => (v == null || v === "" ? null : typeof v === "number" ? v : Number(String(v).replace(/[$,\s]/g, "")));
 
   function parse(wb) {
     const errors = [];
@@ -103,6 +103,8 @@
         if (r.sku != null) r.sku = String(r.sku).trim();
         return r;
       });
+      const bad = data[key].findIndex((r) => Object.entries(r).some(([k, v]) => typeof v === "number" && Number.isNaN(v)));
+      if (bad >= 0) errors.push(`${key[0].toUpperCase() + key.slice(1)} row ${bad + 2} has a value that is not a number`);
     }
     if (!data.inventory && !data.receiving && !data.billing && !errors.length)
       errors.push("No sheet named Inventory, Receiving or Billing was found.");
@@ -221,19 +223,19 @@
       bad: (r) => r.status !== "OK",
       row: (r, i) => [esc(r.sku), [esc(r.desc), "calc"], [qty(r.sys), "n"], [input("inventory", i, "phys", r.phys), "n"],
         [signed(r.variance), vcls(r.variance)], [pill(r.status), "calc"], [esc(r.loc), "calc"], [money(r.cost), "n calc"],
-        [money(r.value), r.value ? "n calc neg" : "n calc"], esc(r.reason ?? ""), day(r.date)],
+        [money(r.value), r.value ? "n calc neg" : "n calc"], esc(r.reason ?? ""), esc(day(r.date))],
     },
     receiving: {
       head: ["Receipt date", "PO", "Carrier", "BOL", "SKU", "Description", "PO qty", "Packing slip qty", "Qty received", "Variance", "Flag", "PO check", "Week"],
       bad: (r) => r.flag !== "OK" || r.poCheck !== "OK",
-      row: (r, i) => [day(r.date), esc(r.po), esc(r.carrier ?? ""), esc(r.bol ?? ""), esc(r.sku), [esc(r.desc), "calc"], [qty(r.poQty), "n"],
+      row: (r, i) => [esc(day(r.date)), esc(r.po), esc(r.carrier ?? ""), esc(r.bol ?? ""), esc(r.sku), [esc(r.desc), "calc"], [qty(r.poQty), "n"],
         [qty(r.slip), "n"], [input("receiving", i, "recv", r.recv), "n"], [signed(r.variance), vcls(r.variance)], [pill(r.flag), "calc"],
         [pill(r.poCheck), "calc"], [r.week, "calc"]],
     },
     billing: {
       head: ["Month", "Client", "Pallets stored", "Rate", "Invoice amount", "Expected", "Variance", "Flag"],
       bad: (r) => r.flag !== "OK",
-      row: (r, i) => [month(r.month), esc(r.client), [qty(r.pallets), "n"], [money(r.rate), "n calc"],
+      row: (r, i) => [esc(month(r.month)), esc(r.client), [qty(r.pallets), "n"], [money(r.rate), "n calc"],
         [input("billing", i, "invoice", r.invoice, "money"), "n"], [money(r.expected), "n calc"],
         [money(r.variance), r.flag !== "OK" ? "n calc neg" : "n calc"], [pill(r.flag), "calc"]],
     },

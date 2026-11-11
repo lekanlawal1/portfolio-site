@@ -282,7 +282,7 @@ footer { color: var(--ink-2); font-size: .85rem; padding: 10px 0 40px; }
 const E = FinePrintEngine;
 const ICON = { rule_violation: "!", needs_human: "?", worth_a_look: "•", rule_compliant: '<svg class="ic" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.2 6.4l2.4 2.4 5.2-5.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' };
 const TYPE_NAME = (t) => t.replaceAll("_", " ");
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]));
 let data, current = 0, guardOn = true;
 let own = null;   // the last analysis of a pasted document
 

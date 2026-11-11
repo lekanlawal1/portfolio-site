@@ -1,7 +1,7 @@
 /* Home page: the particle story, the project map and the small things around them.
-   Three.js is loaded here; GSAP, ScrollTrigger and Lenis come from classic scripts in the page.
-   Everything degrades: no WebGL means the story's captions stack as plain text, and no GSAP means
-   the map simply responds to clicks instead of scrolling. */
+   Three.js is loaded here; Lenis (smooth scrolling) comes from a classic script in the page.
+   Everything degrades: no WebGL means the story's captions stack as plain text, and no Lenis means
+   the page scrolls the browser's own way. */
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -10,16 +10,11 @@ const P = window.PROJECTS;
 const pad = (i) => String(i + 1).padStart(2, "0");
 
 // ------------------------------------------------------------------ smooth scrolling
-const hasGsap = !!(window.gsap && window.ScrollTrigger);
 let lenis = null;
-if (hasGsap) {
-  gsap.registerPlugin(ScrollTrigger);
-  if (!reduce && window.Lenis) {
-    lenis = new Lenis({ lerp: 0.1 });
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add((t) => lenis.raf(t * 1000));
-    gsap.ticker.lagSmoothing(0);
-  }
+if (!reduce && window.Lenis) {
+  lenis = new Lenis({ lerp: 0.1 });
+  const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
+  requestAnimationFrame(raf);
 }
 const scrollToY = (y, d = 1.1) => (lenis ? lenis.scrollTo(y, { duration: d }) : scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" }));
 const land = (y) => { if (lenis) lenis.scrollTo(y, { immediate: true, force: true }); else scrollTo(0, y); };
@@ -55,21 +50,28 @@ addEventListener("scroll", () => {
 // turns it to face you and zooms in; the file arrives as the zoom settles.
 const hero = $("top"), gfile = $("gfile");
 let G = null, gcur = -1, gT = 0;
-function fileHTML(p, i) {
-  return `<div class="top mono"><span>File ${pad(i)} // ${esc(p.kind)}</span><button type="button" class="x" aria-label="Close the file">&times;</button></div>
-    <h2>${esc(p.name)}</h2><p>${esc(p.line)}</p>
+// the part of a project's panel that the globe's file and the map's panel share; they differ in the
+// header, the heading level and the picture's class
+function projectBody(p, i, h, shot) {
+  return `<${h}>${esc(p.name)}</${h}><p>${esc(p.line)}</p>
     <div class="proof"><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}</span></div>
-    <a class="shot" href="${p.live[1]}" aria-label="Open ${esc(p.name)}">${still
+    <a class="${shot}" href="${p.live[1]}" aria-label="Open ${esc(p.name)}">${still
       ? `<img src="${p.img}" alt=""${p.phone ? ' class="phone"' : ""}>`
-      : `<video src="assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${p.img}"`} autoplay muted loop playsinline aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>
+      : `<video src="assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${p.img}"`} autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>
     <div class="stack">${p.skills.map((k) => `<span>${esc(k)}</span>`).join("")}</div>
     <div class="go"><a href="${p.live[1]}">${esc(p.live[0])} ↗</a>${p.study !== p.live[1] ? `<a class="o" href="${p.study}">Case study</a>` : ""}${p.download ? `<a class="o" href="${p.download}" download>Workbook</a>` : ""}${p.source ? `<a class="o" href="${p.source}">Source</a>` : ""}</div>
     <a class="tour-here mono" href="${p.tour || p.live[1]}" data-tour="${p.id}">Tour from here: ${pad(i)} of ${pad(P.length - 1)}, then the rest →</a>`;
 }
-function playOrStill(root) {
-  const v = root.querySelector(".shot video");
-  const q = v && v.play && v.play();
-  if (q && q.catch) q.catch(() => { const img = document.createElement("img"); img.alt = ""; img.src = v.getAttribute("poster") || P[gcur >= 0 ? gcur : cur].img; v.replaceWith(img); });
+function fileHTML(p, i) {
+  return `<div class="top mono"><span>File ${pad(i)} // ${esc(p.kind)}</span><button type="button" class="x" aria-label="Close the file">&times;</button></div>` + projectBody(p, i, "h2", "shot");
+}
+function playOrStill(root, p) {
+  const v = root.querySelector(".shot video"), q = v && v.play && v.play();
+  if (q && q.catch) q.catch(() => {
+    const img = document.createElement("img"); img.alt = ""; img.src = v.getAttribute("poster") || p.img;
+    if (p.phone) img.className = "phone";
+    v.replaceWith(img);
+  });
 }
 function drawGNames() {
   $("gnames").innerHTML = P.map((p, i) => `<button type="button" data-i="${i}"${i === gcur ? ' class="on"' : ""}>${esc(p.name.split(" ").slice(-1)[0])}</button>`).join("");
@@ -85,7 +87,7 @@ function gopen(i) {
     gfile.innerHTML = fileHTML(P[i], i);
     gfile.querySelector(".x").addEventListener("click", gclose);
     gfile.classList.remove("swap"); gfile.classList.add("show");
-    playOrStill(gfile);
+    playOrStill(gfile, P[i]);
   };
   clearTimeout(gT);
   if (reduce) render();
@@ -128,7 +130,7 @@ const howiStep = (k) => {
 };
 document.querySelector(".howi-steps").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; howiStep(+b.dataset.s); if (story) story.go(+b.dataset.s); });
 
-import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js").then(async (THREE) => {
+import("./vendor/three.module.min.js").then(async (THREE) => {
   const [{ makeGlobe }, { makeStory }] = await Promise.all([import("./globe.js?v=20261114"), import("./story.js?v=20261113")]);
   G = makeGlobe(THREE, { hero, stage: $("stage"), projects: P, onPick: gopen,
     keepClear: () => { const r = $("intro").getBoundingClientRect(), t = hero.getBoundingClientRect(); return r.bottom - t.top + 8; } });
@@ -140,7 +142,7 @@ import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js").then(
 // ------------------------------------------------------------------ the work map
 const map = $("map"), cv = $("lines"), ctx = cv.getContext("2d"), hud = $("hud");
 const SKILLS = [...new Set(P.flatMap((p) => p.skills))];
-const VISIT_ID = { fine: "fine-print", dock: "docket", econ: "economy", wh: "discrepancy", store: "superstore", triage: "triage", fifa: "football", sorted: "sorted" };
+const VISIT_ID = Object.fromEntries(P.map((p) => [p.short, p.id]));   // the short id each project site reports, to the portfolio id
 let seen = new Set();
 try { seen = new Set(JSON.parse(localStorage.getItem("town-visited") || "[]").map((v) => VISIT_ID[v]).filter(Boolean)); } catch {}
 let W = 0, H = 0, nodes = [], edges = [], cur = 0, hover = null;
@@ -223,7 +225,7 @@ function swapPanel(render, quick) {
     [...hud.children].forEach((c, k) => c.style.setProperty("--i", k));
     hud.classList.remove("entering"); void hud.offsetWidth; hud.classList.add("entering");
     scramble(hud.querySelector("h3")); scramble(hud.querySelector(".proof b"), 380);
-    fallbackStill();
+    playOrStill(hud, P[cur]);
   };
   if (reduce || quick || !hud.children.length) { enter(); return; }
   hud.classList.add("leaving");
@@ -240,25 +242,7 @@ function send(from, to) {
 const still = reduce || !!(navigator.connection && navigator.connection.saveData);
 function showProject(i) {
   const p = P[i];
-  hud.innerHTML = `<div class="bar mono"><span>File ${pad(i)} // ${esc(p.name)}</span><span>${esc(p.kind)}</span></div>
-    <h3>${esc(p.name)}</h3><p>${esc(p.line)}</p>
-    <div class="proof"><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}</span></div>
-    <a class="shot reveal" href="${p.live[1]}" aria-label="Open ${esc(p.name)}">${still
-      ? `<img src="${p.img}" alt=""${p.phone ? ' class="phone"' : ""}>`
-      : `<video src="assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${p.img}"`} autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>
-    <div class="stack">${p.skills.map((s) => `<span>${esc(s)}</span>`).join("")}</div>
-    <div class="go"><a href="${p.live[1]}">${esc(p.live[0])} ↗</a>${p.study !== p.live[1] ? `<a class="o" href="${p.study}">Case study</a>` : ""}${p.download ? `<a class="o" href="${p.download}" download>Workbook</a>` : ""}${p.source ? `<a class="o" href="${p.source}">Source</a>` : ""}</div>
-    <a class="tour-here mono" href="${p.tour || p.live[1]}" data-tour="${p.id}">Tour from here: ${pad(i)} of ${pad(P.length - 1)}, then the rest →</a>`;
-}
-function fallbackStill() {
-  const v = hud.querySelector(".shot video");
-  if (!v) return;
-  const p = v.play && v.play();
-  if (p && p.catch) p.catch(() => {
-    const img = document.createElement("img"); img.alt = ""; img.src = v.getAttribute("poster") || P[cur].img;
-    if (P[cur].phone) img.className = "phone";
-    v.replaceWith(img);
-  });
+  hud.innerHTML = `<div class="bar mono"><span>File ${pad(i)} // ${esc(p.name)}</span><span>${esc(p.kind)}</span></div>` + projectBody(p, i, "h3", "shot reveal");
 }
 function showSkill(s) {
   const ps = P.filter((p) => p.skills.includes(s));
@@ -275,8 +259,6 @@ function setCur(i) {
     hud.style.setProperty("--sx", small() ? (fwd ? "34px" : "-34px") : "0px");
   }
   cur = i;
-  const nx = P[cur + 1];
-  $("nexthint").textContent = pinST ? (nx ? `Next: ${nx.name} ↓` : "Then: about me ↓") : "";
   $("count").textContent = $("pcount").textContent = `${pad(cur)} / ${pad(P.length - 1)}`;
   $("fill").style.width = `${(cur / (P.length - 1)) * 100}%`;
   $("names").querySelectorAll("button").forEach((b, k) => b.classList.toggle("on", k === cur));
@@ -304,37 +286,16 @@ hud.addEventListener("touchend", (e) => {
   if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) go(cur + (dx < 0 ? 1 : -1));
 }, { passive: true });
 
-// Desktop: the section pins and scrolling steps through the projects. Elsewhere: buttons and taps.
-let pinST = null;
-function setupPin() {
-  if (pinST) { pinST.kill(); pinST = null; }
-  return;   // no pinning: the section scrolls like any other, and projects change on a click
-  pinST = ScrollTrigger.create({ trigger: "#pin", pin: true, start: "top top", end: () => `+=${(P.length - 1) * innerHeight * 0.45}`,
-    snap: reduce ? false : { snapTo: 1 / (P.length - 1), duration: { min: 0.35, max: 0.7 }, delay: 0.12, ease: "power2.inOut" },
-    onUpdate: (s) => { if (gliding) return; const k = Math.round(s.progress * (P.length - 1)); if (k !== cur) { hover = null; setCur(k); } } });
-}
-let gliding = false, glideT = 0;
+// The section scrolls like any other; projects change on a click, an arrow, a key or a swipe.
 const easeIO = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 function go(i, jump) {
   i = (i + P.length) % P.length;
   if (i !== cur) zoomMap(i);
-  if (pinST) {
-    // the page glides to that project's place while the panel goes straight from this one to that
-    // one: no flicker through the projects in between
-    const y = pinST.start + (i / (P.length - 1)) * (pinST.end - pinST.start);
-    hover = null; setCur(i);
-    if (!lenis) { scrollTo(0, y + 1); return; }
-    gliding = true; clearTimeout(glideT);
-    const d = Math.min(1.1, 0.55 + Math.abs(y - scrollY) / innerHeight * 0.18);
-    lenis.scrollTo(y + 1, { duration: d, easing: easeIO, force: true, onComplete: () => { gliding = false; } });
-    glideT = setTimeout(() => { gliding = false; }, d * 1000 + 300);
-  } else {
-    hover = null; setCur(i);
-    // phones and tablets: keep the map and the top of the new panel in view together, so you see
-    // the light travel and the panel arrive
-    const m = map.getBoundingClientRect();
-    if (small() && (m.top < 40 || m.top > innerHeight * 0.3)) scrollToY(scrollY + m.top - 64, 0.8);
-  }
+  hover = null; setCur(i);
+  // phones and tablets: keep the map and the top of the new panel in view together, so you see
+  // the light travel and the panel arrive
+  const m = map.getBoundingClientRect();
+  if (small() && (m.top < 40 || m.top > innerHeight * 0.3)) scrollToY(scrollY + m.top - 64, 0.8);
 }
 
 // one soft glow, drawn once and stamped wherever a dot needs one (blurring every dot each frame is slow)
@@ -345,15 +306,15 @@ const GLOW = (() => {
   c.fillStyle = r; c.fillRect(0, 0, 64, 64); return g;
 })();
 const glow = (x, y, size, alpha) => { ctx.globalAlpha = alpha; ctx.drawImage(GLOW, x - size, y - size, size * 2, size * 2); ctx.globalAlpha = 1; };
+let mapVisible = true;
+new IntersectionObserver(([e]) => { mapVisible = e.isIntersecting; }).observe(map);
 function draw(t) {
-  if (!W) { requestAnimationFrame(draw); return; }
-  const r = map.getBoundingClientRect();
-  if (r.bottom < 0 || r.top > innerHeight) { requestAnimationFrame(draw); return; }   // off screen: skip
+  if (!W || !mapVisible) { requestAnimationFrame(draw); return; }   // off screen: skip
   ctx.clearRect(0, 0, W, H);
   const n = shown(), rel = related(n);
   nodes.forEach((m) => {
     const dx = reduce ? 0 : Math.sin(t * 0.0006 + m.ph) * 3, dy = reduce ? 0 : Math.cos(t * 0.0005 + m.ph) * 3;
-    m.dx = m.x + dx; m.dy = m.y + dy; m.el.style.left = `${m.dx}px`; m.el.style.top = `${m.dy}px`;
+    m.dx = m.x + dx; m.dy = m.y + dy; m.el.style.transform = `translate(${m.dx}px, ${m.dy}px)`;
   });
   edges.forEach((e) => {
     const ax = e.hub ? W / 2 : e.a.dx, ay = e.hub ? H / 2 : e.a.dy, bx = e.b.dx, by = e.b.dy;
@@ -389,7 +350,7 @@ function draw(t) {
 }
 
 function boot() {
-  layout(); setCur(cur); setupPin(); requestAnimationFrame(draw);
+  layout(); setCur(cur); requestAnimationFrame(draw);
   // a link like /#economy (the "All projects" pill on each project) comes back to that project on the globe
   const id = location.hash.slice(1), i = P.findIndex((p) => p.id === id);
   if (i >= 0) { scrollTo(0, 0); gopen(i); }
@@ -401,7 +362,7 @@ addEventListener("resize", () => {
   if (innerWidth === lastW && (small() || Math.abs(innerHeight - lastH) < 120)) return;
   lastH = innerHeight;
   clearTimeout(rt);
-  rt = setTimeout(() => { const crossed = (lastW <= 900) !== (innerWidth <= 900); lastW = innerWidth; layout(); lastShown = null; paint(); if (crossed) setupPin(); if (hasGsap) ScrollTrigger.refresh(); }, 200);
+  rt = setTimeout(() => { lastW = innerWidth; layout(); lastShown = null; paint(); }, 200);
 });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(boot); else boot();
 
@@ -425,7 +386,7 @@ function pickRole(role, quiet) {
   $("tour-label").textContent = `Take the ${r[0]} tour`;
   try { sessionStorage.setItem("pf-role", role); } catch {}
   saveOrder();
-  if (W) { cur = 0; layout(); drawNames(); lastShown = null; setCur(0); if (hasGsap) ScrollTrigger.refresh(); }
+  if (W) { cur = 0; layout(); drawNames(); lastShown = null; setCur(0); }
   if (G) { G.refresh(); G.dim(P.slice(0, 3).map((p) => p.id)); }
   drawGNames();
   // the globe turns to the best fit and lights the three that fit; the buttons stay put
