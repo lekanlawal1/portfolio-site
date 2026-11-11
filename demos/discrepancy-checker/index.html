@@ -23,14 +23,14 @@
     <nav class="rtabs" aria-label="Sections"><a href="#dash">Dashboard</a><a href="#sheets">Sheets</a><a href="#formulas-box">Formulas</a></nav>
     <a class="who" href="../../">Lekan Lawal</a>
   </header>
-  <div class="fx" aria-hidden="true"><span class="nm">F4</span><span class="f">fx</span><code>=<b>SUMIFS</b>(Inventory!J:J, Inventory!F:F, "Check")</code></div>
+  <div class="fx" aria-hidden="true"><span class="nm">C63</span><span class="f">fx</span><code>=<b>SUMIFS</b>(tblBilling[Variance ($)], tblBilling[Flag], "Check", tblBilling[Variance ($)], "&gt;0")</code></div>
 
   <section class="hero">
     <div class="rows" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
     <div class="cells">
       <h1><span>Every count, receipt and invoice,</span> <span class="red">checked.</span></h1>
       <p class="lead"><span>An Excel workbook for warehouse and 3PL teams, built on INDEX/MATCH, SUMIFS and conditional
-        formatting. On the sample it finds 9 count variances worth $502.70, 8 receiving exceptions and $1,028 of billing errors.
+        formatting. On the sample it finds 9 count variances ($652.10 of stock missing, $149.40 extra), 8 receiving exceptions and $1,028 of billing errors ($771 over, $257 under).
         Change any blue number and every check updates.</span></p>
       <div class="btns"><a class="btn" href="Discrepancy_Checker_Sample.xlsx" download>Download the workbook</a><a class="btn o" href="#sheets">Try the checks</a></div>
     </div>

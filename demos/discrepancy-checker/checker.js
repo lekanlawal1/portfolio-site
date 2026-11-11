@@ -1,6 +1,7 @@
 /* Runs the workbook's checks in the browser. The rules mirror the Excel formulas one for one:
      Inventory  variance = physical - system          status = variance = 0 ? OK : Check
-     Receiving  variance = received - packing slip    flag   = Short / Over / PO mismatch / OK
+     Receiving  variance = received - packing slip    flag   = Short / Over / OK
+                                                      PO check = slip qty <> PO qty ? PO mismatch : OK (its own column)
      Billing    expected = pallets x rate             flag   = |invoice - expected| > tolerance ? Check : OK
    Only typed values are read from the file; every result is recomputed here. */
 
@@ -121,8 +122,10 @@
     const rec = (d.receiving || []).map((r) => {
       const item = lookup(r.sku);
       const variance = (r.recv ?? 0) - (r.slip ?? 0);
-      const flag = variance < 0 ? "Short" : variance > 0 ? "Over" : (r.poQty != null && r.slip !== r.poQty) ? "PO mismatch" : "OK";
-      return { ...r, desc: item ? item.desc : "SKU not found", variance, flag,
+      const flag = variance < 0 ? "Short" : variance > 0 ? "Over" : "OK";
+      // checked on its own, so a short box on a mismatched PO shows both problems
+      const poCheck = r.poQty != null && r.slip !== r.poQty ? "PO mismatch" : "OK";
+      return { ...r, desc: item ? item.desc : "SKU not found", variance, flag, poCheck,
         week: r.date instanceof Date ? `Wk ${String(weeknum(r.date)).padStart(2, "0")}` : "" };
     });
     const bil = (d.billing || []).map((r) => {
@@ -135,13 +138,17 @@
     const count = (arr, f) => arr.filter(f).length;
     const reasons = {};
     for (const r of inv) if (r.reason) reasons[r.reason] = (reasons[r.reason] || 0) + 1;
+    // flagged invoices only, so these add up to the over and under figures (an invoice inside the tolerance is not an error)
     const clients = {};
-    for (const r of bil) clients[r.client] = round2((clients[r.client] || 0) + r.variance);
+    for (const r of bil) clients[r.client] = clients[r.client] || 0;
+    for (const r of bil) if (r.flag === "Check") clients[r.client] = round2(clients[r.client] + r.variance);
     const k = {
       items: inv.length, invBad: count(inv, (r) => r.status === "Check"),
-      recv: rec.length, recBad: count(rec, (r) => r.flag !== "OK"),
+      recv: rec.length, recBad: count(rec, (r) => r.flag !== "OK" || r.poCheck !== "OK"),
       invoices: bil.length, bilBad: count(bil, (r) => r.flag === "Check"),
       netCount: round2(inv.reduce((s, r) => s + r.value, 0)),
+      missing: round2(inv.filter((r) => r.value < 0).reduce((s, r) => s + r.value, 0)),
+      extra: round2(inv.filter((r) => r.value > 0).reduce((s, r) => s + r.value, 0)),
       netBilling: round2(bil.filter((r) => r.flag === "Check").reduce((s, r) => s + r.variance, 0)),
       over: round2(bil.filter((r) => r.flag === "Check" && r.variance > 0).reduce((s, r) => s + r.variance, 0)),
       under: round2(bil.filter((r) => r.flag === "Check" && r.variance < 0).reduce((s, r) => s + r.variance, 0)),
@@ -149,7 +156,7 @@
     };
     k.accuracy = k.items ? 1 - k.invBad / k.items : 0;
     const types = [["Count variance", k.invBad], ["Received short", count(rec, (r) => r.flag === "Short")],
-      ["Received over", count(rec, (r) => r.flag === "Over")], ["PO mismatch", count(rec, (r) => r.flag === "PO mismatch")],
+      ["Received over", count(rec, (r) => r.flag === "Over")], ["PO mismatch", count(rec, (r) => r.poCheck === "PO mismatch")],
       ["Billing variance", k.bilBad]];
     return { inv, rec, bil, k, types, reasons: Object.entries(reasons).sort((a, b) => b[1] - a[1]), clients: Object.entries(clients) };
   }
@@ -161,8 +168,8 @@
     const cards = [
       ["Items counted", has.inventory ? qty(k.items) : "-", has.inventory ? `${qty(k.units)} units off in total` : "No Inventory sheet", false],
       ["Count discrepancies", has.inventory ? qty(k.invBad) : "-", has.inventory ? `Accuracy ${(k.accuracy * 100).toFixed(1)}%` : "", k.invBad > 0],
-      ["Net count variance", has.inventory && has.items.size ? money(k.netCount) : "-",
-        has.items.size ? "Units off x unit cost" : "Needs an Items sheet with unit costs", k.netCount < 0],
+      ["Stock missing", has.inventory && has.items.size ? money(k.missing) : "-",
+        has.items.size ? `Extra stock ${money(k.extra)}, net ${money(k.netCount)}` : "Needs an Items sheet with unit costs", k.missing < 0],
       ["Receipts logged", has.receiving ? qty(k.recv) : "-", has.receiving ? "Against packing slip and PO" : "No Receiving sheet", false],
       ["Receiving exceptions", has.receiving ? qty(k.recBad) : "-", "Short, over or PO mismatch", k.recBad > 0],
       ["Invoices checked", has.billing ? qty(k.invoices) : "-", has.billing ? `Tolerance ${money(state.data.tolerance)}` : "No Billing sheet", false],
@@ -217,10 +224,11 @@
         [money(r.value), r.value ? "n calc neg" : "n calc"], esc(r.reason ?? ""), day(r.date)],
     },
     receiving: {
-      head: ["Receipt date", "PO", "Carrier", "BOL", "SKU", "Description", "PO qty", "Packing slip qty", "Qty received", "Variance", "Flag", "Week"],
-      bad: (r) => r.flag !== "OK",
+      head: ["Receipt date", "PO", "Carrier", "BOL", "SKU", "Description", "PO qty", "Packing slip qty", "Qty received", "Variance", "Flag", "PO check", "Week"],
+      bad: (r) => r.flag !== "OK" || r.poCheck !== "OK",
       row: (r, i) => [day(r.date), esc(r.po), esc(r.carrier ?? ""), esc(r.bol ?? ""), esc(r.sku), [esc(r.desc), "calc"], [qty(r.poQty), "n"],
-        [qty(r.slip), "n"], [input("receiving", i, "recv", r.recv), "n"], [signed(r.variance), vcls(r.variance)], [pill(r.flag), "calc"], [r.week, "calc"]],
+        [qty(r.slip), "n"], [input("receiving", i, "recv", r.recv), "n"], [signed(r.variance), vcls(r.variance)], [pill(r.flag), "calc"],
+        [pill(r.poCheck), "calc"], [r.week, "calc"]],
     },
     billing: {
       head: ["Month", "Client", "Pallets stored", "Rate", "Invoice amount", "Expected", "Variance", "Flag"],
@@ -341,28 +349,32 @@
   drop.addEventListener("drop", (e) => readFile(e.dataTransfer.files[0]));
 
   // ------------------------------------------------------------------ formula guide
+  // Each data sheet is an Excel Table, so formulas read columns by name. [@SKU] means "this row's SKU".
   const F = [
     ["Inventory, column B", "Look up the description",
-      `=IFERROR(INDEX(Items!$B$2:$B$200,\n  MATCH($A2,Items!$A$2:$A$200,0)),"SKU not found")`,
-      "MATCH finds the row in the item list that holds this SKU (0 means exact match). INDEX returns the description from that row. IFERROR shows a message instead of an error when the SKU is not on file.",
-      `=XLOOKUP($A2,Items!$A$2:$A$200,Items!$B$2:$B$200,"SKU not found")`],
-    ["Inventory, columns E and F", "Variance and status", `=D2-C2\n=IF(E2=0,"OK","Check")`,
+      `=IFERROR(INDEX(tblItems[Description],\n  MATCH([@SKU],tblItems[SKU],0)),"SKU not found")`,
+      "MATCH finds the row in the item list that holds this SKU (0 means exact match). INDEX returns the description from that row. IFERROR shows a message instead of an error when the SKU is not on file. The item list is a table too, so a new item is found without editing any range.",
+      `=XLOOKUP([@SKU],tblItems[SKU],tblItems[Description],"SKU not found")`],
+    ["Inventory, columns E and F", "Variance and status", `=[@[Physical count]]-[@[System qty]]\n=IF([@Variance]=0,"OK","Check")`,
       "Physical count minus system qty. Negative means fewer on the shelf than the system thinks. Any non-zero variance is marked Check, and conditional formatting turns the row red."],
-    ["Inventory, column I", "Dollar impact", "=E2*H2",
-      "Units off times unit cost (looked up from Items the same way as the description). Summed on the dashboard as the net count variance."],
-    ["Receiving, column K", "Short, over or PO mismatch",
-      `=IF(J2<0,"Short",IF(J2>0,"Over",\n  IF(H2<>G2,"PO mismatch","OK")))`,
-      "J is qty received minus packing slip qty. If the count matches the slip, it still compares the slip with the PO, because a supplier can ship and bill a different quantity than was ordered."],
+    ["Inventory, column I", "Dollar impact", "=[@Variance]*[@[Unit cost ($)]]",
+      "Units off times unit cost (looked up from Items the same way as the description). The dashboard adds the negative and the positive ones separately: stock missing and extra stock."],
+    ["Receiving, column K", "Short or over", `=IF([@Variance]<0,"Short",\n  IF([@Variance]>0,"Over","OK"))`,
+      "Variance is qty received minus packing slip qty, so a negative one means the box came in short."],
+    ["Receiving, column L", "PO check", `=IF([@[Packing slip qty]]<>[@[PO qty]],\n  "PO mismatch","OK")`,
+      "A supplier can ship and bill a different quantity than was ordered even when the box matches its slip. This is its own column so a receipt can be short and mismatched at once, and both show."],
     ["Billing, columns D to F", "Rate and expected amount",
-      `=IFERROR(INDEX(Lists!$F$2:$F$20,\n  MATCH(B2,Lists!$E$2:$E$20,0)),0)\n=C2*D2`,
+      `=IFERROR(INDEX(Lists!$F$2:$F$20,\n  MATCH([@Client],Lists!$E$2:$E$20,0)),0)\n=[@[Pallets stored]]*[@[Rate ($)]]`,
       "The client's storage rate comes from one table on the Lists sheet, so a rate change is made once. Expected invoice is pallets stored times rate.",
-      "=XLOOKUP(B2,Lists!$E$2:$E$20,Lists!$F$2:$F$20,0)"],
-    ["Billing, column H", "Variance flag with a tolerance", `=IF(ABS(G2)>Lists!$I$2,"Check","OK")`,
-      "G is invoiced minus expected. ABS catches overbilling and underbilling alike. The $1.00 tolerance sits in one cell, so rounding cents are not flagged."],
-    ["Dashboard", "Counts", `=COUNTA(Inventory!$A$2:$A$500)\n=COUNTIF(Inventory!$F$2:$F$500,"Check")`,
-      "COUNTA counts the rows filled in; COUNTIF counts the rows marked Check. Ranges run to row 500 so new rows are picked up."],
-    ["Dashboard", "Billing variance", `=SUMIF(Billing!$H$2:$H$500,"Check",\n  Billing!$G$2:$G$500)`,
-      "Adds the variance of flagged invoices only. This page splits it into overbilled and underbilled, so the two can't cancel out."],
+      "=XLOOKUP([@Client],Lists!$E$2:$E$20,Lists!$F$2:$F$20,0)"],
+    ["Billing, column H", "Variance flag with a tolerance", `=IF(ABS([@[Variance ($)]])>Lists!$I$2,"Check","OK")`,
+      "Variance is invoiced minus expected. ABS catches overbilling and underbilling alike. The $1.00 tolerance sits in one cell, so rounding cents are not flagged."],
+    ["Dashboard", "Counts", `=COUNTA(tblInventory[SKU])\n=COUNTIF(tblInventory[Status],"Check")`,
+      "COUNTA counts the rows filled in; COUNTIF counts the rows marked Check. Each sheet is an Excel Table, so type a new row under it and it joins the table. There is no fixed range to run past."],
+    ["Dashboard", "Overbilled and underbilled", `=SUMIFS(tblBilling[Variance ($)],\n  tblBilling[Flag],"Check",\n  tblBilling[Variance ($)],">0")`,
+      "Adds the flagged invoices that came out higher than expected. The same formula with \"<0\" gives underbilled. They are never netted: here $771 over and $257 under would net to $514 and hide half of each problem. Stock missing and extra stock use the same pattern."],
+    ["Dashboard", "Billing by client", `=SUMIFS(tblBilling[Variance ($)],\n  tblBilling[Client],B51,\n  tblBilling[Flag],"Check")`,
+      "Only flagged invoices count, so a client's total agrees with the dashboard card. An invoice inside the tolerance is not an error, so it stays out."],
   ];
   $("formulas").innerHTML = F.map(([where, title, code, text, alt]) => `<div class="f-card"><div class="where">${where}</div><h4>${title}</h4>`
     + `<code class="mono">${esc(code)}</code><p>${text}</p>`
