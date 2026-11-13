@@ -1,9 +1,7 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
-// The 3D desk is the heavy part; the nav, hints and panels paint first and the scene streams in after.
-const Scene = lazy(() => import('./Scene.jsx'));
+import { useEffect, useState } from 'react';
+import Stage from './Stage.jsx';
 // The loader and its 9-second 'slow connection' timer live in index.html so they work before any script arrives.
 const loader = () => document.getElementById('loader');
-let drawn = false;
 const lift = () => { clearTimeout(window.loaderSlow); loader()?.classList.add('done'); };
 import { projects, RESUME } from './projects.js';
 import List from './List.jsx';
@@ -24,14 +22,11 @@ const HINT = {
   card: back
 };
 const isPortrait = () => innerWidth / innerHeight < 0.95;
-// Phones, small tablets and low-core machines start on the light renderer; the monitor can still drop a fast device down.
-const startQuality = () => q.get('q') || (TOUCH || innerWidth < 820 || (navigator.hardwareConcurrency || 8) <= 4 ? 'low' : 'high');
 
 export default function App() {
   const [mode, setMode] = useState(q.get('s') || 'desk');
   const [open, setOpen] = useState(Number(q.get('open') || 0));
   const [portrait, setPortrait] = useState(isPortrait);
-  const [quality, setQuality] = useState(startQuality);
   const [hash, setHash] = useState(route);
   const listView = LIST.has(hash);
   const flip = (d) => setOpen((k) => (k + d + 8) % 8);
@@ -48,11 +43,8 @@ export default function App() {
     return () => { removeEventListener('keydown', onKey); removeEventListener('resize', onResize); removeEventListener('hashchange', onHash); };
   }, [mode]);
 
-  // The list needs no 3D, so the loader lifts at once; going back to a desk that has not drawn yet shows it again.
-  useEffect(() => {
-    if (listView) lift();
-    else if (!drawn) loader()?.classList.remove('done');
-  }, [listView]);
+  // The list has no picture to wait for, so the loader lifts at once.
+  useEffect(() => { if (listView) lift(); }, [listView]);
 
   if (listView) return <List target={hash} />;
 
@@ -60,20 +52,14 @@ export default function App() {
   const Close = ({ label }) => <button type="button" className="close" onClick={putBack}>{label}</button>;
   return (
     <>
-      {/* keyboard and screen-reader way into everything the desk does */}
-      <nav className="skip" aria-label="Desk objects">
-        <button type="button" onClick={() => setMode('fan')}>Projects</button>
-        <button type="button" onClick={() => setMode('mug')}>About me</button>
-        <button type="button" onClick={() => setMode('card')}>Contact</button>
-        <a href={RESUME}>Résumé PDF</a>
-        <a href="#list">List of projects</a>
-      </nav>
-
-      <Suspense fallback={null}>
-        <Scene mode={mode} open={open} setMode={setMode} setOpen={setOpen} portrait={portrait} quality={quality}
-          onDecline={q.get('q') ? null : () => setQuality('low')} putBack={putBack} still={q.has('still')} onReady={() => { drawn = true; lift(); }}
-          onObject={(what) => { if (what === 'resume') open(RESUME, '_blank', 'noopener'); else location.hash = 'skills'; }} />
-      </Suspense>
+      {/* On a phone the panel already carries the file, so the spread desk stays behind it, dimmed. */}
+      <Stage view={mode !== 'open' ? mode : portrait ? 'fan' : `open-${open}`} dim={portrait && mode !== 'desk' && mode !== 'fan'} portrait={portrait} files={projects} onReady={lift} onBack={putBack}
+        onGo={(go) => {
+          if (go === 'resume') window.open(RESUME, '_blank', 'noopener');
+          else if (go === 'skills') location.hash = 'skills';
+          else if (go.startsWith('open-')) { setOpen(Number(go.slice(5))); setMode('open'); }
+          else setMode(go);
+        }} />
 
       <nav className="nav" aria-label="Main">
         <a href={RESUME}>Résumé</a>

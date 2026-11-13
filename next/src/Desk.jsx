@@ -125,7 +125,7 @@ function File({ p, i, pose, onClick, hover, setHover, lit }) {
   // A lifted page leaves the lamp's pool, so it glows a little instead of going dark.
   top.emissive.set('#ffffff'); top.emissiveMap = cover; top.emissiveIntensity = lit ? 0.55 : 0;
   return (
-    <group ref={ref} onClick={(e) => { e.stopPropagation(); onClick(i); }} {...hoverProps(setHover, p.id)}>
+    <group ref={ref} name={`file-${i}`} onClick={(e) => { e.stopPropagation(); onClick(i); }} {...hoverProps(setHover, p.id)}>
       <group ref={liftRef}>
         {sheets.map(([x, z, ry], k) => (
           <mesh key={k} position={[x, 0.0008 + k * 0.0009, z]} rotation={[0, ry, 0]} material={paper} castShadow receiveShadow>
@@ -154,7 +154,7 @@ function Mug({ pose, lifted, onClick, hover, setHover }) {
   // Picked up, the mug leaves the lamp: a soft warm light travels with it so the glaze and gold still read.
   useFrame((_, dt) => { if (glow.current) glow.current.intensity += ((lifted ? 0.05 : 0) - glow.current.intensity) * snap(dt, 6); });
   return (
-    <group ref={ref} onClick={(e) => { e.stopPropagation(); onClick(); }} {...hoverProps(setHover, 'mug')}>
+    <group ref={ref} name="mug" onClick={(e) => { e.stopPropagation(); onClick(); }} {...hoverProps(setHover, 'mug')}>
       <pointLight ref={glow} position={[0.02, 0.11, 0.1]} intensity={0} distance={0.6} decay={2} color="#FFE9C8" />
       <group ref={liftRef}>
         <mesh geometry={geo} material={ceramic} castShadow receiveShadow />
@@ -179,7 +179,7 @@ function Globe({ onClick, hover, setHover }) {
   useFrame((_, dt) => { if (ref.current && !STILL && !REDUCED) ref.current.rotation.y += dt * 0.25; });
   const liftRef = useLift(hover === 'globe', 0.006);
   return (
-    <group position={[0.21, 0, -0.36]} onClick={(e) => { e.stopPropagation(); onClick(); }} {...hoverProps(setHover, 'globe')}>
+    <group name="globe" position={[0.21, 0, -0.36]} onClick={(e) => { e.stopPropagation(); onClick(); }} {...hoverProps(setHover, 'globe')}>
      <group ref={liftRef}>
       <mesh position={[0, 0.007, 0]} material={blackGloss} castShadow receiveShadow>
         <cylinderGeometry args={[0.03, 0.035, 0.014, 64]} />
@@ -209,7 +209,7 @@ function Folio({ onClick, hover, setHover }) {
   const side = useMemo(() => new THREE.MeshStandardMaterial({ color: '#12100E', roughness: 0.75 }), []);
   const liftRef = useLift(hover === 'folio', 0.008);
   return (
-    <group position={[0.07, 0, -0.13]} rotation={[0, -0.22, 0]} onClick={(e) => { e.stopPropagation(); onClick(); }} {...hoverProps(setHover, 'folio')}>
+    <group name="folio" position={[0.07, 0, -0.13]} rotation={[0, -0.22, 0]} onClick={(e) => { e.stopPropagation(); onClick(); }} {...hoverProps(setHover, 'folio')}>
      <group ref={liftRef}>
       <mesh position={[0, 0.007, 0]} material={[side, side, top, side, side, side]} castShadow receiveShadow>
         <boxGeometry args={[0.15, 0.014, 0.21]} />
@@ -241,7 +241,7 @@ function CardStand({ mode, portrait, onClick, hover, setHover }) {
   const handlers = { onClick: (e) => { e.stopPropagation(); onClick(); }, ...hoverProps(setHover, 'card') };
   return (
     <>
-      <group position={at} rotation={[0, -0.3, 0]} {...handlers}>
+      <group name="card" position={at} rotation={[0, -0.3, 0]} {...handlers}>
        <group ref={liftRef}>
         <mesh position={[0, 0.006, 0]} material={walnut} castShadow receiveShadow>
           <boxGeometry args={[0.105, 0.012, 0.045]} />

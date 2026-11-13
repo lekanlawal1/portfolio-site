@@ -7,7 +7,6 @@
 }
 * { box-sizing: border-box; }
 html, body, #root { margin: 0; height: 100%; height: 100dvh; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--sans); overflow: hidden; overscroll-behavior: none; }
-canvas { display: block; touch-action: none; }
 a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
@@ -15,11 +14,6 @@ button { font: inherit; color: inherit; }
 .nav { position: fixed; top: max(20px, env(safe-area-inset-top)); right: var(--edge); display: flex; gap: clamp(14px, 2vw, 26px); align-items: baseline; font-size: clamp(14px, 1.1vw, 15px); text-shadow: 0 1px 8px rgba(0, 0, 0, .5); }
 .nav a { text-decoration: none; padding: 10px 0; }
 .nav a:last-child { font-family: var(--serif); font-style: italic; color: var(--gold); text-decoration: underline; }
-
-/* hidden until a keyboard user tabs in */
-.skip { position: fixed; top: 12px; left: 12px; z-index: 10; display: flex; gap: 8px; flex-wrap: wrap; transform: translateY(-200%); }
-.skip:focus-within { transform: none; }
-.skip a, .skip button { background: var(--paper); color: var(--paper-ink); border: 0; padding: 10px 14px; text-decoration: none; cursor: pointer; }
 
 .hint { position: fixed; left: var(--edge); right: var(--edge); bottom: max(18px, env(safe-area-inset-bottom)); margin: 0; font: clamp(21px, 1.8vw, 26px)/1.1 var(--pen); color: var(--ink2); transform: rotate(-1.2deg); transform-origin: left; pointer-events: none; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
 
@@ -101,3 +95,21 @@ details[open] summary { text-decoration: none; color: var(--paper-mut); }
 @media (max-width: 560px) {
   .skill-map dl > div { grid-template-columns: 1fr; gap: 2px; }
 }
+
+/* the desk: a pre-rendered picture that always fills the screen; the frame keeps the picture's
+   proportions, so the click areas (percentages of the picture) stay on their objects at any size */
+.stage { position: fixed; inset: 0; overflow: hidden; background: var(--bg); }
+.frame { position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+  width: max(100vw, calc(100dvh * var(--ar))); height: max(100dvh, calc(100vw / var(--ar))); }
+.shot { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none; }
+.shot.top { animation: settle .38s var(--ease) both; }
+@keyframes settle { from { opacity: 0; } }
+.stage.dim .shot { filter: brightness(.45); transition: filter .35s var(--ease); }
+.spot { position: absolute; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 6px; -webkit-tap-highlight-color: transparent; }
+.spot span { position: absolute; left: 50%; bottom: calc(100% + 6px); translate: -50% 0; white-space: nowrap; pointer-events: none;
+  font: 24px/1 var(--pen); color: var(--ink); text-shadow: 0 1px 8px rgba(0, 0, 0, .7); opacity: 0; transition: opacity .2s; }
+.spot:hover span, .spot:focus-visible span { opacity: 1; }
+.spot:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+/* no hover on touch screens, so the labels stay on, quietly */
+@media (hover: none) { .spot span { opacity: .8; font-size: 20px; } }
+@media (prefers-reduced-motion: reduce) { .shot.top { animation: none; } }
