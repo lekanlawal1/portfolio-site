@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Draft preview: keep it out of search results. Remove when this becomes the homepage. -->
+<meta name="robots" content="noindex">
+<meta name="description" content="Lekan Lawal: data, BI and AI in Canada. Eight tools that check their own work.">
+<link rel="icon" href="https://lekanlawal1.github.io/portfolio-site/assets/favicon.svg" type="image/svg+xml">
+<title>Lekan Lawal</title>
+<style>
+  html, body { margin: 0; background: #1E1B18; }
+  .loader { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 45%, #2C2621, #1A1714 70%); color: #F2EEE7; transition: opacity .7s cubic-bezier(.2,.7,.2,1), visibility .7s; }
+  .loader.done { opacity: 0; visibility: hidden; }
+  .loader-plate { text-align: center; padding: 0 24px; }
+  .loader-name { margin: 0; font: 600 clamp(28px, 5.4vw, 54px)/1 'Archivo Variable', 'Arial Black', sans-serif; font-stretch: 125%; letter-spacing: .1em; text-transform: uppercase; color: #E2B05C; }
+  .loader-role { margin: 14px 0 0; font: 500 clamp(11px, 1.2vw, 13px)/1 'Archivo Variable', 'Arial', sans-serif; letter-spacing: .32em; text-transform: uppercase; color: #CFC6B8; }
+  .loader-line { display: block; width: min(240px, 60vw); height: 1px; margin: 28px auto 0; background: rgba(226,176,92,.22); overflow: hidden; }
+  .loader-line span { display: block; height: 100%; background: #E2B05C; transform-origin: left; transform: scaleX(.04); animation: fill 7s cubic-bezier(.1,.6,.2,1) forwards; }
+  .loader.done .loader-line span { animation: none; transform: scaleX(1); transition: transform .3s; }
+  @keyframes fill { to { transform: scaleX(.9); } }
+  .loader-note { margin: 18px 0 0; font: 24px 'Nanum Pen Script', cursive; color: #CFC6B8; }
+  .loader-slow { margin: 14px 0 0; font: 14px 'Libre Franklin', system-ui, sans-serif; color: #A69E90; opacity: 0; transition: opacity .5s; }
+  .loader-slow a { color: #E2B05C; font-style: italic; }
+  .loader.slow .loader-slow { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .loader-line span { animation: none; transform: scaleX(.5); } .loader { transition: none; } }
+</style>
+  <script type="module" crossorigin src="./assets/index-BjoiCW2P.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DuQssawf.css">
+</head>
+<body>
+<!-- Plain HTML so it paints before any script; the app lifts it once the desk has drawn its first frame. -->
+<div id="loader" class="loader" role="status" aria-live="polite">
+  <div class="loader-plate">
+    <p class="loader-name">Lekan Lawal</p>
+    <p class="loader-role">Data, BI and AI. Canada</p>
+    <span class="loader-line" aria-hidden="true"><span></span></span>
+    <p class="loader-note">laying out the desk</p>
+    <p class="loader-slow">Slow connection? <a href="#list">Just show me a list</a></p>
+  </div>
+</div>
+<script>window.loaderSlow = setTimeout(function () { document.getElementById('loader').classList.add('slow'); }, 9000);</script>
+<div id="root"></div>
+</body>
+</html>
