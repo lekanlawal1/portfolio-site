@@ -101,7 +101,7 @@
   const back = base + "index.html" + (CARD[project] ? `#${CARD[project]}` : "#work");
   const backA = document.createElement("a");
   backA.href = back; backA.innerHTML = `<span aria-hidden="true">&larr;</span>All projects`;
-  backA.addEventListener("click", warp(back, `Back to the map|${at >= 0 ? STOPS[at][1] : "All projects"}`));
+  backA.addEventListener("click", warp(back, `Back to the projects|${at >= 0 ? STOPS[at][1] : "All projects"}`));
   pill.appendChild(backA);
   let card = null;
   // on the tour: a small constellation of the stops, and the way to the next one

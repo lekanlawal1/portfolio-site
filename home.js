@@ -8,6 +8,8 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<
 const small = () => innerWidth <= 900;
 const P = window.PROJECTS;
 const pad = (i) => String(i + 1).padStart(2, "0");
+// each project panel plays a short silent clip of the live tool; people who ask for less motion or less data get a still
+const still = reduce || !!(navigator.connection && navigator.connection.saveData);
 
 // ------------------------------------------------------------------ smooth scrolling
 let lenis = null;
@@ -21,7 +23,7 @@ const land = (y) => { if (lenis) lenis.scrollTo(y, { immediate: true, force: tru
 // A short hop glides. Anything longer warps (warp.js): the page gathers into a ring with the
 // destination's name, and opens again there, so nobody has to watch the whole page slide past.
 const WARP = window.PFWarp;
-const SECTION = { top: "Back to the start|Messy data in", work: "The work|Eight builds", about: "About|Lekan Lawal", contact: "Contact|Let's talk" };
+const SECTION = { top: "Back to the start|Messy data in", work: "The toolkit|Eight builds", about: "About|Lekan Lawal", contact: "Contact|Let's talk" };
 function jumpTo(y, label) {
   if (Math.abs(y - scrollY) < innerHeight * 1.2 || !WARP || reduce) { scrollToY(y); return; }
   WARP.out(() => land(y), { label });
@@ -33,16 +35,13 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("cli
   jumpTo(id === "top" ? 0 : t.getBoundingClientRect().top + scrollY, SECTION[id]);
   history.replaceState(null, "", id === "top" ? location.pathname : `#${id}`);
 }));
-let lastScroll = scrollY, dockAway = false, dockRest = 0, dockPast = false, dockPin = false;
+let lastScroll = scrollY, dockAway = false;
 addEventListener("scroll", () => {
   const past = scrollY > $("top").offsetHeight - 80;
   document.querySelector(".nav").classList.toggle("solid", past);
-  // on desktop the pinned work section has its own step bar along the bottom: the dock steps aside there
-  const pr = $("pin").getBoundingClientRect(), inPin = !small() && pr.top < innerHeight * 0.5 && pr.bottom > innerHeight * 0.5;
   const down = scrollY > lastScroll + 2, up = scrollY < lastScroll - 2; lastScroll = scrollY;
   if (down) dockAway = true; else if (up) dockAway = false;
-  dockPast = past; dockPin = inPin;
-  $("dock").classList.toggle("on", past && !inPin && !dockAway);
+  $("dock").classList.toggle("on", past && !dockAway);
 }, { passive: true });
 
 // ------------------------------------------------------------------ the globe (centerpiece)
@@ -143,37 +142,39 @@ import("./vendor/three.module.min.js").then(async (THREE) => {
   try { story = makeStory(THREE, { box: $("howi-stage"), onStep: howiStep }); } catch { document.querySelector(".howi").classList.add("no-gl"); }
 }).catch(() => document.documentElement.classList.add("no-gl"));
 
-// ------------------------------------------------------------------ the work map
-const map = $("map"), cv = $("lines"), ctx = cv.getContext("2d"), hud = $("hud");
+// ------------------------------------------------------------------ the toolkit map
+// Every project wired to the skills it uses. Pointing at a node lights what it connects to; clicking a
+// skill lists the projects that use it; clicking a project opens it on the globe, the one place a project
+// opens. Phones get the skills as buttons instead of the map.
+const map = $("map"), cv = $("lines"), ctx = cv.getContext("2d"), hud = $("hud"), chips = $("chips");
 const SKILLS = [...new Set(P.flatMap((p) => p.skills))];
 const VISIT_ID = Object.fromEntries(P.map((p) => [p.short, p.id]));   // the short id each project site reports, to the portfolio id
 let seen = new Set();
 try { seen = new Set(JSON.parse(localStorage.getItem("town-visited") || "[]").map((v) => VISIT_ID[v]).filter(Boolean)); } catch {}
-let W = 0, H = 0, nodes = [], edges = [], cur = 0, hover = null;
+let W = 0, H = 0, nodes = [], edges = [], hover = null, picked = "AI output checks";
 
 function layout() {
+  map.querySelectorAll(".node").forEach((n) => n.remove()); nodes = []; edges = [];
+  if (small()) return;
   const r = map.getBoundingClientRect(), dpr = Math.min(devicePixelRatio, 2);
   W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  map.querySelectorAll(".node").forEach((n) => n.remove()); nodes = []; edges = [];
-  const cx = W / 2, cy = H / 2, S = small();
+  const cx = W / 2, cy = H / 2;
   P.forEach((p, i) => {
     const a = -Math.PI / 2 + (i / P.length) * Math.PI * 2;
-    nodes.push({ k: "p", i, id: p.id, label: p.name, x: cx + Math.cos(a) * W * (S ? 0.36 : 0.27), y: cy + Math.sin(a) * H * (S ? 0.36 : 0.28), ph: Math.random() * 6 });
+    nodes.push({ k: "p", i, id: p.id, label: p.name, x: cx + Math.cos(a) * W * 0.27, y: cy + Math.sin(a) * H * 0.28, ph: Math.random() * 6 });
   });
-  if (!S) SKILLS.forEach((s, i) => {
+  SKILLS.forEach((s, i) => {
     const a = -Math.PI / 2 + ((i + 0.5) / SKILLS.length) * Math.PI * 2;
     nodes.push({ k: "s", id: s, label: s, x: cx + Math.cos(a) * W * 0.41, y: cy + Math.sin(a) * H * 0.45, ph: Math.random() * 6 });
   });
   nodes.forEach((n) => {
     const b = document.createElement("button"); b.type = "button"; n.el = b;
     b.className = `node ${n.k}${n.k === "p" && seen.has(n.id) ? " seen" : ""}`;
-    if (n.k === "p") { b.innerHTML = `<span class="dot"></span><b>${esc(n.label)}</b><small>${pad(n.i)}</small>`; b.setAttribute("aria-label", `${n.label}, project ${n.i + 1} of ${P.length}`); }
+    if (n.k === "p") { b.innerHTML = `<span class="dot"></span><b>${esc(n.label)}</b><small>${pad(n.i)}</small>`; b.setAttribute("aria-label", `${n.label}: open it`); }
     else { b.textContent = n.label; b.setAttribute("aria-label", `${n.label}: show the projects that use it`); }
-    // previews are for a mouse or the keyboard only: on a phone, Safari treats a tap that changes
-    // the page on "hover" as a hover and never sends the click, so a tap goes straight to the project
-    b.addEventListener("pointerenter", (e) => { if (e.pointerType !== "mouse") return; hover = n; paint(); });
-    b.addEventListener("focus", () => { if (!b.matches(":focus-visible")) return; hover = n; paint(); });
-    b.addEventListener("click", () => { if (n.k === "p") { hover = null; go(n.i, true); } else { hover = n; paint(); } });
+    b.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") { hover = n; paint(); } });   // a tap is a click, never a hover
+    b.addEventListener("focus", () => { if (b.matches(":focus-visible")) { hover = n; paint(); } });
+    b.addEventListener("click", () => { hover = null; if (n.k === "p") openFile(n.id); else pickSkill(n.id); });
     map.appendChild(b);
   });
   nodes.filter((n) => n.k === "p").forEach((p) => {
@@ -181,126 +182,41 @@ function layout() {
     P[p.i].skills.forEach((s) => { const sn = nodes.find((n) => n.k === "s" && n.id === s); if (sn) edges.push({ a: p, b: sn, q: [Math.random(), Math.random(), Math.random()] }); });
   });
 }
-map.addEventListener("pointerleave", (e) => { if (e.pointerType !== "mouse") return; hover = null; paint(); });
+map.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") { hover = null; paint(); } });
 
-const shown = () => hover || nodes.find((n) => n.k === "p" && n.i === cur);
+const shown = () => hover || nodes.find((n) => n.k === "s" && n.id === picked);
 function related(n) {
   if (!n) return null;
   const set = new Set([n]);
-  edges.forEach((e) => { if (e.a === n) set.add(e.b); if (e.b === n && e.a) set.add(e.a); if (e.hub && e.b === n) set.add(e.b); });
+  edges.forEach((e) => { if (e.a === n) set.add(e.b); if (e.b === n && e.a) set.add(e.a); });
   return set;
 }
-let lastShown = null;
 function paint() {
-  // pointing at a project or skill lights it up on the map; only a click changes the file
   const n = shown(), rel = related(n);
   map.classList.toggle("focus", !!n);
-  nodes.forEach((m) => { m.el.classList.toggle("lit", !!rel && rel.has(m)); if (m.k === "p") m.el.classList.toggle("cur", m.i === cur); });
-  const c = nodes.find((m) => m.k === "p" && m.i === cur);
-  if (!c || c === lastShown) return;
-  lastShown = c;
-  swapPanel(() => showProject(cur));
+  nodes.forEach((m) => m.el.classList.toggle("lit", !!rel && rel.has(m)));
+  chips.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.skill === picked));
 }
-// a click on the map zooms in on that project and back out as its file arrives
-function zoomMap(i) {
-  const n = nodes.find((m) => m.k === "p" && m.i === i);
-  if (reduce || !n || !map.animate) return;
-  map.style.transformOrigin = `${n.x}px ${n.y}px`;
-  map.animate([{ transform: "scale(1)" }, { transform: "scale(1.22)", offset: 0.42 }, { transform: "scale(1)" }], { duration: 950, easing: "cubic-bezier(.3,.7,.2,1)" });
-}
-// Changing project: the old panel lifts away, the new one settles in line by line, its name
-// resolving out of scrambled letters, while a packet of light travels the map between the two.
-const GLYPH = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/#%";
-function scramble(el, ms = 460) {
-  if (!el || reduce) return;
-  const text = el.textContent, t0 = performance.now();
-  const tick = (now) => {
-    const k = Math.min(1, (now - t0) / ms), n = Math.floor(k * text.length);
-    el.textContent = text.slice(0, n) + text.slice(n).replace(/\S/g, () => GLYPH[(Math.random() * GLYPH.length) | 0]);
-    if (k < 1) requestAnimationFrame(tick); else el.textContent = text;
-  };
-  requestAnimationFrame(tick);
-}
-let swapT = 0;
-function swapPanel(render, quick) {
-  clearTimeout(swapT);
-  const enter = () => {
-    hud.classList.remove("leaving"); render();
-    [...hud.children].forEach((c, k) => c.style.setProperty("--i", k));
-    hud.classList.remove("entering"); void hud.offsetWidth; hud.classList.add("entering");
-    scramble(hud.querySelector("h3")); scramble(hud.querySelector(".proof b"), 380);
-    playOrStill(hud, P[cur]);
-  };
-  if (reduce || quick || !hud.children.length) { enter(); return; }
-  hud.classList.add("leaving");
-  swapT = setTimeout(enter, 190);
-}
-let packet = null;   // { a, b, t0 }: light travelling from one project to another
-function send(from, to) {
-  if (reduce || from === to) return;
-  const a = nodes.find((n) => n.k === "p" && n.i === from), b = nodes.find((n) => n.k === "p" && n.i === to);
-  if (a && b) packet = { a, b, t0: performance.now() };
-}
-
-// each panel plays a short silent clip of the live tool; people who ask for less motion or less data get a still
-const still = reduce || !!(navigator.connection && navigator.connection.saveData);
-function showProject(i) {
-  const p = P[i];
-  hud.innerHTML = `<div class="bar mono"><span>File ${pad(i)} // ${esc(p.name)}</span><span>${esc(p.kind)}</span></div>` + projectBody(p, i, "h3", "shot reveal");
+// a project opens in one place: its file on the globe
+function openFile(id) {
+  const i = P.findIndex((p) => p.id === id);
+  if (i < 0) return;
+  jumpTo(0, SECTION.top);
+  gopen(i);
 }
 function showSkill(s) {
   const ps = P.filter((p) => p.skills.includes(s));
   hud.innerHTML = `<div class="bar mono"><span>Skill // ${esc(s)}</span><span>${ps.length} project${ps.length > 1 ? "s" : ""}</span></div>
-    <h3>${esc(s)}</h3><p>Used in ${ps.map((p) => esc(p.name)).join(", ")}.</p>
-    <div class="stack">${ps.map((p) => `<span>${pad(P.indexOf(p))} ${esc(p.name)}</span>`).join("")}</div>
-    <p class="mono" style="color:var(--mut);margin-top:14px">Click a project on the map to open it.</p>`;
+    <h3>${esc(s)}</h3><p>Used in:</p>
+    <div class="stack">${ps.map((p) => `<button type="button" data-open="${p.id}">${esc(p.name)}</button>`).join("")}</div>`;
+  [...hud.children].forEach((c, k) => c.style.setProperty("--i", k));
+  hud.classList.remove("entering"); void hud.offsetWidth; hud.classList.add("entering");
 }
-function setCur(i) {
-  i = (i + P.length) % P.length;
-  if (i !== cur) {
-    send(cur, i);
-    const fwd = (i - cur + P.length) % P.length <= P.length / 2;
-    hud.style.setProperty("--sx", small() ? (fwd ? "34px" : "-34px") : "0px");
-  }
-  cur = i;
-  $("count").textContent = $("pcount").textContent = `${pad(cur)} / ${pad(P.length - 1)}`;
-  $("fill").style.width = `${(cur / (P.length - 1)) * 100}%`;
-  $("names").querySelectorAll("button").forEach((b, k) => b.classList.toggle("on", k === cur));
-  paint();
-}
-const drawNames = () => { $("names").innerHTML = P.map((p, i) => `<button type="button" data-i="${i}">${esc(p.name.split(" ").slice(-1)[0])}</button>`).join(""); };
-drawNames();
-$("names").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(+b.dataset.i, true); });
-$("prev").addEventListener("click", () => go(cur - 1));
-$("sprev").addEventListener("click", () => go(cur - 1));
-$("snext").addEventListener("click", () => go(cur + 1));
-addEventListener("keydown", (e) => {
-  if (e.altKey || e.metaKey || e.ctrlKey || /input|textarea|select/i.test(e.target.tagName)) return;
-  const r = $("pin").getBoundingClientRect();
-  if (r.top > innerHeight * 0.3 || r.bottom < innerHeight * 0.7) return;
-  if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1); }
-  if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1); }
-});
-$("next").addEventListener("click", () => go(cur + 1));
-// phones: swipe the panel sideways for the next or previous project
-let sx = 0, sy = 0;
-hud.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
-hud.addEventListener("touchend", (e) => {
-  const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) go(cur + (dx < 0 ? 1 : -1));
-}, { passive: true });
-
-// The section scrolls like any other; projects change on a click, an arrow, a key or a swipe.
-const easeIO = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-function go(i, jump) {
-  i = (i + P.length) % P.length;
-  if (i !== cur) zoomMap(i);
-  hover = null; setCur(i);
-  // phones and tablets: keep the map and the top of the new panel in view together, so you see
-  // the light travel and the panel arrive
-  const m = map.getBoundingClientRect();
-  if (small() && (m.top < 40 || m.top > innerHeight * 0.3)) scrollToY(scrollY + m.top - 64, 0.8);
-}
+function pickSkill(s) { picked = s; paint(); showSkill(s); }
+hud.addEventListener("click", (e) => { const b = e.target.closest("[data-open]"); if (b) openFile(b.dataset.open); });
+const usedBy = (s) => P.filter((p) => p.skills.includes(s)).length;
+chips.innerHTML = [...SKILLS].sort((a, b) => usedBy(b) - usedBy(a)).map((s) => `<button type="button" data-skill="${esc(s)}">${esc(s)}</button>`).join("");
+chips.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) pickSkill(b.dataset.skill); });
 
 // one soft glow, drawn once and stamped wherever a dot needs one (blurring every dot each frame is slow)
 const GLOW = (() => {
@@ -322,8 +238,8 @@ function draw(t) {
   });
   edges.forEach((e) => {
     const ax = e.hub ? W / 2 : e.a.dx, ay = e.hub ? H / 2 : e.a.dy, bx = e.b.dx, by = e.b.dy;
-    const on = !!rel && (e.hub ? n === e.b : rel.has(e.a) && rel.has(e.b) && (n === e.a || n === e.b));
-    const dim = !!n && !on;
+    const on = !!rel && !e.hub && rel.has(e.a) && rel.has(e.b) && (n === e.a || n === e.b);
+    const dim = !!n && !on && !e.hub;
     const mx = (ax + bx) / 2 + (ay - by) * 0.12, my = (ay + by) / 2 + (bx - ax) * 0.12;
     ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo(mx, my, bx, by);
     ctx.strokeStyle = on ? "rgba(255,181,71,.65)" : dim ? "rgba(242,238,231,.035)" : e.hub ? "rgba(255,181,71,.16)" : "rgba(242,238,231,.07)";
@@ -333,19 +249,6 @@ function draw(t) {
       glow(u * u * ax + 2 * u * s * mx + s * s * bx, u * u * ay + 2 * u * s * my + s * s * by, on ? 7 : 4, on ? 1 : 0.6);
     });
   });
-  if (packet) {
-    // a bright packet with a short tail: out of the old project, through the hub, into the new one
-    const k = Math.min(1, (t - packet.t0) / 700), { a, b } = packet;
-    const at = (q) => { const s = q < 0.5 ? q * 2 : (q - 0.5) * 2, [x0, y0, x1, y1] = q < 0.5 ? [a.dx, a.dy, W / 2, H / 2] : [W / 2, H / 2, b.dx, b.dy], u = 1 - s;
-      const cx = (x0 + x1) / 2 + (y0 - y1) * 0.12, cy = (y0 + y1) / 2 + (x1 - x0) * 0.12;
-      return [u * u * x0 + 2 * u * s * cx + s * s * x1, u * u * y0 + 2 * u * s * cy + s * s * y1]; };
-    const e = easeIO(k);
-    for (let j = 0; j < 14; j++) {
-      const q = Math.max(0, e - j * 0.018), [x, y] = at(q);
-      glow(x, y, (j ? 9 : 18) * (1 - j / 16), (1 - j / 14) * (1 - Math.max(0, k - 0.85) / 0.15));
-    }
-    if (k >= 1) packet = null;
-  }
   for (let i = 0; i < 90; i++) {
     const a = (i / 90) * Math.PI * 2 + (reduce ? 0 : t * 0.0002), rr = 34 + Math.sin(i * 1.7 + t * 0.001) * 3;
     ctx.beginPath(); ctx.arc(W / 2 + Math.cos(a) * rr, H / 2 + Math.sin(a) * rr, 1.1, 0, 7); ctx.fillStyle = "rgba(255,181,71,.7)"; ctx.fill();
@@ -354,7 +257,7 @@ function draw(t) {
 }
 
 function boot() {
-  layout(); setCur(cur); requestAnimationFrame(draw);
+  layout(); paint(); showSkill(picked); requestAnimationFrame(draw);
   // a link like /#economy (the "All projects" pill on each project) comes back to that project on the globe
   const id = location.hash.slice(1), i = P.findIndex((p) => p.id === id);
   if (i >= 0) { scrollTo(0, 0); gopen(i); }
@@ -362,11 +265,11 @@ function boot() {
 let lastW = innerWidth, lastH = innerHeight, rt;
 addEventListener("resize", () => {
   // phones report a resize every time the address bar shrinks or grows while scrolling: only a real
-  // change of width (or a desktop window changing height) should rebuild the map and panel
+  // change of width (or a desktop window changing height) should rebuild the map
   if (innerWidth === lastW && (small() || Math.abs(innerHeight - lastH) < 120)) return;
   lastH = innerHeight;
   clearTimeout(rt);
-  rt = setTimeout(() => { lastW = innerWidth; layout(); lastShown = null; paint(); }, 200);
+  rt = setTimeout(() => { lastW = innerWidth; layout(); paint(); }, 200);
 });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(boot); else boot();
 
@@ -390,7 +293,7 @@ function pickRole(role, quiet) {
   $("tour-label").textContent = `Take the ${r[0]} tour`;
   try { sessionStorage.setItem("pf-role", role); } catch {}
   history.replaceState(null, "", `?for=${role}${location.hash}`);   // an address to paste into an application
-  if (W) { cur = 0; layout(); drawNames(); lastShown = null; setCur(0); }
+  if (W) { layout(); paint(); }
   if (G) { G.refresh(); G.dim(P.slice(0, 3).map((p) => p.id)); }
   drawGNames();
   // the globe turns to the best fit and lights the three that fit; the buttons stay put
@@ -414,7 +317,7 @@ function clearRole() {
   $("role-note").textContent = ""; $("role-note").classList.remove("set");
   $("tour-label").textContent = "Take the tour";
   history.replaceState(null, "", location.pathname + location.hash);
-  cur = 0; layout(); drawNames(); lastShown = null; setCur(0);
+  if (W) { layout(); paint(); }
   gclose(); if (G) { G.refresh(); G.dim(null); } drawGNames();
 }
 const ORIGINAL = P.map((p) => p.id);
@@ -444,7 +347,7 @@ let finale = false;
 try { finale = sessionStorage.getItem("pf-finale") === "1"; sessionStorage.removeItem("pf-finale"); } catch {}
 if (finale && $("finale").showModal) {
   setTimeout(() => { $("finale").showModal(); $("finale").classList.add("play"); }, reduce ? 0 : 650);
-  $("fin-close").addEventListener("click", () => { $("finale").close(); jumpTo($("work").getBoundingClientRect().top + scrollY, SECTION.work); });
+  $("fin-close").addEventListener("click", () => { $("finale").close(); jumpTo(0, SECTION.top); });
 }
 
 // ------------------------------------------------------------------ contact

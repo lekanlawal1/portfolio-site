@@ -45,8 +45,9 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 
 /* ---------------------------------------------------------------- the work */
 .work { position: relative; z-index: 3; background: var(--bg); border-top: 1px solid var(--line); }
-.pin { height: 100vh; height: 100svh; display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 8px 28px; padding: 86px 32px 22px; }
+.pin { min-height: 100vh; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr); grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px 28px; padding: 86px 32px 40px; }
+.chips { display: none; }
 .whead { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: end; gap: 24px; }
 .whead h2 { margin: 0; font: 500 clamp(36px, 4.4vw, 68px)/.95 "Inter Tight"; letter-spacing: -.04em; }
 .whead h2 i { color: var(--amber); }
@@ -66,7 +67,6 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .map.focus .node { opacity: .22; }
 .map.focus .node.lit { opacity: 1; }
 .node.p.lit .dot { background: var(--amber); transform: scale(1.35); }
-.node.p.cur b { color: var(--amber); }
 .node.s.lit { color: var(--amber); }
 .node:focus-visible { outline: 1px solid var(--amber); outline-offset: 4px; border-radius: 6px; }
 
@@ -81,9 +81,6 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .hud .bar span:last-child { color: var(--mut); }
 .hud h3 { margin: 0 0 6px; font: 500 clamp(30px, 2.8vw, 40px)/1 "Inter Tight"; letter-spacing: -.03em; }
 .hud p { margin: 0 0 12px; color: var(--ink2); font-size: 16px; }
-.hud .proof { margin: 0 0 12px; }
-.hud .proof b { font: 500 34px/1 "Inter Tight"; color: var(--amber); letter-spacing: -.03em; white-space: nowrap; }
-.hud .proof span { font-size: 14.5px; color: var(--ink2); line-height: 1.4; }
 .shot { display: block; position: relative; aspect-ratio: 16/9.5; border: 1px solid var(--line); background: #1a1816 center top / cover no-repeat; overflow: hidden; }
 .shot.phone { background-size: auto 100%; background-color: #E9E5DC; }
 .shot::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0 45%, rgba(255, 181, 71, .16) 50%, transparent 55%) 0 -100% / 100% 200% no-repeat;
@@ -98,13 +95,10 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .go a.o { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 .go a:hover { filter: brightness(1.08); }
 .go a.o:hover { border-color: var(--amber); }
-.steps { grid-column: 1 / -1; display: flex; align-items: center; gap: 18px; }
-.steps .line { flex: 1; height: 1px; background: var(--line); position: relative; }
-.steps .line i { position: absolute; left: 0; top: -1px; height: 3px; background: var(--amber); width: 0; }
-.steps .names { display: flex; gap: 14px; }
-.steps .names button { all: unset; cursor: pointer; color: var(--mut); transition: color .3s; }
-.steps .names button.on, .steps .names button:hover { color: var(--amber); }
-.phone-nav { display: none; }
+.stack button { font: 500 11.5px "JetBrains Mono"; border: 1px solid rgba(255, 181, 71, .35); padding: 4px 10px; color: var(--ink); background: none; cursor: pointer; }
+.stack button:hover, .stack button:focus-visible { border-color: var(--amber); color: var(--amber); }
+.chips button { font: 500 12px "JetBrains Mono"; border: 1px solid var(--line); padding: 8px 12px; color: var(--ink2); background: none; cursor: pointer; min-height: 40px; }
+.chips button.on { border-color: var(--amber); color: var(--amber); }
 
 /* ---------------------------------------------------------------- the rest */
 .receipts, .about, .contact { position: relative; z-index: 3; background: var(--bg); padding: 110px 32px; border-top: 1px solid var(--line); }
@@ -144,7 +138,6 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 @media (max-width: 1100px) {
   .pin { grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); }
   .node.s { font-size: 10.5px; }
-  .steps .names { display: none; }
 }
 @media (max-width: 900px) {
   .nav { padding: 16px 18px; }
@@ -154,18 +147,12 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   .c0 p { font-size: 17px; }
   .c1, .c2, .c3 { left: 18px; right: 18px; bottom: 13vh; text-align: left; }
   .prog { left: 18px; }
-  .pin { height: auto; display: block; padding: 80px 18px 50px; }
+  .pin { min-height: 0; display: block; padding: 80px 18px 50px; }
   .whead { flex-direction: column; align-items: flex-start; gap: 10px; }
   .whead p { text-align: left; }
-  .map { aspect-ratio: 1; margin: 10px auto 0; max-width: 560px; }
-  .node.s { display: none; }
-  .node.p b { font-size: 13px; white-space: normal; max-width: 96px; }
-  .node.p small { display: none; }
+  .map { display: none; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 14px; }
   .hud { margin-top: 10px; }
-  .steps { display: none; }
-  .phone-nav { display: flex; justify-content: center; align-items: center; gap: 22px; margin-top: 16px; }
-  .phone-nav button { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line); background: none; color: var(--ink); font-size: 20px; cursor: pointer; }
-  .phone-nav button:hover { border-color: var(--amber); color: var(--amber); }
   .receipts, .about, .contact { padding: 80px 18px; }
   .nums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nums > details:nth-child(3) { padding-left: 0; border-left: 0; }
@@ -178,7 +165,6 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 @media (max-width: 420px) {
   .nav .links a:nth-child(3) { display: none; }
   .hud { padding: 18px 16px; }
-  .hud .proof b { font-size: 28px; }
   .derby { border-radius: 16px; }
 }
 
@@ -219,17 +205,15 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   .hud { padding: 16px 18px 14px; }
   .hud h3 { font-size: 28px; }
   .hud p { font-size: 14.5px; margin-bottom: 8px; }
-  .hud .proof { margin-bottom: 8px; } .hud .proof b { font-size: 28px; } .hud .proof span { font-size: 13.5px; }
   .shot { max-height: 24vh; }
   .stack { margin: 8px 0 10px; } .stack span { font-size: 10.5px; padding: 1px 6px; }
   .go a { padding: 8px 12px; font-size: 12px; }
   .tour-here { display: none; }
 }
-/* the panel never grows past its row: the preview gives up height first */
+/* the readout never grows past its row */
 @media (min-width: 901px) {
   .hud { display: flex; flex-direction: column; max-height: 100%; }
   .hud > * { flex: 0 0 auto; }
-  .hud .shot { flex: 0 1 auto; min-height: 90px; max-height: none; height: auto; }
 }
 
 /* ---- hiring for: the role picker in the hero ---- */
@@ -249,9 +233,7 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 
 /* ---- the step bar's "next" hint ---- */
 
-/* ---- the project panel changing over ---- */
-.hud > * { transition: opacity .18s ease, transform .18s ease; }
-.hud.leaving > * { opacity: 0; transform: translateY(-8px); }
+/* ---- the readout changing over ---- */
 .hud.entering > * { animation: hin .55s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
 @keyframes hin { from { opacity: 0; transform: translateY(12px); } }
 
@@ -307,21 +289,13 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   .dock { transition: none; }
 }
 
-/* ---- phones and tablets: the work section as one screen: map, arrows, then the panel ---- */
+/* ---- phones and tablets ---- */
 @media (max-width: 900px) {
-  .pin { display: flex; flex-direction: column; }
-  .whead { order: 0; } .map { order: 1; } .phone-nav { order: 2; } .hud { order: 3; }
-  .map { aspect-ratio: 1.3; width: 100%; max-width: 620px; margin: 4px auto 0; }
-  .phone-nav { margin: 4px 0 12px; }
-  .hud.leaving > * { transform: translateX(calc(var(--sx, 0px) * -1)); }
-  .hud.entering > * { animation-name: hin-side; }
   /* the story's captions get a little shade so the particles never sit on top of the words */
   .beat::after { content: ""; position: absolute; inset: auto 0 0 0; height: 58%; z-index: -1; pointer-events: none;
     background: linear-gradient(to top, rgba(14, 13, 12, .92) 0 38%, rgba(14, 13, 12, .55) 70%, transparent); }
   .beat { isolation: isolate; }
 }
-@keyframes hin-side { from { opacity: 0; transform: translate(var(--sx, 0px), 6px); } }
-@media (max-width: 420px) { .map { aspect-ratio: 1.12; } .node.p b { font-size: 12.5px; max-width: 86px; } }
 .no-gl .beat::after { display: none; }
 
 /* =============================== the globe: the home page's centerpiece =============================== */
@@ -416,9 +390,6 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   .howi-stage { height: 230px; border-right: 0; border-bottom: 1px solid var(--line); }
 }
 
-/* the step bar's arrows (the section no longer pins: projects change on a click) */
-.sarrow { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: none; color: var(--ink); font-size: 15px; cursor: pointer; flex: none; }
-.sarrow:hover { border-color: var(--amber); color: var(--amber); }
 
 /* ---- a proof number is a receipt: tap it for how it was measured and where to check ---- */
 .proof summary, .nums summary { cursor: pointer; list-style: none; }

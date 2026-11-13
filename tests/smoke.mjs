@@ -7,7 +7,7 @@
 // 2. a spreadsheet with HTML in its date cells does not run that HTML, and numbers typed as text ("1,250") are read
 // 3. the warp does not leave the page covered when the browser blocks site data
 // 4. a project clip the browser won't autoplay becomes its screenshot, and Fine Print's keeps the phone style
-// 5. every proof number opens a receipt   6. ?for=role links and the three-stop tour
+// 5. every proof number opens a receipt   6. ?for=role links and the three-stop tour   7. the toolkit
 import { createServer } from "node:http";
 import { readFileSync, existsSync, statSync, readdirSync } from "node:fs";
 import { extname, join, normalize } from "node:path";
@@ -40,8 +40,8 @@ const pages = [];
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
 let failed = 0;
 const check = (name, ok, detail = "") => { if (!ok) failed++; console.log(`${ok ? "PASS" : "FAIL"} ${name}${detail ? "  " + detail : ""}`); };
-async function open(init) {
-  const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 } })).newPage();
+async function open(init, width = 1280) {
+  const page = await (await browser.newContext({ viewport: { width, height: 800 } })).newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   if (init) await page.addInitScript(init);
@@ -105,10 +105,6 @@ for (const rel of pages) {
   await page.waitForTimeout(1500);
   const globe = await page.evaluate(() => { const i = document.querySelector("#gfile .shot img"); return i ? i.className : null; });
   check("globe file: Fine Print falls back to its screenshot with the phone style", globe === "phone", `class: ${globe}`);
-  await page.evaluate(() => document.querySelector("#work").scrollIntoView());
-  await page.waitForTimeout(1200);
-  const map = await page.evaluate(() => { const i = document.querySelector("#hud .shot img"); return i ? i.className : null; });
-  check("map panel: the same project falls back with the phone style too", map === "phone", `class: ${map}`);
   check("no errors when autoplay is blocked", errors.length === 0, errors.join(" | "));
   await page.context().close();
 }
@@ -118,8 +114,10 @@ for (const rel of pages) {
   const { page, errors } = await open();
   await page.goto(`${base}/index.html`, { waitUntil: "load" });
   await page.waitForTimeout(1000);
-  await page.evaluate(() => document.querySelector("#hud .proof summary").click());
-  const panel = await page.evaluate(() => { const d = document.querySelector("#hud .proof"); return { open: d.open, text: d.querySelector(".receipt p").textContent.length, links: d.querySelectorAll(".receipt a").length }; });
+  await page.evaluate(() => document.querySelector('#gnames button[data-i="0"]').click());
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => document.querySelector("#gfile .proof summary").click());
+  const panel = await page.evaluate(() => { const d = document.querySelector("#gfile .proof"); return { open: d.open, text: d.querySelector(".receipt p").textContent.length, links: d.querySelectorAll(".receipt a").length }; });
   check("a project's proof number opens a receipt with a link", panel.open && panel.text > 80 && panel.links >= 1, JSON.stringify(panel));
   const strip = await page.evaluate(() => [...document.querySelectorAll(".nums details[data-p]")].map((d) => d.querySelectorAll(".receipt a").length));
   check("every number in the receipts strip has a receipt", strip.length === 4 && strip.every((n) => n >= 1), strip.join(","));
@@ -146,6 +144,27 @@ for (const rel of pages) {
   const tour = await page.evaluate(() => ({ order: JSON.parse(sessionStorage.getItem("pf-order")), on: sessionStorage.getItem("pf-tour") }));
   check("the tour is three stops, starting with the best fit for the role", tour.on === "1" && tour.order.length === 3 && tour.order[0] === "econ", JSON.stringify(tour));
   check("no errors on the role link or tour", errors.length === 0, errors.join(" | "));
+  await page.context().close();
+}
+
+// 7. the toolkit: skills wired to projects, and a project opens in one place, its file on the globe
+for (const [width, label] of [[1280, "laptop"], [390, "phone"]]) {
+  const { page, errors } = await open(undefined, width);
+  await page.goto(`${base}/index.html`, { waitUntil: "load" });
+  await page.waitForTimeout(1500);
+  const start = await page.evaluate(() => ({ title: document.querySelector("#hud h3").textContent, projects: document.querySelectorAll("#hud [data-open]").length,
+    map: getComputedStyle(document.getElementById("map")).display, chips: getComputedStyle(document.getElementById("chips")).display }));
+  check(`${label}: the toolkit opens on the skill behind the whole site`, start.title === "AI output checks" && start.projects === 5, JSON.stringify(start));
+  check(`${label}: ${width > 900 ? "the map is shown, not the buttons" : "skill buttons replace the map"}`,
+    width > 900 ? start.map !== "none" && start.chips === "none" : start.map === "none" && start.chips !== "none");
+  await page.evaluate(() => (getComputedStyle(document.getElementById("chips")).display !== "none"
+    ? document.querySelector('#chips button[data-skill="Python"]') : [...document.querySelectorAll("#map .node.s")].find((n) => n.textContent === "Python")).click());
+  check(`${label}: picking a skill lists the projects that use it`, (await page.evaluate(() => document.querySelector("#hud h3").textContent)) === "Python");
+  await page.evaluate(() => document.querySelector("#hud [data-open]").click());
+  await page.waitForTimeout(2800);
+  const file = await page.evaluate(() => ({ y: scrollY, shown: document.getElementById("gfile").classList.contains("show"), name: document.querySelector("#gfile h2")?.textContent }));
+  check(`${label}: a project from the list opens its file on the globe`, file.shown && file.y < 5 && file.name === "Canada Economy", JSON.stringify(file));
+  check(`${label}: no errors in the toolkit`, errors.length === 0, errors.join(" | "));
   await page.context().close();
 }
 
