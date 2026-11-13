@@ -168,6 +168,20 @@ for (const [width, label] of [[1280, "laptop"], [390, "phone"]]) {
   await page.context().close();
 }
 
+// 8. a stale cached projects.js (from before receipts and short ids) must not blank the page
+{
+  const { page, errors } = await open();
+  await page.route(/projects\.js/, async (route) => {
+    const res = await route.fetch();
+    await route.fulfill({ response: res, body: (await res.text()).replace(/receipt:/g, "oldReceipt:").replace(/short:/g, "oldShort:") });
+  });
+  await page.goto(`${base}/index.html`, { waitUntil: "load" });
+  await page.waitForTimeout(1500);
+  const seen = await page.evaluate(() => ({ hud: document.getElementById("hud").children.length, nodes: document.querySelectorAll("#map .node").length }));
+  check("an older projects.js does not blank the toolkit", seen.hud > 0 && seen.nodes > 0 && errors.length === 0, `${JSON.stringify(seen)} ${errors.join(" | ")}`);
+  await page.context().close();
+}
+
 await browser.close();
 server.close();
 console.log(failed ? `\n${failed} check(s) failed` : "\nall checks passed");

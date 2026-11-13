@@ -50,14 +50,14 @@ addEventListener("scroll", () => {
 const hero = $("top"), gfile = $("gfile");
 let G = null, gcur = -1, gT = 0;
 // what opens when a proof number is tapped: how it was measured, and where to check it
-const receiptHTML = (p) => `<div class="receipt"><p>${esc(p.receipt.how)}</p>${p.receipt.see.map(([t, u]) => `<a href="${u}">${esc(t)}</a>`).join("")}</div>`;
+const receiptHTML = (p) => !p.receipt ? "" : `<div class="receipt"><p>${esc(p.receipt.how)}</p>${p.receipt.see.map(([t, u]) => `<a href="${u}">${esc(t)}</a>`).join("")}</div>`;
 // the receipts strip lower down opens the same receipts from its numbers
 document.querySelectorAll(".nums [data-p]").forEach((d) => { const p = P.find((x) => x.id === d.dataset.p); if (p) d.insertAdjacentHTML("beforeend", receiptHTML(p)); });
 // the part of a project's panel that the globe's file and the map's panel share; they differ in the
 // header, the heading level and the picture's class
 function projectBody(p, i, h, shot) {
   return `<${h}>${esc(p.name)}</${h}><p>${esc(p.line)}</p>
-    <details class="proof"><summary><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}<em>See the proof</em></span></summary>${receiptHTML(p)}</details>
+    <details class="proof"><summary><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}${p.receipt ? "<em>See the proof</em>" : ""}</span></summary>${receiptHTML(p)}</details>
     <a class="${shot}" href="${p.live[1]}" aria-label="Open ${esc(p.name)}">${still
       ? `<img src="${p.img}" alt=""${p.phone ? ' class="phone"' : ""}>`
       : `<video src="assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${p.img}"`} autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>
@@ -134,7 +134,7 @@ const howiStep = (k) => {
 document.querySelector(".howi-steps").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; howiStep(+b.dataset.s); if (story) story.go(+b.dataset.s); });
 
 import("./vendor/three.module.min.js").then(async (THREE) => {
-  const [{ makeGlobe }, { makeStory }] = await Promise.all([import("./globe.js?v=20261114"), import("./story.js?v=20261113")]);
+  const [{ makeGlobe }, { makeStory }] = await Promise.all([import("./globe.js?v=20261116"), import("./story.js?v=20261113")]);
   G = makeGlobe(THREE, { hero, stage: $("stage"), projects: P, onPick: gopen,
     keepClear: () => { const r = $("intro").getBoundingClientRect(), t = hero.getBoundingClientRect(); return r.bottom - t.top + 8; } });
   if (gcur >= 0) G.focus(gcur);
