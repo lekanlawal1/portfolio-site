@@ -50,17 +50,21 @@ addEventListener("scroll", () => {
 // turns it to face you and zooms in; the file arrives as the zoom settles.
 const hero = $("top"), gfile = $("gfile");
 let G = null, gcur = -1, gT = 0;
+// what opens when a proof number is tapped: how it was measured, and where to check it
+const receiptHTML = (p) => `<div class="receipt"><p>${esc(p.receipt.how)}</p>${p.receipt.see.map(([t, u]) => `<a href="${u}">${esc(t)}</a>`).join("")}</div>`;
+// the receipts strip lower down opens the same receipts from its numbers
+document.querySelectorAll(".nums [data-p]").forEach((d) => { const p = P.find((x) => x.id === d.dataset.p); if (p) d.insertAdjacentHTML("beforeend", receiptHTML(p)); });
 // the part of a project's panel that the globe's file and the map's panel share; they differ in the
 // header, the heading level and the picture's class
 function projectBody(p, i, h, shot) {
   return `<${h}>${esc(p.name)}</${h}><p>${esc(p.line)}</p>
-    <div class="proof"><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}</span></div>
+    <details class="proof"><summary><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}<em>See the proof</em></span></summary>${receiptHTML(p)}</details>
     <a class="${shot}" href="${p.live[1]}" aria-label="Open ${esc(p.name)}">${still
       ? `<img src="${p.img}" alt=""${p.phone ? ' class="phone"' : ""}>`
       : `<video src="assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${p.img}"`} autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>
     <div class="stack">${p.skills.map((k) => `<span>${esc(k)}</span>`).join("")}</div>
     <div class="go"><a href="${p.live[1]}">${esc(p.live[0])} ↗</a>${p.study !== p.live[1] ? `<a class="o" href="${p.study}">Case study</a>` : ""}${p.download ? `<a class="o" href="${p.download}" download>Workbook</a>` : ""}${p.source ? `<a class="o" href="${p.source}">Source</a>` : ""}</div>
-    <a class="tour-here mono" href="${p.tour || p.live[1]}" data-tour="${p.id}">Tour from here: ${pad(i)} of ${pad(P.length - 1)}, then the rest →</a>`;
+    <a class="tour-here mono" href="${p.tour || p.live[1]}" data-tour="${p.id}">Tour from here: this one and the next two →</a>`;
 }
 function fileHTML(p, i) {
   return `<div class="top mono"><span>File ${pad(i)} // ${esc(p.kind)}</span><button type="button" class="x" aria-label="Close the file">&times;</button></div>` + projectBody(p, i, "h2", "shot");
@@ -375,17 +379,17 @@ const ROLES = {
   ops: ["Operations", ["discrepancy", "superstore", "docket", "sorted", "economy", "triage", "fine-print", "football"]],
 };
 const TOUR_ID = Object.fromEntries(Object.entries(VISIT_ID).map(([k, v]) => [v, k]));
-const saveOrder = () => { try { sessionStorage.setItem("pf-order", JSON.stringify(P.map((p) => TOUR_ID[p.id]))); } catch {} };
+const TOUR_STOPS = 3;   // the project the tour starts from and the next two in the current order
 function pickRole(role, quiet) {
   const r = ROLES[role]; if (!r) return;
   const byId = Object.fromEntries(P.map((p) => [p.id, p]));
   P.splice(0, P.length, ...r[1].map((id) => byId[id]).filter(Boolean));
   document.querySelectorAll("[data-role]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.role === role)));
-  $("role-note").innerHTML = `${esc(P[0].name)}, ${esc(P[1].name)} and ${esc(P[2].name)} first. <button type="button" id="role-clear">Show all</button>`;
+  $("role-note").innerHTML = `${esc(P[0].name)}, ${esc(P[1].name)} and ${esc(P[2].name)} first. <button type="button" id="role-clear">Show all</button><button type="button" id="role-copy">Copy link</button>`;
   $("role-note").classList.add("set");
   $("tour-label").textContent = `Take the ${r[0]} tour`;
   try { sessionStorage.setItem("pf-role", role); } catch {}
-  saveOrder();
+  history.replaceState(null, "", `?for=${role}${location.hash}`);   // an address to paste into an application
   if (W) { cur = 0; layout(); drawNames(); lastShown = null; setCur(0); }
   if (G) { G.refresh(); G.dim(P.slice(0, 3).map((p) => p.id)); }
   drawGNames();
@@ -396,35 +400,46 @@ function pickRole(role, quiet) {
 document.querySelectorAll("[data-role]").forEach((b) => b.addEventListener("click", () => {
   if (b.getAttribute("aria-pressed") === "true") clearRole(); else pickRole(b.dataset.role);
 }));
-$("role-note").addEventListener("click", (e) => { if (e.target.closest("#role-clear")) clearRole(); });
+$("role-note").addEventListener("click", async (e) => {
+  if (e.target.closest("#role-clear")) clearRole();
+  const c = e.target.closest("#role-copy");
+  if (!c) return;
+  try { await navigator.clipboard.writeText(location.href); c.textContent = "Copied"; setTimeout(() => { c.textContent = "Copy link"; }, 1600); } catch {}   // the address bar already holds it
+});
 function clearRole() {
   try { sessionStorage.removeItem("pf-role"); } catch {}
   const byId = Object.fromEntries(P.map((p) => [p.id, p]));
   P.splice(0, P.length, ...ORIGINAL.map((id) => byId[id]));
   document.querySelectorAll("[data-role]").forEach((b) => b.setAttribute("aria-pressed", "false"));
-  $("role-note").textContent = "Pick one and the globe turns to the work that fits."; $("role-note").classList.remove("set");
+  $("role-note").textContent = ""; $("role-note").classList.remove("set");
   $("tour-label").textContent = "Take the tour";
-  saveOrder(); cur = 0; layout(); drawNames(); lastShown = null; setCur(0);
+  history.replaceState(null, "", location.pathname + location.hash);
+  cur = 0; layout(); drawNames(); lastShown = null; setCur(0);
   gclose(); if (G) { G.refresh(); G.dim(null); } drawGNames();
 }
 const ORIGINAL = P.map((p) => p.id);
-try { const r = sessionStorage.getItem("pf-role"); if (r) pickRole(r, true); } catch {}
+// ?for=analyst (or bi, ai, ops) opens the page already set to that role
+{ let r = new URLSearchParams(location.search).get("for");
+  if (!ROLES[r]) { r = null; try { r = sessionStorage.getItem("pf-role"); } catch {} }
+  if (r) pickRole(r, true); }
 
 // ------------------------------------------------------------------ the tour
 // "Take the tour" warps into the first project; on every project the pill then shows a stop card,
-// the eight stops as a small constellation, and the way to the next one (portfolio-bar.js).
+// the three stops as a small constellation, and the way to the next one (portfolio-bar.js).
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-tour]");
   if (!b) return;
   e.preventDefault();
   const from = Math.max(0, P.findIndex((p) => p.id === b.dataset.tour));
-  try { sessionStorage.setItem("pf-tour", "1"); } catch {}
-  saveOrder();
-  const url = P[from].tour || P[from].live[1], label = `Stop ${from + 1} of ${P.length}|${P[from].name}`;
+  try {
+    sessionStorage.setItem("pf-tour", "1");
+    sessionStorage.setItem("pf-order", JSON.stringify(Array.from({ length: TOUR_STOPS }, (_, k) => TOUR_ID[P[(from + k) % P.length].id])));
+  } catch {}
+  const url = P[from].tour || P[from].live[1], label = `Stop 1 of ${TOUR_STOPS}|${P[from].name}`;
   if (WARP) WARP.out(url, { label }); else location.href = url;
 });
 
-// the end of the tour: the eight stops close into the ring, and a way to get in touch
+// the end of the tour: the stops close into the ring, and a way to get in touch
 let finale = false;
 try { finale = sessionStorage.getItem("pf-finale") === "1"; sessionStorage.removeItem("pf-finale"); } catch {}
 if (finale && $("finale").showModal) {

@@ -37,16 +37,15 @@
     <div class="intro" id="intro">
       <span class="mono">Lekan Lawal · Data, BI and AI · Canada</span>
       <h1 id="hero-title">Messy data in.<br><i>Trusted</i> tools out.</h1>
-      <p>Eight tools that check their own work. Turn the globe and pick a point, or tell me what you're hiring for.</p>
+      <p>Eight tools that check their own work, with a receipt behind every number.</p>
       <div class="roles" role="group" aria-labelledby="roles-label">
         <span class="mono" id="roles-label">Hiring for</span>
         <button type="button" data-role="analyst" aria-pressed="false">Data analyst</button><button type="button" data-role="bi" aria-pressed="false">BI</button><button type="button" data-role="ai" aria-pressed="false">AI engineer</button><button type="button" data-role="ops" aria-pressed="false">Operations</button>
       </div>
-      <p class="role-note mono" id="role-note" aria-live="polite">Pick one and the globe turns to the work that fits.</p>
+      <p class="role-note mono" id="role-note" aria-live="polite"></p>
       <div class="cta"><a class="go-tour" href="demos/fine-print/" data-tour="first"><span id="tour-label">Take the tour</span> <span aria-hidden="true">→</span></a><a class="go-work" href="#work">See all the work</a></div>
     </div>
     <div class="gbar">
-      <span class="hint mono" id="ghint"><b>Drag</b> to turn · <b>pick</b> a point</span>
       <div class="gnames" id="gnames"></div>
       <div class="garrows"><button type="button" id="gprev" aria-label="Previous project">←</button><button type="button" id="gnext" aria-label="Next project">→</button></div>
     </div>
@@ -71,10 +70,10 @@
   <section class="receipts" aria-labelledby="r-title">
     <h2 id="r-title" class="mono">The receipts</h2>
     <div class="nums">
-      <div><b>11/11</b><span>headline figures matching Statistics Canada's official releases</span></div>
-      <div><b>89</b><span>automatic checks that block a bad data update</span></div>
-      <div><b>0</b><span>wrong legal verdicts across Fine Print's 12-document test set</span></div>
-      <div><b>30/30</b><span>prompt-injection and data attacks stopped by The Gaffer</span></div>
+      <details data-p="economy"><summary><b>11/11</b><span>headline figures matching Statistics Canada's official releases<em>See the proof</em></span></summary></details>
+      <details data-p="economy"><summary><b>89</b><span>automatic checks that block a bad data update<em>See the proof</em></span></summary></details>
+      <details data-p="fine-print"><summary><b>0</b><span>wrong legal verdicts across Fine Print's 12-document test set<em>See the proof</em></span></summary></details>
+      <details data-p="football"><summary><b>30/30</b><span>prompt-injection and data attacks stopped by The Gaffer<em>See the proof</em></span></summary></details>
     </div>
     <a class="derby" href="https://dailyderby.app/" target="_blank" rel="noopener">
       <img src="assets/derby-mini.webp" width="240" height="360" alt="" loading="lazy">
@@ -132,9 +131,9 @@
 <!-- the end of the tour -->
 <dialog class="finale" id="finale" aria-labelledby="fin-title">
   <div class="fin-ring" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b>LL</b></div>
-  <p class="mono">Tour complete · 8 of 8</p>
-  <h2 id="fin-title">That's all eight.<br><i>Let's talk.</i></h2>
-  <p>Every one of them checks its own work. If that's what your team needs, I'd like to hear about it.</p>
+  <p class="mono">Tour complete · 3 of 3</p>
+  <h2 id="fin-title">That's the tour.<br><i>Let's talk.</i></h2>
+  <p>Every one of them checks its own work, and so do the other five on the map. If that's what your team needs, I'd like to hear about it.</p>
   <div class="fin-go">
     <button type="button" data-copy="lekan1553@gmail.com">Copy my email <small class="mono">lekan1553@gmail.com</small></button>
     <a href="https://www.linkedin.com/in/lekan-lawal/">LinkedIn</a>
@@ -143,7 +142,7 @@
   <button type="button" class="fin-close" id="fin-close">Back to the map</button>
 </dialog>
 
-<footer class="foot mono">© 2026 Lekan Lawal · Built by hand: Three.js, GSAP and plain JavaScript.</footer>
+<footer class="foot mono">© 2026 Lekan Lawal · Built by hand: Three.js, Lenis and plain JavaScript.</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="projects.js?v=20261113"></script>

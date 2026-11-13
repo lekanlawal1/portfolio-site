@@ -1,6 +1,6 @@
 /* The warp: the one transition used across the portfolio and every project it links to.
    Leaving, the page dims while amber particles stream in and close into a small ring with a label
-   ("Stop 4 of 8 · The Gaffer"). Arriving, the next page starts on that same ring, which bursts outward
+   ("Stop 2 of 3 · The Gaffer"). Arriving, the next page starts on that same ring, which bursts outward
    as the page fades in. Between pages on this site the browser's own cross-page transition (where
    supported) bridges the two, so it reads as one movement.
 

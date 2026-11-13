@@ -7,6 +7,7 @@
 // 2. a spreadsheet with HTML in its date cells does not run that HTML, and numbers typed as text ("1,250") are read
 // 3. the warp does not leave the page covered when the browser blocks site data
 // 4. a project clip the browser won't autoplay becomes its screenshot, and Fine Print's keeps the phone style
+// 5. every proof number opens a receipt   6. ?for=role links and the three-stop tour
 import { createServer } from "node:http";
 import { readFileSync, existsSync, statSync, readdirSync } from "node:fs";
 import { extname, join, normalize } from "node:path";
@@ -109,6 +110,42 @@ for (const rel of pages) {
   const map = await page.evaluate(() => { const i = document.querySelector("#hud .shot img"); return i ? i.className : null; });
   check("map panel: the same project falls back with the phone style too", map === "phone", `class: ${map}`);
   check("no errors when autoplay is blocked", errors.length === 0, errors.join(" | "));
+  await page.context().close();
+}
+
+// 5. receipts: every proof number opens how it was measured and a link to check it
+{
+  const { page, errors } = await open();
+  await page.goto(`${base}/index.html`, { waitUntil: "load" });
+  await page.waitForTimeout(1000);
+  await page.evaluate(() => document.querySelector("#hud .proof summary").click());
+  const panel = await page.evaluate(() => { const d = document.querySelector("#hud .proof"); return { open: d.open, text: d.querySelector(".receipt p").textContent.length, links: d.querySelectorAll(".receipt a").length }; });
+  check("a project's proof number opens a receipt with a link", panel.open && panel.text > 80 && panel.links >= 1, JSON.stringify(panel));
+  const strip = await page.evaluate(() => [...document.querySelectorAll(".nums details[data-p]")].map((d) => d.querySelectorAll(".receipt a").length));
+  check("every number in the receipts strip has a receipt", strip.length === 4 && strip.every((n) => n >= 1), strip.join(","));
+  const bad = await page.evaluate(() => window.PROJECTS.filter((p) => !p.receipt || !p.receipt.see.every(([, u]) => /^(https:\/\/|demos\/)/.test(u))).map((p) => p.id));
+  check("all eight projects carry a receipt with an https or local link", bad.length === 0, bad.join(","));
+  check("no errors on the receipts", errors.length === 0, errors.join(" | "));
+  await page.context().close();
+}
+
+// 6. a link per application, and a three-stop tour
+{
+  const { page, errors } = await open();
+  await page.goto(`${base}/index.html?for=ai`, { waitUntil: "load" });
+  await page.waitForTimeout(1200);
+  const set = await page.evaluate(() => ({ pressed: document.querySelector('[data-role="ai"]').getAttribute("aria-pressed"), first: window.PROJECTS[0].id, search: location.search }));
+  check("?for=ai opens the page set to that role", set.pressed === "true" && set.first === "fine-print" && set.search === "?for=ai", JSON.stringify(set));
+  await page.click('[data-role="bi"]');
+  check("picking another role updates the address", (await page.evaluate(() => location.search)) === "?for=bi");
+  await page.click("#role-clear");
+  check("Show all clears the role and the address", (await page.evaluate(() => location.search)) === "" && (await page.evaluate(() => document.querySelector('[data-role="bi"]').getAttribute("aria-pressed"))) === "false");
+  await page.goto(`${base}/index.html?for=analyst`, { waitUntil: "load" });
+  await page.waitForTimeout(1000);
+  await page.click(".go-tour");
+  const tour = await page.evaluate(() => ({ order: JSON.parse(sessionStorage.getItem("pf-order")), on: sessionStorage.getItem("pf-tour") }));
+  check("the tour is three stops, starting with the best fit for the role", tour.on === "1" && tour.order.length === 3 && tour.order[0] === "econ", JSON.stringify(tour));
+  check("no errors on the role link or tour", errors.length === 0, errors.join(" | "));
   await page.context().close();
 }
 

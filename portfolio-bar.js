@@ -25,9 +25,10 @@
     ["dock", "Docket", "https://lekanlawal1.github.io/docket/", "Drop in any PDF. Nothing leaves your device, so try a real one."],
     ["wh", "Discrepancy Checker", PORTFOLIO + "demos/discrepancy-checker/", "Change a blue number in the sheet and watch every check update."],
   ];
-  // the portfolio can reorder the tour for the role a visitor is hiring for
+  // the portfolio decides which stops the tour has (three, starting where the visitor chose)
   try { const order = JSON.parse(sessionStorage.getItem("pf-order") || "null");
-    if (Array.isArray(order)) STOPS = order.map((id) => STOPS.find((s) => s[0] === id)).filter(Boolean).concat(STOPS.filter((s) => !order.includes(s[0]))); } catch {}
+    const mine = Array.isArray(order) ? order.map((id) => STOPS.find((s) => s[0] === id)).filter(Boolean) : [];
+    if (mine.length) STOPS = mine; } catch {}
   const me = document.currentScript;
   // a page that loads this without data-project is recognised by its address
   const project = (me && me.dataset.project) || (STOPS.find(([, , url]) => location.href.startsWith(url)) || [])[0]
@@ -103,7 +104,7 @@
   backA.addEventListener("click", warp(back, `Back to the map|${at >= 0 ? STOPS[at][1] : "All projects"}`));
   pill.appendChild(backA);
   let card = null;
-  // on the tour: a small constellation of the eight stops, and the way to the next one
+  // on the tour: a small constellation of the stops, and the way to the next one
   if (touring && at >= 0) {
     const n = STOPS.length, w = 76, pts = STOPS.map((_, i) => [4 + (i * (w - 8)) / (n - 1), i % 2 ? 5 : 13]);
     const con = document.createElement("span");

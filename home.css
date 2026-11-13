@@ -81,7 +81,7 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .hud .bar span:last-child { color: var(--mut); }
 .hud h3 { margin: 0 0 6px; font: 500 clamp(30px, 2.8vw, 40px)/1 "Inter Tight"; letter-spacing: -.03em; }
 .hud p { margin: 0 0 12px; color: var(--ink2); font-size: 16px; }
-.hud .proof { display: flex; gap: 12px; align-items: baseline; margin: 0 0 12px; }
+.hud .proof { margin: 0 0 12px; }
 .hud .proof b { font: 500 34px/1 "Inter Tight"; color: var(--amber); letter-spacing: -.03em; white-space: nowrap; }
 .hud .proof span { font-size: 14.5px; color: var(--ink2); line-height: 1.4; }
 .shot { display: block; position: relative; aspect-ratio: 16/9.5; border: 1px solid var(--line); background: #1a1816 center top / cover no-repeat; overflow: hidden; }
@@ -110,8 +110,8 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .receipts, .about, .contact { position: relative; z-index: 3; background: var(--bg); padding: 110px 32px; border-top: 1px solid var(--line); }
 .receipts h2 { margin: 0 0 22px; color: var(--amber); font-weight: 500; }
 .nums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.nums div { padding: 26px 22px 24px 0; }
-.nums div + div { padding-left: 22px; border-left: 1px solid var(--line); }
+.nums > details { padding: 26px 22px 24px 0; }
+.nums > details + details { padding-left: 22px; border-left: 1px solid var(--line); }
 .nums b { display: block; font: 500 clamp(44px, 5vw, 76px)/1 "Inter Tight"; letter-spacing: -.04em; }
 .nums span { display: block; margin-top: 10px; color: var(--ink2); font-size: 15.5px; }
 .derby { display: inline-flex; align-items: center; gap: 16px; margin-top: 34px; text-decoration: none; padding: 10px 18px 10px 10px; border: 1px solid var(--line); border-radius: 999px; }
@@ -168,8 +168,8 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   .phone-nav button:hover { border-color: var(--amber); color: var(--amber); }
   .receipts, .about, .contact { padding: 80px 18px; }
   .nums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .nums div:nth-child(3) { padding-left: 0; border-left: 0; }
-  .nums div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .nums > details:nth-child(3) { padding-left: 0; border-left: 0; }
+  .nums > details:nth-child(n+3) { border-top: 1px solid var(--line); }
   .about { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .me { display: flex; gap: 16px; align-items: center; }
   .me img { width: 110px; }
@@ -241,6 +241,7 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .roles button[aria-pressed="true"] { background: rgba(255, 181, 71, .14); border-color: var(--amber); color: var(--amber); }
 .role-note { margin: 10px 0 0 !important; font-size: 11.5px !important; color: var(--mut) !important; pointer-events: auto; min-height: 1.5em; }
 .role-note.set { color: var(--amber) !important; }
+.role-note:empty { min-height: 0; margin: 0 !important; }
 .role-note button { all: unset; cursor: pointer; color: var(--ink2); text-decoration: underline; text-underline-offset: 3px; margin-left: 6px; }
 .cta { margin-top: 18px; }
 .cap[aria-hidden="true"] .roles, .cap[aria-hidden="true"] .role-note { pointer-events: none; }
@@ -351,8 +352,6 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .mk:focus-visible { outline: 1px solid var(--amber); outline-offset: 2px; }
 /* the bottom bar: hint, names, arrows */
 .gbar { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 14px; padding: 16px 32px 22px; }
-.gbar .hint { color: var(--mut); }
-.gbar .hint b { color: var(--amber); font-weight: 500; }
 .gnames { display: flex; gap: 12px; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
 .gnames button { all: unset; cursor: pointer; font: 500 12px "JetBrains Mono"; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
 .gnames button.on, .gnames button:hover, .gnames button:focus-visible { color: var(--amber); }
@@ -372,7 +371,7 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .gfile .x:hover { color: var(--ink); }
 .gfile h2 { margin: 10px 0 6px; font: 500 36px/1 "Inter Tight"; letter-spacing: -.03em; }
 .gfile p { margin: 0 0 12px; color: var(--ink2); font-size: 15.5px; }
-.gfile .proof { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+.gfile .proof { margin-bottom: 12px; }
 .gfile .proof b { font: 500 32px/1 "Inter Tight"; color: var(--amber); letter-spacing: -.03em; white-space: nowrap; }
 .gfile .proof span { font-size: 14px; color: var(--ink2); line-height: 1.4; }
 .gfile .shot { aspect-ratio: 16 / 10; }
@@ -420,3 +419,19 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 /* the step bar's arrows (the section no longer pins: projects change on a click) */
 .sarrow { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: none; color: var(--ink); font-size: 15px; cursor: pointer; flex: none; }
 .sarrow:hover { border-color: var(--amber); color: var(--amber); }
+
+/* ---- a proof number is a receipt: tap it for how it was measured and where to check ---- */
+.proof summary, .nums summary { cursor: pointer; list-style: none; }
+.proof summary::-webkit-details-marker, .nums summary::-webkit-details-marker { display: none; }
+.proof summary { display: flex; gap: 12px; align-items: baseline; }
+.proof summary em, .nums summary em { display: block; margin-top: 5px; font: 500 11px/1.2 "JetBrains Mono"; letter-spacing: .08em; text-transform: uppercase; font-style: normal; color: var(--amber); text-decoration: underline; text-underline-offset: 3px; }
+.receipt { margin: 12px 0 2px; padding: 2px 0 2px 14px; border-left: 2px solid var(--amber); }
+.receipt p { margin: 0 0 8px; color: var(--ink2); font-size: 14px; line-height: 1.5; }
+.receipt a { display: inline-block; margin: 0 16px 4px 0; color: var(--amber); font-size: 13.5px; }
+.nums .receipt { margin-top: 14px; }
+.proof summary:focus-visible, .nums summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; }
+@media (max-width: 560px) {   /* an open receipt needs the full width */
+  .nums { grid-template-columns: 1fr; }
+  .nums > details, .nums > details + details, .nums > details:nth-child(3) { padding-left: 0; border-left: 0; }
+  .nums > details + details { border-top: 1px solid var(--line); }
+}
