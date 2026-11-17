@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All projects | Lekan Lawal</title>
+<meta name="description" content="Lekan Lawal: data, BI and AI in Canada. Eight tools that check their own work, as one plain list with how each number was measured.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="page.css?v=20261106">
+<meta name="theme-color" content="#0E0D0C">
+<link rel="icon" href="assets/favicon.svg?v=3" type="image/svg+xml">
+<link rel="icon" href="assets/favicon-32.png?v=3" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=3">
+<style>
+/* The whole portfolio as one plain list: no globe, no WebGL, so it loads at once on any phone
+   and reads well to screen readers and search engines. Built from projects.js, like the globe. */
+.list-head { padding: 56px 0 30px; border-bottom: 1px solid var(--line); }
+.list-head h1 { font-size: clamp(34px, 5vw, 56px); font-weight: 500; letter-spacing: -.035em; line-height: 1.02; margin: 26px 0 6px; }
+.list-head .role { color: var(--amber); margin: 0 0 18px; }
+.list-head p { color: var(--ink2); max-width: 44rem; margin: 0; }
+.links-row { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; margin-top: 22px; }
+.links-row a, .acts a { display: inline-flex; align-items: center; min-height: 44px; }
+.btn { background: var(--amber); color: #111 !important; text-decoration: none; font-weight: 600; padding: 0 16px; }
+.files { list-style: none; margin: 0; padding: 0; }
+.files > li { padding: 36px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 80px; }
+.files h2 { font-size: clamp(28px, 3.6vw, 38px); font-weight: 500; letter-spacing: -.025em; margin: 6px 0 8px; }
+.files p { margin: 0; }
+.files .kind { color: var(--mut); }
+.files .line { color: var(--ink2); max-width: 46rem; }
+.proof { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin: 16px 0 !important; }
+.proof b { font-size: clamp(38px, 5vw, 52px); font-weight: 600; letter-spacing: -.03em; line-height: 1; color: var(--amber); }
+.proof span { color: var(--ink); max-width: 36rem; }
+details { border-left: 2px solid var(--amber); background: var(--bg-2); padding: 0 16px; margin: 0 0 14px; }
+details[open] { padding-bottom: 14px; }
+summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; color: var(--ink); }
+details p { color: var(--ink2); font-size: 16px; }
+details .see { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+details .see a { display: inline-flex; align-items: center; min-height: 40px; }
+.acts { display: flex; flex-wrap: wrap; gap: 4px 20px; align-items: center; margin-bottom: 12px; }
+.skills { color: var(--mut); text-transform: none; letter-spacing: .02em; }
+.skill-map { padding: 44px 0 20px; }
+.skill-map h2 { font-size: clamp(26px, 3.2vw, 34px); font-weight: 500; letter-spacing: -.02em; margin: 0 0 16px; }
+.skill-map dl { margin: 0; }
+.skill-map dl > div { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); gap: 4px 18px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.skill-map dt { color: var(--ink); }
+.skill-map dd { margin: 0; color: var(--ink2); }
+.list-foot { padding: 30px 0 80px; color: var(--ink2); }
+@media (max-width: 640px) {
+  .nav { padding: 14px 18px; }
+  .nav .links { gap: 16px; font-size: 14.5px; }
+  .wrap { padding: 0 18px; }
+  .skill-map dl > div { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <a class="name" href="./">Lekan Lawal</a>
+  <nav class="links" aria-label="Sections">
+    <a href="./#work">Toolkit</a><a href="resume.html">Résumé</a><a href="#contact">Contact</a><a href="list.html" aria-current="page">List view</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <header class="list-head">
+    <a class="backlink" href="./">Back to the globe</a>
+    <h1>Lekan Lawal</h1>
+    <p class="mono role">Data, BI and AI. Canada</p>
+    <p>Eight tools that check their own work. Under every number is how it was measured, and where you can check it yourself.</p>
+    <p class="links-row" id="contact">
+      <a class="btn" href="assets/Lekan_Lawal_Resume.pdf" download>Résumé PDF</a>
+      <a href="mailto:lekan1553@gmail.com">lekan1553@gmail.com</a>
+      <a href="https://www.linkedin.com/in/lekan-lawal/">LinkedIn</a>
+      <a href="https://github.com/lekanlawal1">GitHub</a>
+    </p>
+  </header>
+
+  <ol class="files" id="files"></ol>
+  <noscript><p>This list is built from the project data with JavaScript. The <a href="resume.html">résumé</a> lists every project without it.</p></noscript>
+
+  <section class="skill-map" id="skills" aria-labelledby="skills-title">
+    <h2 id="skills-title">Skills, and where I used them</h2>
+    <dl id="skill-map"></dl>
+  </section>
+
+  <footer class="list-foot">
+    <p>Email is the quickest way to reach me: <a href="mailto:lekan1553@gmail.com">lekan1553@gmail.com</a></p>
+  </footer>
+</main>
+
+<script src="projects.js?v=20261116"></script>
+<script>
+(() => {
+  const P = window.PROJECTS || [];
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const a = (href, text, extra = "") => `<a href="${esc(href)}"${extra}>${esc(text)}</a>`;
+
+  document.getElementById("files").innerHTML = P.map((p, i) => `
+    <li id="${esc(p.id)}"><article aria-labelledby="t-${esc(p.id)}">
+      <p class="mono kind">${i + 1} of ${P.length}, ${esc(p.kind)}</p>
+      <h2 id="t-${esc(p.id)}">${esc(p.name)}</h2>
+      <p class="line">${esc(p.line)}</p>
+      <p class="proof"><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}</span></p>
+      ${p.receipt ? `<details><summary>How I know</summary><p>${esc(p.receipt.how)}</p>
+        <p class="see">${p.receipt.see.map(([t, u]) => a(u, t)).join("")}</p></details>` : ""}
+      <p class="acts">
+        ${p.live ? a(p.live[1], p.live[0], ' class="btn"') : ""}
+        ${p.study ? a(p.study, "Case study") : ""}
+        ${p.download ? a(p.download, "Download the workbook", " download") : p.source ? a(p.source, "Source") : ""}
+      </p>
+      <p class="mono skills">${p.skills.map(esc).join(", ")}</p>
+    </article></li>`).join("");
+
+  // skill -> projects that use it, in the order skills first appear
+  const skills = [...new Set(P.flatMap((p) => p.skills))];
+  document.getElementById("skill-map").innerHTML = skills.map((s) => `<div><dt>${esc(s)}</dt><dd>${
+    P.filter((p) => p.skills.includes(s)).map((p) => a(`#${p.id}`, p.name)).join(", ")}</dd></div>`).join("");
+
+  // a link like list.html#economy lands on that project once the list exists
+  if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+})();
+</script>
+</body>
+</html>

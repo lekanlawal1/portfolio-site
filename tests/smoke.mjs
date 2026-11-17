@@ -182,6 +182,23 @@ for (const [width, label] of [[1280, "laptop"], [390, "phone"]]) {
   await page.context().close();
 }
 
+// 9. the list view: every project, with its receipt, on a phone with no sideways scroll; a deep link lands on its project
+{
+  const { page, errors } = await open(null, 390);
+  await page.goto(`${base}/list.html#economy`, { waitUntil: "load" });
+  await page.waitForTimeout(500);
+  const seen = await page.evaluate(() => ({
+    files: document.querySelectorAll("#files > li").length,
+    receipts: document.querySelectorAll("#files details").length,
+    skills: document.querySelectorAll("#skill-map > div").length,
+    side: document.documentElement.scrollWidth > innerWidth,
+    landed: Math.abs(document.getElementById("economy").getBoundingClientRect().top) < 120
+  }));
+  check("the list shows every project with its receipt, no sideways scroll, and #economy lands on it",
+    seen.files === 8 && seen.receipts === 8 && seen.skills > 10 && !seen.side && seen.landed && errors.length === 0, `${JSON.stringify(seen)} ${errors.join(" | ")}`);
+  await page.context().close();
+}
+
 await browser.close();
 server.close();
 console.log(failed ? `\n${failed} check(s) failed` : "\nall checks passed");
