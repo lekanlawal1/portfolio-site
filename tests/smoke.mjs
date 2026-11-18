@@ -185,13 +185,14 @@ for (const rel of pages) {
   const { page, errors } = await open(null, 1280);
   await page.route(/data\/letterboxd\.json/, (route) => route.fulfill({ json: { films: [
     { title: '<img src=x onerror="window.hacked=1">', year: "2024", rating: 3.5, url: "https://letterboxd.com/x/film/a/", poster: "https://a.ltrbxd.com/p.jpg" },
-    { title: "Se7en", year: "1995", rating: null, url: "https://letterboxd.com/x/film/se7en/", poster: "https://a.ltrbxd.com/q.jpg" } ] } }));
+    { title: "Se7en", year: "1995", rating: null, url: "https://letterboxd.com/x/film/se7en/", poster: "https://a.ltrbxd.com/q.jpg", review: '<b id="bold">loud</b> review' } ] } }));
   await page.goto(`${base}/index.html`, { waitUntil: "load" });
   await page.waitForTimeout(800);
   const seen = await page.evaluate(() => ({ shown: !document.getElementById("films").hidden, cards: document.querySelectorAll("#film-row li").length,
-    stars: document.querySelector("#film-row .stars")?.getAttribute("aria-label"), halves: document.querySelectorAll("#film-row .stars i").length, hacked: !!window.hacked }));
-  check("recently watched shows each film, half stars drawn, and titles stay text",
-    seen.shown && seen.cards === 2 && seen.stars === "3.5 out of 5" && seen.halves === 1 && !seen.hacked && errors.length === 0, `${JSON.stringify(seen)} ${errors.join(" | ")}`);
+    stars: document.querySelector("#film-row .stars")?.getAttribute("aria-label"), halves: document.querySelectorAll("#film-row .stars i").length, hacked: !!window.hacked || !!document.getElementById("bold"),
+    reviews: document.querySelectorAll("#film-row .review").length }));
+  check("recently watched shows each film, half stars drawn, and titles and reviews stay text",
+    seen.shown && seen.cards === 2 && seen.stars === "3.5 out of 5" && seen.halves === 1 && seen.reviews === 1 && !seen.hacked && errors.length === 0, `${JSON.stringify(seen)} ${errors.join(" | ")}`);
   await page.context().close();
 }
 

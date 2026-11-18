@@ -456,7 +456,7 @@ const stars = (r) => !r ? "" : `<span class="stars" role="img" aria-label="${r} 
 fetch("data/letterboxd.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).then((d) => {
   if (!d?.films?.length) return;
   $("film-row").innerHTML = d.films.map((f) => `<li><a href="${esc(f.url)}">
-    <img src="${esc(f.poster)}" alt="" width="300" height="450" loading="lazy" decoding="async">
+    <span class="poster"><img src="${esc(f.poster)}" alt="" width="300" height="450" loading="lazy" decoding="async">${f.review ? `<span class="review"><span>${esc(f.review)}</span></span>` : ""}</span>
     <b>${esc(f.title)} <small>${esc(f.year)}</small></b>${stars(f.rating)}</a></li>`).join("");
   $("films").hidden = false;
 }).catch(() => {});   // no list is fine: the section reads the same without it

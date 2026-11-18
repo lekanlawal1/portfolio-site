@@ -1,5 +1,5 @@
 // Saves my latest Letterboxd diary entries to data/letterboxd.json for the About section: poster,
-// title and rating only. Review text stays on Letterboxd (each poster links to it).
+// title, rating and the start of my review (the page shows it only when you point at the poster).
 // Letterboxd's feed can't be read from the page itself (it doesn't allow other sites to fetch it),
 // so a scheduled GitHub Action runs this and commits the result when it changes.
 //
@@ -24,12 +24,15 @@ const films = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map((m) => m[1])
   .map((item) => {
     const html = decode(tag(item, "description"));
     const poster = (html.match(/<img src="([^"]+)"/) || [])[1] || "";
+    const text = html.replace(/<img[^>]*>/g, "").replace(/<br\s*\/?>/g, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
     return {
       title: decode(tag(item, "letterboxd:filmTitle")),
       year: tag(item, "letterboxd:filmYear"),
       rating: Number(tag(item, "letterboxd:memberRating")) || null,   // 0.5 to 5, or none
       url: tag(item, "link"),
       poster: poster.replace(/-0-\d+-0-\d+-crop/, "-0-300-0-450-crop"),   // the 300 x 450 poster is about 25 KB
+      // a review marked as spoilers stays on Letterboxd; long ones are cut at a word
+      review: /^This review may contain spoilers/.test(text) ? "" : text.length > 90 ? text.slice(0, 90).replace(/\s+\S*$/, "") + "..." : text,
     };
   })
   // only Letterboxd's own pages and posters ever reach the site
