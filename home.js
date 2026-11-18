@@ -448,3 +448,15 @@ document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("clic
   try { await navigator.clipboard.writeText(b.dataset.copy); } catch { location.href = `mailto:${b.dataset.copy}`; return; }
   const s = b.querySelector("small"), was = s.textContent; s.textContent = "copied"; setTimeout(() => { s.textContent = was; }, 1600);
 }));
+
+// ------------------------------------------------------------------ recently watched, from Letterboxd
+// tools/letterboxd.mjs (run every few hours by a GitHub Action) keeps data/letterboxd.json fresh
+const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.4l2.65 5.4 5.95.86-4.3 4.2 1 5.93L12 17l-5.3 2.8 1-5.93-4.3-4.2 5.95-.86z"/></svg>';
+const stars = (r) => !r ? "" : `<span class="stars" role="img" aria-label="${r} out of 5">${STAR.repeat(Math.floor(r))}${r % 1 ? `<i>${STAR}</i>` : ""}</span>`;
+fetch("data/letterboxd.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).then((d) => {
+  if (!d?.films?.length) return;
+  $("film-row").innerHTML = d.films.map((f) => `<li><a href="${esc(f.url)}">
+    <img src="${esc(f.poster)}" alt="" width="300" height="450" loading="lazy" decoding="async">
+    <b>${esc(f.title)} <small>${esc(f.year)}</small></b>${stars(f.rating)}</a></li>`).join("");
+  $("films").hidden = false;
+}).catch(() => {});   // no list is fine: the section reads the same without it
