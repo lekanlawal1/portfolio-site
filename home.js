@@ -208,19 +208,8 @@ function zoomMap(i) {
   map.style.transformOrigin = `${n.x}px ${n.y}px`;
   map.animate([{ transform: "scale(1)" }, { transform: "scale(1.22)", offset: 0.42 }, { transform: "scale(1)" }], { duration: 950, easing: "cubic-bezier(.3,.7,.2,1)" });
 }
-// Changing project: the old panel lifts away, the new one settles in line by line, its name
-// resolving out of scrambled letters, while a packet of light travels the map between the two.
-const GLYPH = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/#%";
-function scramble(el, ms = 460) {
-  if (!el || reduce) return;
-  const text = el.textContent, t0 = performance.now();
-  const tick = (now) => {
-    const k = Math.min(1, (now - t0) / ms), n = Math.floor(k * text.length);
-    el.textContent = text.slice(0, n) + text.slice(n).replace(/\S/g, () => GLYPH[(Math.random() * GLYPH.length) | 0]);
-    if (k < 1) requestAnimationFrame(tick); else el.textContent = text;
-  };
-  requestAnimationFrame(tick);
-}
+// Changing project: the old panel slides out the way you're going and the new one settles in line by
+// line from the other side, while a packet of light travels the map between the two.
 let swapT = 0;
 function swapPanel(render, quick) {
   clearTimeout(swapT);
@@ -228,12 +217,20 @@ function swapPanel(render, quick) {
     hud.classList.remove("leaving"); render();
     [...hud.children].forEach((c, k) => c.style.setProperty("--i", k));
     hud.classList.remove("entering"); void hud.offsetWidth; hud.classList.add("entering");
-    scramble(hud.querySelector("h3")); scramble(hud.querySelector(".proof b"), 380);
     playOrStill(hud, P[cur]);
   };
   if (reduce || quick || !hud.children.length) { enter(); return; }
   hud.classList.add("leaving");
   swapT = setTimeout(enter, 190);
+}
+// the live preview leans a little toward the pointer, like a screen you could pick up (mouse only)
+if (!reduce && matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  hud.addEventListener("pointermove", (e) => {
+    const s = e.target.closest(".shot"); if (!s) return;
+    const r = s.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+    s.style.transform = `perspective(900px) rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 7).toFixed(2)}deg) scale(1.015)`;
+  });
+  hud.addEventListener("pointerout", (e) => { const s = e.target.closest(".shot"); if (s && !s.contains(e.relatedTarget)) s.style.transform = ""; });
 }
 let packet = null;   // { a, b, t0 }: light travelling from one project to another
 function send(from, to) {
@@ -259,7 +256,7 @@ function setCur(i) {
   if (i !== cur) {
     send(cur, i);
     const fwd = (i - cur + P.length) % P.length <= P.length / 2;
-    hud.style.setProperty("--sx", small() ? (fwd ? "34px" : "-34px") : "0px");
+    hud.style.setProperty("--sx", fwd ? "28px" : "-28px");
   }
   cur = i;
   $("count").textContent = $("pcount").textContent = `${pad(cur)} / ${pad(P.length - 1)}`;
