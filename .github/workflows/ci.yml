@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node --test tools/fine-print-demo/*.test.mjs
+      - run: node --test tools/fine-print-demo/*.test.mjs tests/letterboxd.test.mjs
       - run: npm install --no-save playwright@1.56.1
       - run: npx playwright install --with-deps chromium
       - run: node tests/smoke.mjs

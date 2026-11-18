@@ -469,6 +469,7 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   background: linear-gradient(to top, rgba(14, 13, 12, .96) 0 55%, rgba(14, 13, 12, .7)); opacity: 0; transition: opacity .2s; overflow: hidden; }
 #film-row .review > span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 7; overflow: hidden; }
 #film-row a:focus-visible .review { opacity: 1; }
+#film-row .bleep { display: inline-block; height: .95em; vertical-align: -.12em; background: #000; outline: 1px solid rgba(242, 238, 231, .25); }   /* a swear word, redacted */
 #film-row img { display: block; width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; background: var(--bg-2);
   outline: 1px solid rgba(255, 255, 255, .1); outline-offset: -1px; transition: box-shadow .3s; }
 #film-row b { display: block; margin-top: 10px; font: 500 14px/1.3 "Inter Tight"; }
