@@ -190,7 +190,10 @@ export function makeGlobe(THREE, { hero, stage, projects: P, onPick, keepClear }
       v.project(cam);
       const sx = (v.x + 1) / 2 * W, sy = (1 - v.y) / 2 * H;
       const off = sy < 64 || (S && sy < clearBelow) || sy > bottomLimit || sx < 6 || sx > W - (S ? 96 : 120) || (!S && open && sx > W - 480) || (open && camZ < base * 0.8 && i !== cur && !S);
-      marks[i].style.transform = `translate(${(sx - 12).toFixed(1)}px, ${(sy - 14).toFixed(1)}px)`;
+      // a label that would run off the right edge sits to the left of its point instead
+      const w = (marks[i].w ||= marks[i].offsetWidth), flip = sx - 12 + w > W - 8;
+      marks[i].style.transform = `translate(${(flip ? sx + 12 - w : sx - 12).toFixed(1)}px, ${(sy - 14).toFixed(1)}px)`;
+      marks[i].classList.toggle("flip", flip);
       marks[i].classList.toggle("back", back);
       marks[i].classList.toggle("off", off);
     });
@@ -198,5 +201,6 @@ export function makeGlobe(THREE, { hero, stage, projects: P, onPick, keepClear }
   }
   const gz = () => globe.position.z;
   requestAnimationFrame(frame);
+  document.fonts?.ready.then(() => marks.forEach((m) => { m.w = 0; }));   // label widths change once the web font is in
   return { focus, turn, release, refresh, dim, wasDrag: () => moved > 6 };
 }

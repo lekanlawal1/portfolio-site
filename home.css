@@ -176,6 +176,8 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 
 /* the hero's two ways in */
 .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; pointer-events: auto; }
+.arr { vertical-align: -0.15em; }
+.garrows button .arr { display: block; margin: auto; }
 .cta a { font: 600 13px "Inter Tight"; letter-spacing: .05em; text-transform: uppercase; text-decoration: none; padding: 13px 18px; }
 .go-tour { background: var(--amber); color: #1A1510; }
 .go-tour:hover { filter: brightness(1.08); }
@@ -243,9 +245,9 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   transform: translate(-50%, 140%); opacity: 0; transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .3s; box-shadow: 0 12px 30px rgba(0, 0, 0, .35); }
 .dock.on { transform: translate(-50%, 0); opacity: 1; }
 .dock a { text-decoration: none; color: var(--ink2); font: 500 14px "Inter Tight"; padding: 9px 14px; border-radius: 999px; display: inline-flex; align-items: center; }
-.dock a:hover, .dock a:focus-visible { color: var(--ink); background: rgba(255, 255, 255, .07); outline: none; }
+.dock a:hover, .dock a:focus-visible { color: var(--ink); background: rgba(255, 255, 255, .07); }
 .dock a.home svg { transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
-.dock a.home:hover svg { transform: rotate(90deg) scale(1.1); }
+@media (hover: hover) and (pointer: fine) { .dock a.home:hover svg { transform: rotate(90deg) scale(1.1); } }
 .foot { padding-bottom: 90px; }
 
 /* ---- the end of the tour ---- */
@@ -287,6 +289,10 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 @media (prefers-reduced-motion: reduce) {
   .hud.entering > *, .finale.play .fin-ring i, .finale.play .fin-ring b { animation: none; opacity: 1; }
   .dock { transition: none; }
+  /* the project panel and intro fade instead of sliding */
+  .gfile { transition: opacity .2s, visibility 0s .2s; }
+  .gfile.show, .hero .intro { transition: opacity .2s, visibility 0s; }
+  .hero.open .intro { transform: none; }
 }
 
 /* ---- phones and tablets ---- */
@@ -317,7 +323,8 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
 .mk i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--amber); background: rgba(14, 13, 12, .6); box-shadow: 0 0 12px rgba(255, 181, 71, .7); flex: none; transition: transform .3s, background .3s; }
 .mk span { text-shadow: 0 0 8px var(--bg), 0 0 3px var(--bg); }
 .mk small { font: 500 10.5px "JetBrains Mono"; color: var(--mut); }
-.mk:hover i { transform: scale(1.3); }
+@media (hover: hover) and (pointer: fine) { .mk:hover i { transform: scale(1.3); } }
+.mk.flip { flex-direction: row-reverse; }
 .mk.back { opacity: .16; pointer-events: none; }
 .mk.off { opacity: 0; visibility: hidden; pointer-events: none; }
 .mk.on i { background: var(--amber); transform: scale(1.35); }

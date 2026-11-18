@@ -63,7 +63,7 @@ function projectBody(p, i, h, shot) {
       : `<video src="assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${p.img}"`} autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>
     <div class="stack">${p.skills.map((k) => `<span>${esc(k)}</span>`).join("")}</div>
     <div class="go"><a href="${p.live[1]}">${esc(p.live[0])} ↗</a>${p.study !== p.live[1] ? `<a class="o" href="${p.study}">Case study</a>` : ""}${p.download ? `<a class="o" href="${p.download}" download>Workbook</a>` : ""}${p.source ? `<a class="o" href="${p.source}">Source</a>` : ""}</div>
-    <a class="tour-here mono" href="${p.tour || p.live[1]}" data-tour="${p.id}">Tour from here: this one and the next two →</a>`;
+    <a class="tour-here mono" href="${p.tour || p.live[1]}" data-tour="${p.id}">Tour from here: this one and the next two <svg class="arr" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>`;
 }
 function fileHTML(p, i) {
   return `<div class="top mono"><span>File ${pad(i)} // ${esc(p.kind)}</span><button type="button" class="x" aria-label="Close the file">&times;</button></div>` + projectBody(p, i, "h2", "shot");
