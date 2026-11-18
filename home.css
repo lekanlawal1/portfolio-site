@@ -458,8 +458,10 @@ canvas#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; 
   .hud.leaving > * { transform: none; }
 }
 
-/* ---- recently watched: posters from Letterboxd under the About text ---- */
-.films { margin-top: 40px; }
+/* ---- recently watched: posters from Letterboxd, under the contact links ---- */
+.films { margin-top: 8px; }
+.contact .films { grid-column: 2; }
+@media (max-width: 900px) { .contact .films { grid-column: auto; } }
 .films h3 { margin: 0 0 16px; font: 500 24px/1.15 "Inter Tight"; letter-spacing: -.02em; }
 #film-row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
 #film-row a { display: block; text-decoration: none; color: var(--ink); }
