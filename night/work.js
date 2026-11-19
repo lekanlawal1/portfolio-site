@@ -13,12 +13,19 @@ const receiptHTML = (p) => !p.receipt ? "" : `<div class="receipt"><p>${esc(p.re
 document.querySelectorAll(".nums [data-p]").forEach((d) => { const p = P.find((x) => x.id === d.dataset.p); if (p) d.insertAdjacentHTML("beforeend", receiptHTML(p)); });
 // the part of a project's panel that the globe's file and the map's panel share; they differ in the
 // header, the heading level and the picture's class
+// an iPhone app gets a line-drawn mockup: two phones in the same ink as the map, its real screens inside
+const SCREENS = { "fine-print": ["assets/fine-print/2-results.png", "assets/fine-print/5-detail-source.png"] };
+function phoneMock(p, shot) {
+  const screens = SCREENS[p.id] || [p.img];
+  return `<a class="${shot} mock" href="${U(p.live[1])}" aria-label="Open ${esc(p.name)}">${screens.map((src, k) =>
+    `<span class="device d${k}"><span class="screen"><img src="${U(src)}" alt="" loading="lazy"></span></span>`).join("")}<span class="mono">In the app</span></a>`;
+}
 function projectBody(p, i, h, shot) {
   return `<${h}>${esc(p.name)}</${h}><p class="meta">${esc(p.kind)} · ${i + 1} of ${P.length}</p><p>${esc(p.line)}</p>
     <details class="proof"><summary><b>${esc(p.proof[0])}</b><span>${esc(p.proof[1])}${p.receipt ? "<em>See the proof</em>" : ""}</span></summary>${receiptHTML(p)}</details>
-    <a class="${shot}" href="${U(p.live[1])}" aria-label="Open ${esc(p.name)}">${still
+    ${p.phone ? phoneMock(p, shot) : `<a class="${shot}" href="${U(p.live[1])}" aria-label="Open ${esc(p.name)}">${still
       ? `<img src="${U(p.img)}" alt=""${p.phone ? ' class="phone"' : ""}>`
-      : `<video src="../assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${U(p.img)}"`} autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>
+      : `<video src="../assets/previews/${p.id}.mp4" ${p.phone ? "" : `poster="${U(p.img)}"`} autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`}<span class="mono">Live preview</span></a>`}
     <div class="stack">${p.skills.map((k) => `<span>${esc(k)}</span>`).join("")}</div>
     <div class="go"><a href="${U(p.live[1])}">${esc(p.live[0])} <svg class="arr" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>${p.study !== p.live[1] ? `<a class="o" href="${U(p.study)}">Case study</a>` : ""}${p.download ? `<a class="o" href="${U(p.download)}" download>Workbook</a>` : ""}${p.source ? `<a class="o" href="${p.source}">Source</a>` : ""}</div>`;
 }
