@@ -212,14 +212,14 @@ function start() {
 
   // ------------------------------------------------------------------ buildings
   const PROJECTS = [
-    { id: "econ", color: "#E63946", x: 1.2, z: 1.2, w: 2, d: 2, name: "Canada Economy", sub: "Live StatCan data", href: "../projects/project5.html" },
-    { id: "store", color: "#FFB020", x: 5.0, z: 1.0, w: 3, d: 2, name: "Money Snitch", sub: "Who's taking your money?", href: "../projects/project1.html" },
-    { id: "triage", color: "#3E8BFF", x: 1.2, z: 3.9, w: 2.2, d: 2, name: "App Review Insights", sub: "Real App Store reviews", href: "../projects/app-reviews.html" },
-    { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "The Gaffer", sub: "Football questions in plain English", href: "../projects/football-agent.html" },
-    { id: "fine", color: "#FF4F8B", x: 4.0, z: 9.6, w: 1.7, d: 0.5, name: "Fine Print", sub: "iOS contract checker", href: "../projects/fine-print.html" },
-    { id: "wh", color: "#FF6B35", x: 8.0, z: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "../demos/discrepancy-checker/" },
-    { id: "dock", color: "#2E86AB", x: 9.9, z: 1.3, w: 1, d: 1, name: "Docket", sub: "Every PDF tool, private", href: "../projects/docket.html" },
-    { id: "sorted", color: "#8A4DFF", x: 1.3, z: 6.9, w: 2, d: 1.6, name: "Sorted", sub: "AI triage for bank support", href: "../projects/project2.html" },
+    { id: "econ", color: "#E63946", x: 1.2, z: 1.2, w: 2, d: 2, name: "Canada Economy", sub: "Live StatCan data", href: "projects/project5.html" },
+    { id: "store", color: "#FFB020", x: 5.0, z: 1.0, w: 3, d: 2, name: "Money Snitch", sub: "Who's taking your money?", href: "projects/project1.html" },
+    { id: "triage", color: "#3E8BFF", x: 1.2, z: 3.9, w: 2.2, d: 2, name: "App Review Insights", sub: "Real App Store reviews", href: "projects/app-reviews.html" },
+    { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "The Gaffer", sub: "Football questions in plain English", href: "projects/football-agent.html" },
+    { id: "fine", color: "#FF4F8B", x: 4.0, z: 9.6, w: 1.7, d: 0.5, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
+    { id: "wh", color: "#FF6B35", x: 8.0, z: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
+    { id: "dock", color: "#2E86AB", x: 9.9, z: 1.3, w: 1, d: 1, name: "Docket", sub: "Every PDF tool, private", href: "projects/docket.html" },
+    { id: "sorted", color: "#8A4DFF", x: 1.3, z: 6.9, w: 2, d: 1.6, name: "Sorted", sub: "AI triage for bank support", href: "projects/project2.html" },
   ];
   const animated = [];   // per-frame callbacks for small motions
   const BUILD = {
@@ -493,7 +493,7 @@ function start() {
   wrap.appendChild(label);
   const photo = document.createElement("div");
   photo.className = "t3-photo"; photo.setAttribute("aria-hidden", "true");
-  photo.innerHTML = '<img src="assets/lekan-sm.webp" width="240" height="240" alt=""><b>Lekan Lawal</b><span>Hi! Thanks for visiting.</span>';
+  photo.innerHTML = '<img src="night/assets/lekan-sm.webp" width="240" height="240" alt=""><b>Lekan Lawal</b><span>Hi! Thanks for visiting.</span>';
   wrap.appendChild(photo);
   let photoOn = false, bbPop = 0;
   function showPhoto(on) {

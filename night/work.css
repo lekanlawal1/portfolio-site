@@ -425,3 +425,129 @@ header.site {
 .ported .mock .screen img { position: static; display: block; width: 106%; height: auto; margin: -3.2% 0 0 -3%; object-fit: initial; }
 .ported .shot.mock > .mono { z-index: 3; }
 .ported .mock .device::before { display: none; }   /* the screens already show the camera cut-out */
+
+/* ---- the key under the map: every skill; point at one (or tap it) to circle its projects ---- */
+@media (min-width: 1181px) {
+  .ported .pin { grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr); grid-template-rows: auto auto auto; }
+  .ported .map { grid-column: 1; grid-row: 1; }
+  .ported .legend { grid-column: 1; grid-row: 2; }
+  .ported .hud { grid-column: 2; grid-row: 1 / span 2; }
+  .ported .steps { grid-column: 1 / -1; grid-row: 3; }
+}
+@media (max-width: 1180px) { .ported .legend { order: 1; } }
+.ported .legend { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 4px; margin: 4px 0 0; padding: 14px 18px; border-radius: 16px;
+  border: 1.5px dashed color-mix(in srgb, var(--map-ink) 45%, transparent); background: var(--map-paper); }
+.ported .legend-title { font: 400 16px "IM Fell English SC", Georgia, serif; color: var(--map-ink); margin-right: 8px; }
+.ported .legend .node.s { position: static; translate: none; transform: none !important; font: italic 400 15px/1.3 "IM Fell English", Georgia, serif; padding: 6px 8px;
+  color: color-mix(in srgb, var(--map-ink) 70%, transparent); text-shadow: none; border-radius: 6px; min-height: 32px; }
+.ported .legend .node.s:hover, .ported .legend .node.s.lit { color: var(--map-ink); text-decoration: underline; text-underline-offset: 3px; }
+.ported .legend.focus .node.s:not(.lit) { opacity: .45; }
+@media (prefers-reduced-motion: no-preference) { .ported .legend .node.s { transition: color .25s, opacity .25s; } }
+@media (max-width: 900px) { .ported .legend .node.s { display: inline-block; font-size: 14px; } .ported .legend { padding: 12px 14px; } }
+
+/* =============================== the shelf (replaces the map) =============================== */
+.ported .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 22px; }
+.ported .chip { font: 500 12.5px/1 "JetBrains Mono", monospace; padding: 9px 13px; min-height: 36px; border-radius: 999px; cursor: pointer; color: var(--ink-2);
+  border: 1px solid var(--glass-edge); background: linear-gradient(155deg, var(--glass-shine) -60%, var(--glass-tint) 45%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%); backdrop-filter: blur(14px) saturate(170%); transition: color .2s, background-color .2s, border-color .2s, scale .16s; }
+.ported .chip:hover { color: var(--ink); border-color: var(--accent); }
+.ported .chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.ported .chip:active { scale: .96; }
+.ported .filters:not(.all) .chip.extra { display: none; }
+.ported .chip.more { color: var(--accent); border-style: dashed; }
+.ported .shelf { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.ported .tile { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 190px; padding: 20px; text-align: left; cursor: pointer;
+  color: var(--ink); font: inherit; border-radius: 22px; transition: opacity .3s, translate .3s cubic-bezier(.23, 1, .32, 1), box-shadow .3s, border-color .3s; }
+.ported .lm { width: 46px; height: 46px; fill: none; stroke: var(--c); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ported .lm.sm { width: 26px; height: 26px; }
+.ported .tile b { font: 700 19px/1.15 "Bricolage Grotesque", "Inter", sans-serif; margin-top: 8px; }
+.ported .tile .k { color: var(--muted); font-size: 13.5px; }
+.ported .tile .pr { margin-top: auto; padding-top: 12px; display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.ported .tile .pr strong { font: 800 26px/1 "Bricolage Grotesque", "Inter", sans-serif; color: var(--accent); white-space: nowrap; }
+.ported .tile .pr small { color: var(--ink-2); font-size: 12.5px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ported .tile.dim { opacity: .3; }
+.ported .tile.sel { border-color: var(--accent) !important; box-shadow: 0 0 0 1px var(--accent), 0 18px 36px -18px rgba(0, 0, 0, .6) !important; }
+.ported .tile.seen::after { content: ""; position: absolute; top: 18px; right: 18px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .ported .tile:hover { translate: 0 -3px; } }
+.ported .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* glass on the shelf: cards, panel, table */
+.ported .tile, .ported .skill-table, .ported .table-toggle {
+  --glass-tint: rgba(255, 255, 255, .5); --glass-edge: rgba(255, 255, 255, .8); --glass-shine: rgba(255, 255, 255, .95); --glass-drop: rgba(29, 21, 53, .16);
+  background: linear-gradient(155deg, var(--glass-shine) -50%, var(--glass-tint) 40%); border: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: inset 0 1px 0 var(--glass-shine), 0 14px 34px -16px var(--glass-drop); }
+:root[data-theme="dark"] :is(.ported .tile, .ported .skill-table, .ported .table-toggle, .ported .chip) {
+  --glass-tint: rgba(38, 32, 25, .5); --glass-edge: rgba(255, 236, 205, .14); --glass-shine: rgba(255, 236, 205, .18); --glass-drop: rgba(0, 0, 0, .5); }
+.ported .chip { --glass-tint: rgba(255, 255, 255, .5); --glass-edge: rgba(29, 21, 53, .14); --glass-shine: rgba(255, 255, 255, .9); }
+/* the panel: full width under the shelf, words left and preview right */
+.ported .hud { margin-top: 22px; max-height: none; }
+@media (min-width: 901px) {
+  .ported .hud { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); column-gap: 36px; align-items: start; padding: 30px 32px; }
+  .ported .hud > * { grid-column: 1; }
+  .ported .hud > .shot { grid-column: 2; grid-row: 1 / span 6; margin: 0; aspect-ratio: 16 / 10; height: auto; max-height: none; min-height: 0; }
+}
+/* the table toggle and the table */
+.ported .table-toggle { display: inline-flex; align-items: center; gap: 10px; margin: 22px auto 0; padding: 12px 20px; min-height: 46px; border-radius: 999px; cursor: pointer;
+  color: var(--ink); font: 600 15px "Inter", sans-serif; transition: border-color .2s, scale .16s; }
+.ported .table-toggle:hover { border-color: var(--accent); }
+.ported .table-toggle:active { scale: .97; }
+.ported .table-toggle svg { color: var(--accent); }
+#projects .wrap { display: flex; flex-direction: column; }
+#projects .wrap > .table-toggle { align-self: center; }
+.ported .skill-table { margin-top: 18px; padding: 18px 20px 10px; border-radius: 22px; overflow-x: auto; }
+.ported .skill-table table { border-collapse: collapse; width: 100%; }
+.ported .skill-table th, .ported .skill-table td { padding: 9px 6px; text-align: center; border-bottom: 1px solid color-mix(in srgb, var(--ink) 9%, transparent); }
+.ported .skill-table tr:last-child > * { border-bottom: 0; }
+.ported .skill-table th.sk { height: 150px; vertical-align: bottom; padding: 0 2px 10px; }
+.ported .skill-table th.sk span { writing-mode: vertical-rl; rotate: 180deg; font: 500 11.5px "JetBrains Mono", monospace; color: var(--muted); white-space: nowrap; }
+.ported .skill-table th[scope="row"] { text-align: left; white-space: nowrap; }
+.ported .skill-table th[scope="row"] button, .ported .skill-table thead button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+  font: 700 16px "Bricolage Grotesque", "Inter", sans-serif; color: var(--ink); padding: 4px; border-radius: 8px; }
+.ported .skill-table th[scope="row"] button:hover { color: var(--accent); }
+.ported .skill-table button:focus-visible { outline: 2px solid var(--accent); }
+.ported .skill-table .d { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 55%, transparent); }
+.ported .skill-table .n { display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: color-mix(in srgb, var(--ink) 22%, transparent); }
+.ported .skill-table .hl { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.ported .skill-table th.sk.hl span { color: var(--accent); }
+.ported .skill-table .ct { font: 500 12px "JetBrains Mono", monospace; color: var(--muted); }
+/* phones and tablets: two cards a row; the table on its side (skills down, projects across) */
+@media (max-width: 1100px) { .ported .shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 900px) {
+  .ported .shelf { gap: 10px; }
+  .ported .tile { min-height: 158px; padding: 16px; border-radius: 18px; }
+  .ported .lm { width: 36px; height: 36px; }
+  .ported .tile b { font-size: 16.5px; }
+  .ported .tile .pr strong { font-size: 21px; }
+  .ported .tile .pr { flex-direction: column; gap: 3px; }
+  .ported .filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: -18px; padding: 2px 18px 8px; scrollbar-width: none; }
+  .ported .filters::-webkit-scrollbar { display: none; }
+  .ported .filters .chip { flex: none; }
+  .ported .filters .chip.extra { display: inline-block !important; }
+  .ported .filters .chip.more { display: none; }
+  .ported .skill-table { padding: 12px 8px 6px; }
+  .ported .skill-table th, .ported .skill-table td { padding: 7px 2px; }
+  .ported .skill-table thead th { position: sticky; top: 0; }
+  .ported .skill-table th[scope="row"] { font: 500 12px "JetBrains Mono", monospace; color: var(--ink-2); white-space: normal; padding-right: 6px; }
+  .ported .skill-table .d { width: 10px; height: 10px; }
+}
+@media (max-width: 380px) { .ported .tile .pr small { display: none; } }
+@media (prefers-reduced-motion: reduce) { .ported .tile, .ported .chip { transition: none; } .ported .tile:hover { translate: none; } }
+
+/* contact rows: back to solid cards, no glass */
+.contact-list li a, .contact-list li button, :root[data-theme="dark"] .contact-list li a, :root[data-theme="dark"] .contact-list li button {
+  background: var(--card) !important; -webkit-backdrop-filter: none; backdrop-filter: none; color: var(--ink) !important;
+  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent) !important; box-shadow: 0 6px 16px -10px rgba(0, 0, 0, .35) !important; }
+.contact-list li small { color: var(--muted) !important; }
+@media (max-width: 900px) {
+  .ported .skill-table table { table-layout: fixed; }
+  .ported .skill-table th[scope="row"] { width: 34%; font-size: 11px; line-height: 1.25; overflow-wrap: anywhere; }
+  .ported .skill-table thead .lm.sm { width: 22px; height: 22px; }
+  .ported .skill-table thead button { padding: 2px; }
+  .ported .skill-table th, .ported .skill-table td { padding: 6px 0; }
+}
+.contact-card { overflow: clip; }
+html { overflow-x: clip; }   /* the hero clouds and the contact circle drift past the edge on phones */
+@media (max-width: 900px) {
+  .ported .skill-table thead th:first-child { width: 38%; }
+  .ported .skill-table th[scope="row"] { overflow-wrap: normal; word-break: normal; hyphens: auto; }
+}

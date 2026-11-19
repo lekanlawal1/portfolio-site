@@ -34,7 +34,7 @@ window.PROJECTS = [
     live: ["Try it on any app", "https://lekanlawal1.github.io/app-review-insights/"], study: "projects/app-reviews.html", source: "https://github.com/lekanlawal1/app-review-insights",
     skills: ["JavaScript", "Gemini API", "AI output checks", "Cloudflare Workers", "GitHub Actions"] },
   { id: "docket", short: "dock", name: "Docket", kind: "PDF toolkit", line: "39 PDF and document tools that run entirely in your browser: merge, sign, redact, compare, OCR and convert. Nothing is uploaded.",
-    proof: ["38", "tools, and redaction is checked after the fact before anything is saved"],
+    proof: ["39", "tools, and redaction is checked after the fact before anything is saved"],
     receipt: { how: "Docket has 39 tools and all of them run in the browser. Redaction redraws the marked pages as pictures, reads the result back, and refuses to save if any redacted text can still be found. A browser test drives every tool with generated PDFs.", see: [["The end-to-end test", "https://github.com/lekanlawal1/docket/blob/main/tests/e2e.mjs"]] }, img: "assets/shots/docket.jpg",
     live: ["Use it now", "https://lekanlawal1.github.io/docket/"], study: "projects/docket.html", source: "https://github.com/lekanlawal1/docket",
     skills: ["JavaScript", "PDF parsing and OCR", "WebAssembly", "GitHub Actions", "Playwright"] },

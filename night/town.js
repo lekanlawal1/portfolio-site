@@ -237,14 +237,14 @@
   };
 
   const PROJECTS = [
-    { id: "econ", color: "#E63946", x: 1.2, y: 1.0, w: 2, d: 2, name: "Canada Economy", sub: "Live StatCan data", href: "../projects/project5.html" },
-    { id: "store", color: "#FFB020", x: 5.0, y: 0.8, w: 3, d: 2, name: "Money Snitch", sub: "Who's taking your money?", href: "../projects/project1.html" },
-    { id: "triage", color: "#3E8BFF", x: 1.0, y: 4.0, w: 2.2, d: 2, name: "App Review Insights", sub: "Real App Store reviews", href: "../projects/app-reviews.html" },
-    { id: "fifa", color: "#22C3A6", x: 4.8, y: 4.6, w: 3, d: 3, name: "The Gaffer", sub: "Football questions in plain English", href: "../projects/football-agent.html" },
-    { id: "fine", color: "#FF4F8B", x: 4.2, y: 9.2, w: 0.5, d: 1.7, name: "Fine Print", sub: "iOS contract checker", href: "../projects/fine-print.html" },
-    { id: "wh", color: "#FF6B35", x: 8.4, y: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "../demos/discrepancy-checker/" },
-    { id: "dock", color: "#2E86AB", x: 10.2, y: 1.4, w: 1, d: 1, name: "Docket", sub: "Every PDF tool, private", href: "../projects/docket.html" },
-    { id: "sorted", color: "#8A4DFF", x: 1.3, y: 6.9, w: 2, d: 1.6, name: "Sorted", sub: "AI triage for bank support", href: "../projects/project2.html" },
+    { id: "econ", color: "#E63946", x: 1.2, y: 1.0, w: 2, d: 2, name: "Canada Economy", sub: "Live StatCan data", href: "projects/project5.html" },
+    { id: "store", color: "#FFB020", x: 5.0, y: 0.8, w: 3, d: 2, name: "Money Snitch", sub: "Who's taking your money?", href: "projects/project1.html" },
+    { id: "triage", color: "#3E8BFF", x: 1.0, y: 4.0, w: 2.2, d: 2, name: "App Review Insights", sub: "Real App Store reviews", href: "projects/app-reviews.html" },
+    { id: "fifa", color: "#22C3A6", x: 4.8, y: 4.6, w: 3, d: 3, name: "The Gaffer", sub: "Football questions in plain English", href: "projects/football-agent.html" },
+    { id: "fine", color: "#FF4F8B", x: 4.2, y: 9.2, w: 0.5, d: 1.7, name: "Fine Print", sub: "iOS contract checker", href: "projects/fine-print.html" },
+    { id: "wh", color: "#FF6B35", x: 8.4, y: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "demos/discrepancy-checker/" },
+    { id: "dock", color: "#2E86AB", x: 10.2, y: 1.4, w: 1, d: 1, name: "Docket", sub: "Every PDF tool, private", href: "projects/docket.html" },
+    { id: "sorted", color: "#8A4DFF", x: 1.3, y: 6.9, w: 2, d: 1.6, name: "Sorted", sub: "AI triage for bank support", href: "projects/project2.html" },
   ];
 
   // keep only buildings that still exist (the old robot, "agent", merged into the stadium)
@@ -306,7 +306,7 @@
   const [px, py] = P(BB.x + 0.8, BB.y, 2.3);
   const photoTip = el("g", { class: "tip photo-tip" }, tipLayer);
   el("rect", { x: px - 62, y: py - 168, width: 124, height: 158, rx: 12 }, photoTip);
-  el("image", { href: "assets/lekan-sm.webp", x: px - 54, y: py - 160, width: 108, height: 108 }, photoTip);
+  el("image", { href: "night/assets/lekan-sm.webp", x: px - 54, y: py - 160, width: 108, height: 108 }, photoTip);
   el("text", { x: px, y: py - 34, "text-anchor": "middle" }, photoTip).textContent = "Lekan Lawal";
   el("text", { x: px, y: py - 19, "text-anchor": "middle", class: "sub" }, photoTip).textContent = "Thanks for visiting!";
   let billOn = false;

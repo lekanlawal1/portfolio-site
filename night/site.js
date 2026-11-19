@@ -138,14 +138,14 @@
 
     // the checklist: which projects are explored and which are left, opened from the counter
     const TOUR = [
-      { id: "fine", name: "Fine Print", href: "../projects/fine-print.html" },
-      { id: "dock", name: "Docket", href: "../projects/docket.html" },
-      { id: "econ", name: "Canada Economy", href: "../projects/project5.html" },
-      { id: "wh", name: "Discrepancy Checker", href: "../demos/discrepancy-checker/" },
-      { id: "store", name: "Money Snitch", href: "../projects/project1.html" },
-      { id: "triage", name: "App Review Insights", href: "../projects/app-reviews.html" },
-      { id: "fifa", name: "The Gaffer", href: "../projects/football-agent.html" },
-      { id: "sorted", name: "Sorted", href: "../projects/project2.html" },
+      { id: "fine", name: "Fine Print", href: "projects/fine-print.html" },
+      { id: "dock", name: "Docket", href: "projects/docket.html" },
+      { id: "econ", name: "Canada Economy", href: "projects/project5.html" },
+      { id: "wh", name: "Discrepancy Checker", href: "demos/discrepancy-checker/" },
+      { id: "store", name: "Money Snitch", href: "projects/project1.html" },
+      { id: "triage", name: "App Review Insights", href: "projects/app-reviews.html" },
+      { id: "fifa", name: "The Gaffer", href: "projects/football-agent.html" },
+      { id: "sorted", name: "Sorted", href: "projects/project2.html" },
     ];
     let panel = null;
     const drawPanel = () => {

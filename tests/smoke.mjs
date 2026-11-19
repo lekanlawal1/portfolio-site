@@ -84,7 +84,7 @@ for (const rel of pages) {
     Object.defineProperty(window, "sessionStorage", { configurable: true, get() { throw new DOMException("denied", "SecurityError"); } });
     Object.defineProperty(window, "localStorage", { configurable: true, get() { throw new DOMException("denied", "SecurityError"); } });
   });
-  await page.goto(`${base}/index.html`, { waitUntil: "load" });
+  await page.goto(`${base}/globe.html`, { waitUntil: "load" });
   await page.waitForTimeout(1500);
   const before = await page.evaluate(() => scrollY);
   await page.click('.nav a[href="#contact"]');
@@ -99,7 +99,7 @@ for (const rel of pages) {
 // 4. autoplay blocked: the clip becomes its screenshot, and the phone screenshot keeps its style
 {
   const { page, errors } = await open(() => { HTMLMediaElement.prototype.play = () => Promise.reject(new Error("autoplay blocked")); });
-  await page.goto(`${base}/index.html`, { waitUntil: "load" });
+  await page.goto(`${base}/globe.html`, { waitUntil: "load" });
   await page.waitForTimeout(1000);
   await page.click('#gnames button[data-i="0"]');
   await page.waitForTimeout(1500);
@@ -116,7 +116,7 @@ for (const rel of pages) {
 // 5. receipts: every proof number opens how it was measured and a link to check it
 {
   const { page, errors } = await open();
-  await page.goto(`${base}/index.html`, { waitUntil: "load" });
+  await page.goto(`${base}/globe.html`, { waitUntil: "load" });
   await page.waitForTimeout(1000);
   await page.evaluate(() => document.querySelector("#hud .proof summary").click());
   const panel = await page.evaluate(() => { const d = document.querySelector("#hud .proof"); return { open: d.open, text: d.querySelector(".receipt p").textContent.length, links: d.querySelectorAll(".receipt a").length }; });
@@ -132,7 +132,7 @@ for (const rel of pages) {
 // 6. a link per application, and a three-stop tour
 {
   const { page, errors } = await open();
-  await page.goto(`${base}/index.html?for=ai`, { waitUntil: "load" });
+  await page.goto(`${base}/globe.html?for=ai`, { waitUntil: "load" });
   await page.waitForTimeout(1200);
   const set = await page.evaluate(() => ({ pressed: document.querySelector('[data-role="ai"]').getAttribute("aria-pressed"), first: window.PROJECTS[0].id, search: location.search }));
   check("?for=ai opens the page set to that role", set.pressed === "true" && set.first === "fine-print" && set.search === "?for=ai", JSON.stringify(set));
@@ -140,7 +140,7 @@ for (const rel of pages) {
   check("picking another role updates the address", (await page.evaluate(() => location.search)) === "?for=bi");
   await page.click("#role-clear");
   check("Show all clears the role and the address", (await page.evaluate(() => location.search)) === "" && (await page.evaluate(() => document.querySelector('[data-role="bi"]').getAttribute("aria-pressed"))) === "false");
-  await page.goto(`${base}/index.html?for=analyst`, { waitUntil: "load" });
+  await page.goto(`${base}/globe.html?for=analyst`, { waitUntil: "load" });
   await page.waitForTimeout(1000);
   await page.click(".go-tour");
   const tour = await page.evaluate(() => ({ order: JSON.parse(sessionStorage.getItem("pf-order")), on: sessionStorage.getItem("pf-tour") }));
@@ -156,7 +156,7 @@ for (const rel of pages) {
     const res = await route.fetch();
     await route.fulfill({ response: res, body: (await res.text()).replace(/receipt:/g, "oldReceipt:").replace(/short:/g, "oldShort:") });
   });
-  await page.goto(`${base}/index.html`, { waitUntil: "load" });
+  await page.goto(`${base}/globe.html`, { waitUntil: "load" });
   await page.waitForTimeout(1500);
   const seen = await page.evaluate(() => ({ hud: document.getElementById("hud").children.length, nodes: document.querySelectorAll("#map .node").length }));
   check("an older projects.js does not blank the toolkit", seen.hud > 0 && seen.nodes > 0 && errors.length === 0, `${JSON.stringify(seen)} ${errors.join(" | ")}`);
@@ -186,7 +186,7 @@ for (const rel of pages) {
   await page.route(/data\/letterboxd\.json/, (route) => route.fulfill({ json: { films: [
     { title: '<img src=x onerror="window.hacked=1">', year: "2024", rating: 3.5, url: "https://letterboxd.com/x/film/a/", poster: "https://a.ltrbxd.com/p.jpg" },
     { title: "Se7en", year: "1995", rating: null, url: "https://letterboxd.com/x/film/se7en/", poster: "https://a.ltrbxd.com/q.jpg", review: '<b id="bold">loud</b> {bleep:4} review' } ] } }));
-  await page.goto(`${base}/index.html`, { waitUntil: "load" });
+  await page.goto(`${base}/globe.html`, { waitUntil: "load" });
   await page.waitForTimeout(800);
   const seen = await page.evaluate(() => ({ shown: !document.getElementById("films").hidden, cards: document.querySelectorAll("#film-row li").length,
     stars: document.querySelector("#film-row .stars")?.getAttribute("aria-label"), halves: document.querySelectorAll("#film-row .stars i").length, hacked: !!window.hacked || !!document.getElementById("bold"),
