@@ -18,6 +18,34 @@
 <script src="night/site.js?v=20261119"></script>
 </head>
 <body>
+<!-- a loading screen while the island builds (it can take a few seconds on a phone) -->
+<div id="boot" role="status" aria-live="polite">
+  <div class="boot-isle" aria-hidden="true"><i></i><i></i><i></i></div>
+  <p id="boot-text">Building the island...</p>
+</div>
+<style>
+#boot { position: fixed; inset: 0; z-index: 9999; display: grid; place-content: center; justify-items: center; gap: 18px; background: var(--bg, #0E0D0C);
+  color: var(--ink, #F2EEE7); font: 600 16px Inter, system-ui, sans-serif; transition: opacity .45s ease, visibility 0s .45s; }
+#boot.done { opacity: 0; visibility: hidden; }
+.boot-isle { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
+.boot-isle i { width: 14px; border-radius: 4px; background: var(--accent, #FFB547); animation: boot-rise 1.1s ease-in-out infinite; }
+.boot-isle i:nth-child(1) { height: 18px; } .boot-isle i:nth-child(2) { height: 34px; animation-delay: .15s; } .boot-isle i:nth-child(3) { height: 24px; animation-delay: .3s; }
+@keyframes boot-rise { 50% { transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .boot-isle i { animation: none; } }
+</style>
+<script>
+(() => {
+  const boot = document.getElementById("boot"), text = document.getElementById("boot-text");
+  const steps = ["Building the island...", "Loading the projects...", "Almost there..."];
+  let k = 0; const tick = setInterval(() => { if (k < steps.length - 1) text.textContent = steps[++k]; }, 1200);
+  const done = () => { clearInterval(tick); boot.classList.add("done"); };
+  // gone once the 3D island is on screen; without 3D (old phones, reduced motion) once the page has loaded
+  new MutationObserver((_, o) => { if (document.querySelector(".town-wrap.ready3d")) { o.disconnect(); setTimeout(done, 250); } })
+    .observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ["class"] });
+  addEventListener("load", () => setTimeout(done, 2500));
+  setTimeout(done, 8000);   // never stuck
+})();
+</script>
 
 <header class="site">
   <div class="wrap">
