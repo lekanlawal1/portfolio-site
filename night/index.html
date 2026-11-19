@@ -61,28 +61,10 @@
 
   <section id="projects" class="ported">
     <div class="wrap">
-      <div class="derby-rail">
-        <a class="derby-side" href="https://dailyderby.app/" target="_blank" rel="noopener">
-          <svg class="dtruck" viewBox="0 0 120 64" aria-hidden="true">
-            <line class="road" x1="0" y1="60" x2="120" y2="60"/>
-            <g class="body">
-              <rect x="8" y="8" width="66" height="38" rx="4" fill="#fff" stroke="currentColor" stroke-width="3"/>
-              <text x="41" y="32" text-anchor="middle">DERBY</text>
-              <path d="M74 18h18l12 14v14H74z" fill="#FF6B35" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
-              <path d="M80 23h10l7 8H80z" fill="#CDEBFF" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
-            </g>
-            <g class="wheels" fill="#1D1535"><circle cx="24" cy="50" r="7"/><circle cx="56" cy="50" r="7"/><circle cx="90" cy="50" r="7"/></g>
-          </svg>
-          <span class="kicker">Now building</span>
-          <b>Derby</b>
-          <span class="what">A daily football quiz. Ten questions a day, and you play for your club.</span>
-          <span class="go">Try it <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        </a>
-      </div>
       <h2 class="section">Eight builds, <i>one</i> toolkit.</h2>
-      <p class="section-sub">Each project is wired to the skills it uses. Click a project or use the arrows; point at a skill to see where it shows up.</p>
+      <p class="section-sub">The town from above. Each building is a project, and each signpost a skill, on the roads to every project that uses it. Click a building, or point at a signpost.</p>
       <div class="pin" id="pin">
-      <div class="map" id="map"><canvas id="lines" aria-hidden="true"></canvas><div class="hub" aria-hidden="true">LL</div></div>
+      <div class="map" id="map"><canvas id="lines" aria-hidden="true"></canvas></div>
       <aside class="hud" id="hud" aria-live="polite"></aside>
       <div class="steps"><button type="button" class="sarrow" id="sprev" aria-label="Previous project"><svg class="arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><span class="mono" id="count">01 / 08</span><button type="button" class="sarrow" id="snext" aria-label="Next project"><svg class="arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><span class="line"><i id="fill"></i></span><span class="names mono" id="names"></span></div>
       <div class="phone-nav"><button type="button" id="prev" aria-label="Previous project"><svg class="arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><span class="mono" id="pcount">01 / 08</span><button type="button" id="next" aria-label="Next project"><svg class="arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
@@ -151,6 +133,12 @@
     </div>
   </section>
 </main>
+
+<!-- Derby, small and out of the way: a glass chip in the corner once you're past the island -->
+<div class="derby-chip glass" id="derby-chip" hidden>
+  <a href="https://dailyderby.app/" target="_blank" rel="noopener"><img src="derby-icon.svg" width="28" height="28" alt=""><span><small>Also building</small><b>Derby</b></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+  <button type="button" aria-label="Hide Derby"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
 
 <footer class="site">
   <div class="wrap">© 2026 Lekan Lawal · Built by hand: Three.js and plain JavaScript.</div>

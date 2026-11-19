@@ -39,34 +39,80 @@ let seen = new Set();
 try { seen = new Set(JSON.parse(localStorage.getItem("town-visited") || "[]").map((v) => VISIT_ID[v]).filter(Boolean)); } catch {}
 let W = 0, H = 0, nodes = [], edges = [], cur = 0, hover = null;
 
+// The town from above: each project's building sits where it stands on the island, and each skill is a
+// signpost on the roads to the buildings that use it, so a skill several projects share ends up on a main
+// street between them. Grid units match town3d.js, where the island is 12 x 12.
+const SPOT = { econ: [2.2, 2.2, "#E63946"], store: [6.5, 2.0, "#FFB020"], triage: [2.3, 4.9, "#3E8BFF"], fifa: [6.3, 6.1, "#22C3A6"],
+  fine: [4.85, 9.6, "#FF4F8B"], wh: [9.5, 7.9, "#FF6B35"], dock: [10.2, 1.8, "#2E86AB"], sorted: [2.3, 7.7, "#8A4DFF"] };
+let isle = { x: 0, y: 0, s: 0 };
+const at = (gx, gz) => [isle.x + (gx / 12) * isle.s, isle.y + (gz / 12) * isle.s];
+// nudge the signposts apart, and off the buildings, until no two labels overlap; sizes are measured
+function spread(side) {
+  nodes.forEach((n) => { n.w = n.el.offsetWidth + 8; n.h = n.el.offsetHeight + 6; });
+  const signs = nodes.filter((n) => n.k === "s"), pad = 10;
+  for (let it = 0; it < 400; it++) {
+    let moved = false;
+    for (const a of signs) for (const o of nodes) {
+      if (a === o) continue;
+      const ox = (a.w + o.w) / 2 - Math.abs(a.x - o.x), oy = (a.h + o.h) / 2 - Math.abs(a.y - o.y);
+      if (ox <= 0 || oy <= 0) continue;
+      moved = true;
+      // push along the shorter overlap; a signpost moves, a building never does
+      const k = o.k === "s" ? 0.5 : 1;
+      // ...unless it's pinned against the island's top or bottom edge: then it slides along it
+      const minY = isle.y + a.h / 2 + pad, maxY = isle.y + side - a.h / 2 - pad, pinned = a.y <= minY + 0.5 || a.y >= maxY - 0.5;
+      if (ox < oy * 2.2 || pinned) a.x += Math.sign(a.x - o.x || 1) * ox * k; else a.y += Math.sign(a.y - o.y || 1) * oy * k;
+    }
+    for (const a of signs) {
+      a.x = Math.min(isle.x + side - a.w / 2 - pad, Math.max(isle.x + a.w / 2 + pad, a.x));
+      a.y = Math.min(isle.y + side - a.h / 2 - pad, Math.max(isle.y + a.h / 2 + pad, a.y));
+    }
+    if (!moved) break;
+  }
+  // anything still touching something: the nearest free spot, searched in widening rings
+  const hits = (a, x, y) => nodes.some((o) => o !== a && Math.abs(x - o.x) < (a.w + o.w) / 2 && Math.abs(y - o.y) < (a.h + o.h) / 2);
+  const inside = (a, x, y) => x - a.w / 2 >= isle.x + pad && x + a.w / 2 <= isle.x + side - pad && y - a.h / 2 >= isle.y + pad && y + a.h / 2 <= isle.y + side - pad;
+  for (const a of signs) {
+    if (!hits(a, a.x, a.y)) continue;
+    search: for (let r = 12; r < side / 2; r += 10) for (let k = 0; k < 16; k++) {
+      const x = a.x + Math.cos((k / 16) * Math.PI * 2) * r * 1.8, y = a.y + Math.sin((k / 16) * Math.PI * 2) * r;
+      if (inside(a, x, y) && !hits(a, x, y)) { a.x = x; a.y = y; break search; }
+    }
+  }
+}
 function layout() {
   const r = map.getBoundingClientRect(), dpr = Math.min(devicePixelRatio, 2);
   W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   map.querySelectorAll(".node").forEach((n) => n.remove()); nodes = []; edges = [];
-  const cx = W / 2, cy = H / 2, S = small();
+  const S = small(), side = Math.min(W, H) * (S ? 0.94 : 0.9);
+  isle = { x: (W - side) / 2, y: (H - side) / 2, s: side };
   P.forEach((p, i) => {
-    const a = -Math.PI / 2 + (i / P.length) * Math.PI * 2;
-    nodes.push({ k: "p", i, id: p.id, label: p.name, x: cx + Math.cos(a) * W * (S ? 0.36 : 0.27), y: cy + Math.sin(a) * H * (S ? 0.36 : 0.28), ph: Math.random() * 6 });
+    const [gx, gz, color] = SPOT[p.short] || [6, 6, "#999999"], [x, y] = at(gx, gz);
+    nodes.push({ k: "p", i, id: p.id, label: p.name, x, y, color, ph: Math.random() * 6 });
   });
-  if (!S) SKILLS.forEach((s, i) => {
-    const a = -Math.PI / 2 + ((i + 0.5) / SKILLS.length) * Math.PI * 2;
-    nodes.push({ k: "s", id: s, label: s, x: cx + Math.cos(a) * W * 0.41, y: cy + Math.sin(a) * H * 0.45, ph: Math.random() * 6 });
-  });
+  if (!S) {
+    const proj = nodes.filter((n) => n.k === "p");
+    SKILLS.forEach((sk, i) => {
+      const users = proj.filter((n) => P[n.i].skills.includes(sk));
+      let x = users.reduce((t, n) => t + n.x, 0) / users.length, y = users.reduce((t, n) => t + n.y, 0) / users.length;
+      if (users.length === 1) { const a = i * 2.4; x += Math.cos(a) * side * 0.12; y += Math.sin(a) * side * 0.1; }   // one project's own skill sits beside it
+      nodes.push({ k: "s", id: sk, label: sk, x, y, ph: Math.random() * 6 });
+    });
+  }
   nodes.forEach((n) => {
     const b = document.createElement("button"); b.type = "button"; n.el = b;
     b.className = `node ${n.k}${n.k === "p" && seen.has(n.id) ? " seen" : ""}`;
-    if (n.k === "p") { b.innerHTML = `<span class="dot"></span><b>${esc(n.label)}</b><small>${pad(n.i)}</small>`; b.setAttribute("aria-label", `${n.label}, project ${n.i + 1} of ${P.length}`); }
+    if (n.k === "p") { b.innerHTML = `<span class="dot" style="--c:${n.color}"></span><b>${esc(n.label)}</b>`; b.setAttribute("aria-label", `${n.label}, project ${n.i + 1} of ${P.length}`); }
     else { b.textContent = n.label; b.setAttribute("aria-label", `${n.label}: show the projects that use it`); }
-    // previews are for a mouse or the keyboard only: on a phone, Safari treats a tap that changes
-    // the page on "hover" as a hover and never sends the click, so a tap goes straight to the project
+    // previews are for a mouse or the keyboard only: on a phone a tap goes straight to the project
     b.addEventListener("pointerenter", (e) => { if (e.pointerType !== "mouse") return; hover = n; paint(); });
     b.addEventListener("focus", () => { if (!b.matches(":focus-visible")) return; hover = n; paint(); });
     b.addEventListener("click", () => { if (n.k === "p") { hover = null; go(n.i, true); } else { hover = n; paint(); } });
     map.appendChild(b);
   });
+  if (!S) spread(side);
   nodes.filter((n) => n.k === "p").forEach((p) => {
-    edges.push({ a: null, b: p, hub: true, q: [Math.random(), Math.random()] });
-    P[p.i].skills.forEach((s) => { const sn = nodes.find((n) => n.k === "s" && n.id === s); if (sn) edges.push({ a: p, b: sn, q: [Math.random(), Math.random(), Math.random()] }); });
+    P[p.i].skills.forEach((sk) => { const sn = nodes.find((n) => n.k === "s" && n.id === sk); if (sn) edges.push({ a: p, b: sn, q: [Math.random(), Math.random()] }); });
   });
 }
 map.addEventListener("pointerleave", (e) => { if (e.pointerType !== "mouse") return; hover = null; paint(); });
@@ -75,7 +121,7 @@ const shown = () => hover || nodes.find((n) => n.k === "p" && n.i === cur);
 function related(n) {
   if (!n) return null;
   const set = new Set([n]);
-  edges.forEach((e) => { if (e.a === n) set.add(e.b); if (e.b === n && e.a) set.add(e.a); if (e.hub && e.b === n) set.add(e.b); });
+  edges.forEach((e) => { if (e.a === n) set.add(e.b); if (e.b === n) set.add(e.a); });
   return set;
 }
 let lastShown = null;
@@ -200,43 +246,50 @@ new IntersectionObserver(([e]) => { mapVisible = e.isIntersecting; }).observe(ma
 // the map's lines follow the island's day or night
 const INK = () => (document.documentElement.dataset.theme === "light" ? "29,21,53" : "242,238,231");
 const AMB = () => (document.documentElement.dataset.theme === "light" ? "255,93,58" : "255,181,71");
+function rr(x, y, w, h, r, fill, stroke, lw) {
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, r);
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
+}
+// the island from above: soil edge, grass, the lake by Docket's boathouse and the ring road
+function ground() {
+  const day = document.documentElement.dataset.theme === "light", { x, y, s } = isle, r = s * 0.06;
+  rr(x, y + s * 0.03, s, s, r, day ? "#C98B5B" : "#2A1C11");
+  rr(x, y, s, s, r, day ? "#86D69A" : "#17291C");
+  const [lx, ly] = at(7.5, 1.35); rr(lx, ly, s * 0.2, s * 0.175, s * 0.05, day ? "#7FD0F5" : "#14313F");
+  const k = s * 0.07; rr(x + k, y + k, s - 2 * k, s - 2 * k, r * 0.7, null, day ? "#5B5872" : "#2B2A30", s * 0.035);
+  ctx.setLineDash([s * 0.02, s * 0.025]); rr(x + k, y + k, s - 2 * k, s - 2 * k, r * 0.7, null, day ? "#FFD66B" : "rgba(255,181,71,.35)", 1.5); ctx.setLineDash([]);
+}
 function draw(t) {
   if (!W || !mapVisible) { requestAnimationFrame(draw); return; }   // off screen: skip
   ctx.clearRect(0, 0, W, H);
+  ground();
   const n = shown(), rel = related(n);
   nodes.forEach((m) => {
-    const dx = reduce ? 0 : Math.sin(t * 0.0006 + m.ph) * 3, dy = reduce ? 0 : Math.cos(t * 0.0005 + m.ph) * 3;
-    m.dx = m.x + dx; m.dy = m.y + dy; m.el.style.transform = `translate(${m.dx}px, ${m.dy}px)`;
+    const dy = reduce || m.k === "p" ? 0 : Math.sin(t * 0.0008 + m.ph) * 1.5;   // signposts sway a little; buildings stay put
+    m.dx = m.x; m.dy = m.y + dy; m.el.style.transform = `translate(${m.dx}px, ${m.dy}px)`;
   });
+  // roads from each signpost to the buildings that use it; little lights travel the lit ones
   edges.forEach((e) => {
-    const ax = e.hub ? W / 2 : e.a.dx, ay = e.hub ? H / 2 : e.a.dy, bx = e.b.dx, by = e.b.dy;
-    const on = !!rel && (e.hub ? n === e.b : rel.has(e.a) && rel.has(e.b) && (n === e.a || n === e.b));
-    const dim = !!n && !on;
-    const mx = (ax + bx) / 2 + (ay - by) * 0.12, my = (ay + by) / 2 + (bx - ax) * 0.12;
+    const ax = e.a.dx, ay = e.a.dy, bx = e.b.dx, by = e.b.dy;
+    const on = !!rel && rel.has(e.a) && rel.has(e.b) && (n === e.a || n === e.b), dim = !!n && !on;
+    const mx = (ax + bx) / 2 + (ay - by) * 0.1, my = (ay + by) / 2 + (bx - ax) * 0.1;
     ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo(mx, my, bx, by);
-    ctx.strokeStyle = on ? `rgba(${AMB()},.65)` : dim ? `rgba(${INK()},.05)` : e.hub ? `rgba(${AMB()},.2)` : `rgba(${INK()},.1)`;
-    ctx.lineWidth = on ? 1.4 : 1; ctx.setLineDash(e.hub ? [] : [2, 5]); ctx.stroke(); ctx.setLineDash([]);
-    if (!dim) e.q.forEach((q) => {
-      const s = reduce ? q : (q + t * (on ? 0.00028 : 0.00009)) % 1, u = 1 - s;
-      glow(u * u * ax + 2 * u * s * mx + s * s * bx, u * u * ay + 2 * u * s * my + s * s * by, on ? 7 : 4, on ? 1 : 0.6);
+    ctx.lineCap = "round"; ctx.strokeStyle = on ? `rgba(${AMB()},.8)` : dim ? `rgba(${INK()},.05)` : `rgba(${INK()},.13)`;
+    ctx.lineWidth = on ? 3 : 2; ctx.stroke();
+    if (on) e.q.forEach((q) => {
+      const s = reduce ? q : (q + t * 0.00025) % 1, u = 1 - s;
+      glow(u * u * ax + 2 * u * s * mx + s * s * bx, u * u * ay + 2 * u * s * my + s * s * by, 7, 1);
     });
   });
   if (packet) {
-    // a bright packet with a short tail: out of the old project, through the hub, into the new one
-    const k = Math.min(1, (t - packet.t0) / 700), { a, b } = packet;
-    const at = (q) => { const s = q < 0.5 ? q * 2 : (q - 0.5) * 2, [x0, y0, x1, y1] = q < 0.5 ? [a.dx, a.dy, W / 2, H / 2] : [W / 2, H / 2, b.dx, b.dy], u = 1 - s;
-      const cx = (x0 + x1) / 2 + (y0 - y1) * 0.12, cy = (y0 + y1) / 2 + (x1 - x0) * 0.12;
-      return [u * u * x0 + 2 * u * s * cx + s * s * x1, u * u * y0 + 2 * u * s * cy + s * s * y1]; };
-    const e = easeIO(k);
+    // a bright packet with a short tail, straight from the old project's building to the new one's
+    const k = Math.min(1, (t - packet.t0) / 650), { a, b } = packet, e = easeIO(k);
     for (let j = 0; j < 14; j++) {
-      const q = Math.max(0, e - j * 0.018), [x, y] = at(q);
-      glow(x, y, (j ? 9 : 18) * (1 - j / 16), (1 - j / 14) * (1 - Math.max(0, k - 0.85) / 0.15));
+      const q = Math.max(0, e - j * 0.02);
+      glow(a.dx + (b.dx - a.dx) * q, a.dy + (b.dy - a.dy) * q, (j ? 9 : 18) * (1 - j / 16), (1 - j / 14) * (1 - Math.max(0, k - 0.85) / 0.15));
     }
     if (k >= 1) packet = null;
-  }
-  for (let i = 0; i < 90; i++) {
-    const a = (i / 90) * Math.PI * 2 + (reduce ? 0 : t * 0.0002), rr = 34 + Math.sin(i * 1.7 + t * 0.001) * 3;
-    ctx.beginPath(); ctx.arc(W / 2 + Math.cos(a) * rr, H / 2 + Math.sin(a) * rr, 1.1, 0, 7); ctx.fillStyle = `rgba(${AMB()},.7)`; ctx.fill();
   }
   requestAnimationFrame(draw);
 }
@@ -270,3 +323,12 @@ fetch("../data/letterboxd.json", { cache: "no-cache" }).then((r) => (r.ok ? r.js
   $("films").hidden = false;
 }).catch(() => {});   // no list is fine: the section reads the same without it
 
+// ------------------------------------------------------------------ Derby, in the corner
+{
+  const chip = $("derby-chip"), top = document.querySelector(".hero");
+  let gone = false;
+  try { gone = localStorage.getItem("derby-chip") === "hidden"; } catch {}
+  const place = () => { chip.hidden = gone || scrollY < (top ? top.offsetHeight * 0.7 : 400); };
+  if (chip && !gone) { addEventListener("scroll", place, { passive: true }); place(); }
+  chip?.querySelector("button").addEventListener("click", () => { gone = true; chip.hidden = true; try { localStorage.setItem("derby-chip", "hidden"); } catch {} });
+}
