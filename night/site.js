@@ -123,7 +123,6 @@
     // (an island building, a project card, or the page itself). Finishing unlocks the contact card.
     const quest = document.getElementById("quest");
     const BODY_TO_ID = { "c-econ": "econ", "c-store": "store", "c-triage": "triage", "c-fifa": "fifa", "c-fine": "fine", "c-wh": "wh", "c-dock": "dock" };
-    const CARD_TO_ID = { economy: "econ", superstore: "store", triage: "triage", football: "fifa", "fine-print": "fine", discrepancy: "wh", docket: "dock" };
     const readVisited = () => { try { return JSON.parse(localStorage.getItem("town-visited") || "[]"); } catch { return []; } };
     const markVisited = (id) => {
       if (window.Town) window.Town.visited.add(id);
@@ -133,19 +132,20 @@
     const here = Object.keys(BODY_TO_ID).find((c) => document.body.classList.contains(c));
     if (here && !document.querySelector(".archived")) markVisited(BODY_TO_ID[here]);
     document.addEventListener("click", (e) => {
-      const card = e.target.closest(".card[id] a")?.closest(".card[id]");
-      if (card && CARD_TO_ID[card.id]) markVisited(CARD_TO_ID[card.id]);
+      const panel = e.target.closest("#hud a") && document.getElementById("hud");   // the Work panel
+      if (panel && panel.dataset.short) markVisited(panel.dataset.short);
     });
 
     // the checklist: which projects are explored and which are left, opened from the counter
     const TOUR = [
       { id: "fine", name: "Fine Print", href: "../projects/fine-print.html" },
       { id: "dock", name: "Docket", href: "../projects/docket.html" },
-      { id: "econ", name: "Canada Economy Platform", href: "../projects/project5.html" },
+      { id: "econ", name: "Canada Economy", href: "../projects/project5.html" },
       { id: "wh", name: "Discrepancy Checker", href: "../demos/discrepancy-checker/" },
       { id: "store", name: "Money Snitch", href: "../projects/project1.html" },
       { id: "triage", name: "App Review Insights", href: "../projects/app-reviews.html" },
-      { id: "fifa", name: "Football Stats Agent", href: "../projects/football-agent.html" },
+      { id: "fifa", name: "The Gaffer", href: "../projects/football-agent.html" },
+      { id: "sorted", name: "Sorted", href: "../projects/project2.html" },
     ];
     let panel = null;
     const drawPanel = () => {
@@ -154,7 +154,7 @@
       panel.innerHTML = `
         <p class="tour-head">${done ? "Every project explored. Your reward is ready." : `Explore all ${TOUR.length} to unlock a surprise. ${TOUR.length - n} to go.`}</p>
         <ul>${TOUR.map((t) => `<li class="${v.has(t.id) ? "seen" : ""}">
-          <span class="tour-mark" aria-hidden="true">${v.has(t.id) ? "&#10003;" : ""}</span>
+          <span class="tour-mark" aria-hidden="true">${v.has(t.id) ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>' : ""}</span>
           <a href="${t.href}">${t.name}</a>
           <span class="tour-state">${v.has(t.id) ? "Explored" : "Not yet"}</span></li>`).join("")}</ul>
         ${done ? `<button type="button" class="btn primary tour-reward">Open your reward</button>` : ""}`;
@@ -223,7 +223,7 @@
         reward.className = "reward";
         reward.setAttribute("aria-labelledby", "reward-title");
         reward.innerHTML = `<div class="reward-card">
-          <button type="button" class="x" aria-label="Close">&times;</button>
+          <button type="button" class="x" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
           <p class="unlocked"><span class="stars">${"<i class=\"on\"></i>".repeat(window.Town ? window.Town.total : 6)}</span>Whole town explored</p>
           <div class="who"><span class="dot big" aria-hidden="true">LL</span>
             <div><h2 id="reward-title">Lekan Lawal</h2><p>Data, BI and AI · Canada</p></div></div>

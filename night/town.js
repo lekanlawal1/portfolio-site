@@ -136,7 +136,7 @@
       el("rect", { x: qx + 8, y: qy + 3.5, width: 6, height: 7, fill: "#fff", rx: 1 }, g);
       return 7.6;
     },
-    store(g, x, y) { // Superstore: shop with a striped awning
+    store(g, x, y) { // Money Snitch: shop with a striped awning
       box(g, x, y, 0, 3, 2, 1.9, "#FFF2D6");
       box(g, x - 0.05, y - 0.05, 1.9, 3.1, 2.1, 0.25, "#FFB020");
       for (let i = 0; i < 6; i++) {
@@ -149,7 +149,16 @@
       el("text", { x: sx, y: sy + 3, "text-anchor": "middle", "font-size": 11, "font-weight": 800, fill: "#1D1535", "font-family": "Bricolage Grotesque, Inter, sans-serif" }, g).textContent = "SHOP";
       return 3.4;
     },
-    triage(g, x, y) { // Ticket Triage: a post office with a sorting chute and a mailbox
+    sorted(g, x, y) { // Sorted: a sorting office with parcels by the door
+      box(g, x, y, 0, 2, 1.6, 1.5, "#F1E9FF");
+      box(g, x - 0.08, y - 0.08, 1.5, 2.16, 1.76, 0.25, "#8A4DFF");
+      windowsLeft(g, x, y, 0.3, 2, 1.6, 1.0, 2, 1);
+      windowsRight(g, x, y, 0.3, 2, 1.6, 1.0, 2, 1);
+      box(g, x + 2.15, y + 0.15, 0, 0.36, 0.36, 0.3, "#C9955F");
+      box(g, x + 2.15, y + 0.6, 0, 0.3, 0.3, 0.26, "#E0AE72");
+      return 2.1;
+    },
+    triage(g, x, y) { // App Review Insights: a post office with a mailbox and a floating envelope
       box(g, x, y, 0, 2.2, 2, 2.2, "#D9E8FF");
       box(g, x - 0.1, y - 0.1, 2.2, 2.4, 2.2, 0.3, "#3E8BFF");
       windowsLeft(g, x, y, 0.3, 2.2, 2, 1.5, 2, 1);
@@ -160,7 +169,7 @@
       box(g, x + 2.5, y + 1.6, 0, 0.35, 0.35, 0.7, "#3E8BFF");
       return 3.8;
     },
-    fifa(g, x, y) { // Football Stats Agent: a stadium with floodlights and a SQL scoreboard
+    fifa(g, x, y) { // The Gaffer: a stadium with floodlights and a SQL scoreboard
       box(g, x, y, 0, 3, 3, 0.5, "#E9E3D7");
       el("polygon", { points: pts([[x + 0.35, y + 0.35, 0.5], [x + 2.65, y + 0.35, 0.5], [x + 2.65, y + 2.65, 0.5], [x + 0.35, y + 2.65, 0.5]]), fill: "#3DBE6A", ...STROKE }, g);
       el("polyline", { points: pts([[x + 1.5, y + 0.35, 0.5], [x + 1.5, y + 2.65, 0.5]]), stroke: "#fff", "stroke-width": 1.6, fill: "none" }, g);
@@ -228,13 +237,14 @@
   };
 
   const PROJECTS = [
-    { id: "econ", color: "#E63946", x: 1.2, y: 1.0, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "../projects/project5.html" },
+    { id: "econ", color: "#E63946", x: 1.2, y: 1.0, w: 2, d: 2, name: "Canada Economy", sub: "Live StatCan data", href: "../projects/project5.html" },
     { id: "store", color: "#FFB020", x: 5.0, y: 0.8, w: 3, d: 2, name: "Money Snitch", sub: "Who's taking your money?", href: "../projects/project1.html" },
     { id: "triage", color: "#3E8BFF", x: 1.0, y: 4.0, w: 2.2, d: 2, name: "App Review Insights", sub: "Real App Store reviews", href: "../projects/app-reviews.html" },
-    { id: "fifa", color: "#22C3A6", x: 4.8, y: 4.6, w: 3, d: 3, name: "Football Stats Agent", sub: "Ask football in English", href: "../projects/football-agent.html" },
+    { id: "fifa", color: "#22C3A6", x: 4.8, y: 4.6, w: 3, d: 3, name: "The Gaffer", sub: "Football questions in plain English", href: "../projects/football-agent.html" },
     { id: "fine", color: "#FF4F8B", x: 4.2, y: 9.2, w: 0.5, d: 1.7, name: "Fine Print", sub: "iOS contract checker", href: "../projects/fine-print.html" },
     { id: "wh", color: "#FF6B35", x: 8.4, y: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "../demos/discrepancy-checker/" },
     { id: "dock", color: "#2E86AB", x: 10.2, y: 1.4, w: 1, d: 1, name: "Docket", sub: "Every PDF tool, private", href: "../projects/docket.html" },
+    { id: "sorted", color: "#8A4DFF", x: 1.3, y: 6.9, w: 2, d: 1.6, name: "Sorted", sub: "AI triage for bank support", href: "../projects/project2.html" },
   ];
 
   // keep only buildings that still exist (the old robot, "agent", merged into the stadium)
@@ -290,7 +300,7 @@
   box(billLift, BB.x, BB.y, 1.15, 1.65, 0.06, 0.95, "#FFF7EA", { left: "#FFF7EA", right: "#2E86AB", top: "#E6D9C3" });
   // the words sit on the board's front face, slanted along it
   const [fx, fy] = P(BB.x + 0.825, BB.y + 0.06, 1.5);
-  el("text", { class: "bill-text", transform: `matrix(${C30} 0.5 0 1 ${fx.toFixed(1)} ${fy.toFixed(1)})`, "text-anchor": "middle" }, billLift).textContent = "Hi! 👋";
+  el("text", { class: "bill-text", transform: `matrix(${C30} 0.5 0 1 ${fx.toFixed(1)} ${fy.toFixed(1)})`, "text-anchor": "middle" }, billLift).textContent = "Hi!";
   place(bill, BB.x, BB.y, 1.65, 0.1);
   // the photo card, above everything else
   const [px, py] = P(BB.x + 0.8, BB.y, 2.3);

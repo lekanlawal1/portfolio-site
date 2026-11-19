@@ -212,13 +212,14 @@ function start() {
 
   // ------------------------------------------------------------------ buildings
   const PROJECTS = [
-    { id: "econ", color: "#E63946", x: 1.2, z: 1.2, w: 2, d: 2, name: "Canada Economy Platform", sub: "Live StatCan data", href: "../projects/project5.html" },
+    { id: "econ", color: "#E63946", x: 1.2, z: 1.2, w: 2, d: 2, name: "Canada Economy", sub: "Live StatCan data", href: "../projects/project5.html" },
     { id: "store", color: "#FFB020", x: 5.0, z: 1.0, w: 3, d: 2, name: "Money Snitch", sub: "Who's taking your money?", href: "../projects/project1.html" },
     { id: "triage", color: "#3E8BFF", x: 1.2, z: 3.9, w: 2.2, d: 2, name: "App Review Insights", sub: "Real App Store reviews", href: "../projects/app-reviews.html" },
-    { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "Football Stats Agent", sub: "Ask football in English", href: "../projects/football-agent.html" },
+    { id: "fifa", color: "#22C3A6", x: 4.8, z: 4.6, w: 3, d: 3, name: "The Gaffer", sub: "Football questions in plain English", href: "../projects/football-agent.html" },
     { id: "fine", color: "#FF4F8B", x: 4.0, z: 9.6, w: 1.7, d: 0.5, name: "Fine Print", sub: "iOS contract checker", href: "../projects/fine-print.html" },
     { id: "wh", color: "#FF6B35", x: 8.0, z: 6.6, w: 3, d: 2.6, name: "Discrepancy Checker", sub: "Excel + browser tool", href: "../demos/discrepancy-checker/" },
     { id: "dock", color: "#2E86AB", x: 9.9, z: 1.3, w: 1, d: 1, name: "Docket", sub: "Every PDF tool, private", href: "../projects/docket.html" },
+    { id: "sorted", color: "#8A4DFF", x: 1.3, z: 6.9, w: 2, d: 1.6, name: "Sorted", sub: "AI triage for bank support", href: "../projects/project2.html" },
   ];
   const animated = [];   // per-frame callbacks for small motions
   const BUILD = {
@@ -231,7 +232,12 @@ function start() {
       const flagGeo = new THREE.PlaneGeometry(0.9, 0.5, 8, 2);
       const flagTex = textTexture((c, w, h) => {
         c.fillStyle = "#E63946"; c.fillRect(0, 0, w, h); c.fillStyle = "#fff"; c.fillRect(w * 0.25, 0, w * 0.5, h);
-        c.fillStyle = "#E63946"; c.font = `800 ${h * 0.62}px ${FONT}`; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("✦", w / 2, h / 2 + 2);
+        // a simple maple leaf, drawn: the right half, mirrored, plus a stem
+        const R = [[0, -1], [0.13, -0.62], [0.36, -0.74], [0.3, -0.3], [0.62, -0.44], [0.55, -0.18], [0.86, -0.02], [0.5, 0.14], [0.58, 0.4], [0.1, 0.3], [0.06, 0.6]];
+        const s = h * 0.36, cx = w / 2, cy = h / 2;
+        c.fillStyle = "#E63946"; c.beginPath();
+        [...R, ...R.slice().reverse().map(([x, y]) => [-x, y])].forEach(([x, y], i) => (i ? c.lineTo : c.moveTo).call(c, cx + x * s, cy + y * s));
+        c.closePath(); c.fill(); c.fillRect(cx - s * 0.05, cy + s * 0.55, s * 0.1, s * 0.4);
       }, 128, 64);
       const flag = mesh(flagGeo, new THREE.MeshStandardMaterial({ map: flagTex, side: THREE.DoubleSide, roughness: 0.9 }), g);
       flag.position.set(gx(p.x + 0.4) + 0.45, 6.95, gz(p.z + 0.4));
@@ -322,6 +328,16 @@ function start() {
       box(g, p.x + 2.25, p.z + 2.8, 0.45, 0.45, 0.4, 0xe0ae72, 0.45);
       return 3.3;
     },
+    sorted(g, p) {
+      // a sorting office: purple roof, parcels waiting by the door to be routed
+      box(g, p.x, p.z, 2, 1.6, 1.5, 0xf1e9ff);
+      box(g, p.x - 0.08, p.z - 0.08, 2.16, 1.76, 0.25, 0x8a4dff, 1.5);
+      windows(p.x, p.z, 2, 1.6, 0.3, 1.0, 2, 1);
+      box(g, p.x + 2.15, p.z + 0.15, 0.36, 0.36, 0.3, 0xc9955f);
+      box(g, p.x + 2.15, p.z + 0.6, 0.3, 0.3, 0.26, 0xe0ae72);
+      box(g, p.x + 2.18, p.z + 0.18, 0.3, 0.3, 0.24, 0xe0ae72, 0.3);
+      return 2.1;
+    },
     dock(g, p) {
       // a boathouse on the lake's shore, a pier out of its door and a sailboat tied up beside it
       box(g, p.x, p.z, 1, 1, 0.9, 0xf4ebdd);
@@ -380,7 +396,7 @@ function start() {
     c.fillStyle = "#FFC23C"; c.fillRect(0, h - 22, w, 22);
     c.fillStyle = "#1D1535"; c.textAlign = "center"; c.textBaseline = "middle";
     c.font = `800 ${h * 0.2}px ${FONT}`; c.fillText("Hi, I'm Lekan", w / 2, h * 0.38);
-    c.font = `600 ${h * 0.17}px ${FONT}`; c.fillText("👋 say hi", w / 2, h * 0.62);
+    c.font = `600 ${h * 0.17}px ${FONT}`; c.fillText("say hi", w / 2, h * 0.62);
   }, 256, 150);
   const plain = mat(0xfff7ea);
   const board = mesh(new THREE.BoxGeometry(1.3, 0.76, 0.08), [plain, plain, plain, plain, new THREE.MeshStandardMaterial({ map: boardTex, roughness: 0.85 }), mat(0x2e86ab)], billboard, { edges: true });
